@@ -1,13 +1,17 @@
+import Image from 'next/image'
+
 export default function Footer() {
   return (
-    <footer className="bg-gray-900/50 backdrop-blur-sm border-t border-gray-800/50 mt-24">
+    <footer className="bg-gray-900/50 backdrop-blur-sm border-t border-gray-800/50 mt-24" role="contentinfo">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           <div>
             <div className="mb-6">
-              <img 
+              <Image 
                 src="/images/CTDHUB.png" 
-                alt="CTDHub - Learn, Build, Earn" 
+                alt="CTDHub - Blockchain Learning Platform" 
+                width={160}
+                height={80}
                 className="h-20 w-auto"
               />
             </div>
@@ -18,21 +22,25 @@ export default function Footer() {
           
           <div>
             <h4 className="text-lg font-semibold text-white mb-6">Quick Links</h4>
-            <ul className="space-y-3">
-              <li><a href="/courses" className="text-gray-400 hover:text-[#FFC700] transition-colors duration-200 text-lg">Courses</a></li>
-              <li><a href="/quiz" className="text-gray-400 hover:text-[#FFC700] transition-colors duration-200 text-lg">Quiz</a></li>
-              <li><a href="/binno-ai" className="text-gray-400 hover:text-[#FFC700] transition-colors duration-200 text-lg">Binno AI</a></li>
-              <li><a href="/developer" className="text-gray-400 hover:text-[#FFC700] transition-colors duration-200 text-lg">Dev Area</a></li>
-            </ul>
+            <nav aria-label="Footer navigation">
+              <ul className="space-y-3">
+                <li><a href="/courses" className="text-gray-400 hover:text-[#FFC700] transition-colors duration-200 text-lg" aria-label="Browse blockchain courses">Courses</a></li>
+                <li><a href="/quiz" className="text-gray-400 hover:text-[#FFC700] transition-colors duration-200 text-lg" aria-label="Take knowledge quizzes">Quiz</a></li>
+                <li><a href="/binno-ai" className="text-gray-400 hover:text-[#FFC700] transition-colors duration-200 text-lg" aria-label="Chat with Binno AI assistant">Binno AI</a></li>
+                <li><a href="/developer" className="text-gray-400 hover:text-[#FFC700] transition-colors duration-200 text-lg" aria-label="Access developer tools">Dev Area</a></li>
+              </ul>
+            </nav>
           </div>
           
           <div>
             <h4 className="text-lg font-semibold text-white mb-6">Connect</h4>
-            <ul className="space-y-3">
-              <li><a href="#" className="text-gray-400 hover:text-[#FFC700] transition-colors duration-200 text-lg">Twitter</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-[#FFC700] transition-colors duration-200 text-lg">Discord</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-[#FFC700] transition-colors duration-200 text-lg">GitHub</a></li>
-            </ul>
+            <nav aria-label="Social media links">
+              <ul className="space-y-3">
+                <li><a href="#" className="text-gray-400 hover:text-[#FFC700] transition-colors duration-200 text-lg" aria-label="Follow us on Twitter" target="_blank" rel="noopener noreferrer">Twitter</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-[#FFC700] transition-colors duration-200 text-lg" aria-label="Join our Discord community" target="_blank" rel="noopener noreferrer">Discord</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-[#FFC700] transition-colors duration-200 text-lg" aria-label="View our GitHub repository" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+              </ul>
+            </nav>
           </div>
         </div>
         
