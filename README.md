@@ -1,6 +1,28 @@
 # CTDHub Platform - Rebuild
 
-Uma plataforma educacional blockchain moderna construída com Next.js 14, React 18 e integração BSC.
+# 🚀 CTDHUB Platform - Blockchain Learning Platform
+
+<div align="center">
+  <img src="public/images/CTDHUB.png" alt="CTDHUB" width="300" />
+  
+  <p><strong>A moderna plataforma de educação blockchain construída com Next.js 14</strong></p>
+  
+  [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/SEU_USUARIO/ctdhub-platform)
+  [![Next.js](https://img.shields.io/badge/Next.js-14.2.5-black)](https://nextjs.org/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://www.typescriptlang.org/)
+  [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.4+-38B2AC)](https://tailwindcss.com/)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+</div>
+
+## ✨ Características
+
+- 🎯 **Educação Blockchain Completa** - Cursos, quizzes e certificações
+- 🔗 **Integração Web3** - Conecte carteiras e interaja com contratos inteligentes
+- 🤖 **AI Assistant** - Binno AI para suporte personalizado
+- 🎨 **Design Moderno** - Interface responsiva e acessível
+- ⚡ **Performance** - Build otimizado de apenas 84.4 kB
+- 🔒 **Segurança** - Validação de ambiente e error boundaries
+- 📱 **Mobile First** - Totalmente responsivo para todos dispositivos
 
 ## 🚀 Características Principais
 
