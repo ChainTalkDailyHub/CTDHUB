@@ -307,7 +307,7 @@ export default function DeveloperPage() {
               </div>
             ) : (
               <p className="text-xl text-gray-400 mb-8 max-w-4xl mx-auto leading-relaxed">
-                Create and manage educational content for the CTDHub Platform. Build comprehensive courses or individual videos for the community.
+                Create and manage educational content for the CTDHUB Platform. Build comprehensive courses or individual videos for the community.
               </p>
             )}
             <WalletButton />

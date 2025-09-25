@@ -11,15 +11,15 @@ export default function Header() {
   return (
     <header className="bg-gray-900/80 backdrop-blur-md border-b border-gray-700/50 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-24">
           <Link href="/" className="flex items-center group">
             <Image 
               src="/images/CTDHUB.png" 
-              alt="CTDHub - Blockchain Learning Platform" 
-              width={120}
-              height={48}
+              alt="CTDHUB - Blockchain Learning Platform" 
+              width={200}
+              height={80}
               priority
-              className="h-12 w-auto hover:opacity-90 transition-opacity duration-300"
+              className="h-20 w-auto hover:opacity-90 transition-opacity duration-300"
             />
           </Link>
           

@@ -247,7 +247,7 @@ export default function Courses() {
                     
                     <div className="flex items-center justify-between">
                       <div className="text-sm text-gray-500">
-                        <span>By {course.creator || 'CTDHub Team'}</span>
+                        <span>By {course.creator || 'CTDHUB Team'}</span>
                       </div>
                       <a
                         href={`/courses/${course.slug}`}
