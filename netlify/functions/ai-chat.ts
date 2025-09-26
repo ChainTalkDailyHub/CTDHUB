@@ -38,7 +38,68 @@ const knowledgeBase = {
 const generateContextualResponse = (userMessage: string): string => {
   const message = userMessage.toLowerCase()
   
-  // Check for specific knowledge base matches
+  console.log('Processing message:', message)
+  
+  // Expanded keyword matching for more specific responses
+  
+  // Bitcoin questions
+  if (message.includes('bitcoin') || message.includes('btc')) {
+    return "₿ **Bitcoin** é a primeira e mais conhecida criptomoeda, criada por Satoshi Nakamoto em 2009. É uma moeda digital descentralizada que utiliza tecnologia blockchain para permitir transações peer-to-peer sem intermediários. Bitcoin usa o algoritmo de consenso Proof of Work (PoW) e tem um suprimento limitado de 21 milhões de moedas. É considerada 'ouro digital' e serve como reserva de valor."
+  }
+  
+  // Ethereum questions
+  if (message.includes('ethereum') || message.includes('eth') || message.includes('smart contract')) {
+    return "⟐ **Ethereum** é uma plataforma blockchain que permite criar contratos inteligentes (smart contracts) e aplicações descentralizadas (DApps). Criada por Vitalik Buterin, permite programar lógica complexa na blockchain. Ethereum usa sua própria linguagem de programação (Solidity) e está migrando do Proof of Work para Proof of Stake com o Ethereum 2.0."
+  }
+  
+  // DeFi questions  
+  if (message.includes('defi') || message.includes('yield') || message.includes('liquidity') || message.includes('staking')) {
+    return "🏦 **DeFi (Decentralized Finance)** refere-se a serviços financeiros construídos em blockchain que eliminam intermediários tradicionais. Inclui: lending/borrowing, DEXs, yield farming, liquidity mining, e staking. Permite ganhos passivos através de protocolos como Compound, Aave, Uniswap, e PancakeSwap. **Cuidado com riscos**: impermanent loss, smart contract bugs, e volatilidade."
+  }
+  
+  // NFT questions
+  if (message.includes('nft') || message.includes('token não fungível')) {
+    return "🎨 **NFTs (Non-Fungible Tokens)** são tokens únicos que representam propriedade digital de arte, colecionáveis, ou outros ativos digitais. Cada NFT tem características únicas e não pode ser dividido ou substituído por outro. São populares em marketplaces como OpenSea e podem ter utilidade em jogos, metaverso, e comunidades exclusivas."
+  }
+  
+  // Trading questions
+  if (message.includes('trading') || message.includes('investir') || message.includes('comprar') || message.includes('vender')) {
+    return "📈 **Trading de Criptomoedas** envolve compra e venda de ativos digitais. **Dicas importantes**: Faça sua própria pesquisa (DYOR), nunca invista mais do que pode perder, use stop-loss, diversifique seu portfólio, e entenda análise técnica e fundamental. Exchanges populares incluem Binance, Coinbase, e Kraken. **Sempre use autenticação de dois fatores!**"
+  }
+  
+  // Wallet questions
+  if (message.includes('wallet') || message.includes('carteira') || message.includes('metamask')) {
+    return "👛 **Wallets de Criptomoedas** armazenam suas chaves privadas e permitem gerenciar seus ativos. **Tipos**: Hot wallets (online) como MetaMask, Trust Wallet; Cold wallets (offline) como Ledger, Trezor. **Segurança essencial**: Nunca compartilhe sua seed phrase, use wallets oficiais, verifique endereços antes de enviar, e mantenha backups seguros."
+  }
+  
+  // Binance Smart Chain questions
+  if (message.includes('bsc') || message.includes('binance smart chain') || message.includes('bnb')) {
+    return "🟡 **Binance Smart Chain (BSC)** é uma blockchain compatível com Ethereum criada pela Binance. Oferece transações mais rápidas e baratas que Ethereum. Usa consenso Proof of Staked Authority (PoSA). Popular para DeFi com protocolos como PancakeSwap, Venus, e Alpaca Finance. Token nativo: BNB."
+  }
+  
+  // Greeting responses
+  if (message.includes('olá') || message.includes('oi') || message.includes('hello') || message.includes('hi')) {
+    return "👋 **Olá! Sou o Binno AI, seu assistente de blockchain!** Estou aqui para ajudar com tudo relacionado a criptomoedas, DeFi, trading, e tecnologia blockchain. Pode perguntar sobre Bitcoin, Ethereum, NFTs, wallets, ou qualquer dúvida sobre o mundo Web3. Como posso ajudar você hoje? 🚀"
+  }
+  
+  // Portuguese blockchain terms
+  if (message.includes('blockchain') || message.includes('criptomoeda') || message.includes('crypto')) {
+    return "⛓️ **Blockchain** é uma tecnologia de registro distribuído que mantém uma lista crescente de registros (blocos) ligados por criptografia. Cada bloco contém hash do bloco anterior, timestamp e dados de transação. **Características**: descentralização, imutabilidade, transparência, e consenso distribuído. É a base de todas as criptomoedas e aplicações Web3."
+  }
+  
+  // Help/assistance requests
+  if (message.includes('ajuda') || message.includes('help') || message.includes('como') || message.includes('what') || message.includes('o que')) {
+    return "🤖 **Como posso ajudar?** Sou especialista em blockchain e posso explicar sobre:\n\n" +
+           "💰 **Criptomoedas**: Bitcoin, Ethereum, altcoins\n" +
+           "🏦 **DeFi**: Protocolos, yield farming, staking\n" +
+           "📊 **Trading**: Estratégias, análise técnica\n" +
+           "👛 **Wallets**: MetaMask, hardware wallets\n" +
+           "🎨 **NFTs**: Criação, marketplaces, utilidades\n" +
+           "⛓️ **Tecnologia**: Smart contracts, consenso\n\n" +
+           "Digite sua pergunta específica! 😊"
+  }
+  
+  // Check original knowledge base for matches
   for (const [category, data] of Object.entries(knowledgeBase)) {
     if (data.keywords.some(keyword => message.includes(keyword))) {
       const randomResponse = data.responses[Math.floor(Math.random() * data.responses.length)]
@@ -46,13 +107,23 @@ const generateContextualResponse = (userMessage: string): string => {
     }
   }
   
-  // Default helpful response
-  return "🤖 **Binno AI aqui!** Estou aqui para ajudar com suas dúvidas sobre blockchain, CTD, DeFi e Web3. Pode perguntar sobre:\n\n" +
-         "• 🎓 **Educação Blockchain** - Conceitos fundamentais e avançados\n" +
-         "• 💰 **CTD Token & Platform** - Como funciona nosso ecossistema\n" +
-         "• 🔧 **Smart Contracts** - Análise e explicações técnicas\n" +
-         "• 📊 **DeFi Protocols** - Estratégias e análises de risco\n\n" +
-         "O que gostaria de aprender hoje? 🚀"
+  // More intelligent default response based on message analysis
+  if (message.length < 5) {
+    return "🤔 **Pergunta muito curta!** Pode ser mais específico? Por exemplo: 'O que é Bitcoin?', 'Como funciona DeFi?', ou 'Como criar uma wallet?'"
+  }
+  
+  if (message.includes('?')) {
+    return "❓ **Boa pergunta!** Embora eu não tenha uma resposta específica para isso, posso ajudar com tópicos relacionados a blockchain, criptomoedas, DeFi, NFTs, wallets, e trading. Pode reformular ou perguntar sobre um tópico mais específico?"
+  }
+  
+  // Final fallback
+  return "🤖 **Binno AI aqui!** Não entendi exatamente sua pergunta, mas estou aqui para ajudar! Posso explicar sobre:\n\n" +
+         "• 💰 **Bitcoin e Ethereum** - Como funcionam\n" +
+         "• 🏦 **DeFi** - Protocolos e estratégias\n" +
+         "• 📊 **Trading** - Dicas e análises\n" +
+         "• 👛 **Wallets** - Segurança e uso\n" +
+         "• 🎨 **NFTs** - Criação e mercados\n\n" +
+         "Faça uma pergunta mais específica! 🚀"
 }
 
 export const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
@@ -98,7 +169,25 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
       }
     }
 
-    const { messages } = JSON.parse(event.body) as { messages: ChatMessage[] }
+    console.log('Raw body:', event.body)
+    
+    let parsedBody
+    try {
+      parsedBody = JSON.parse(event.body)
+    } catch (parseError) {
+      console.error('JSON Parse Error:', parseError)
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ 
+          error: 'Invalid JSON in request body',
+          message: 'Request body must be valid JSON',
+          details: parseError instanceof Error ? parseError.message : 'Unknown parse error'
+        })
+      }
+    }
+
+    const { messages } = parsedBody as { messages: ChatMessage[] }
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return {

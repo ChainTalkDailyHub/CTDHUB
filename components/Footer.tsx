@@ -7,13 +7,27 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           <div>
             <div className="mb-6">
-              <Image 
-                src="/images/CTDHUB.png" 
-                alt="CTDHUB - Blockchain Learning Platform" 
-                width={200}
-                height={100}
-                className="h-24 w-auto"
-              />
+              <div className="relative">
+                <Image 
+                  src="/images/CTDHUB.png" 
+                  alt="CTDHUB - Blockchain Learning Platform" 
+                  width={200}
+                  height={100}
+                  className="h-24 w-auto"
+                  onError={(e) => {
+                    const target = e.target as HTMLElement;
+                    target.style.display = 'none';
+                    const fallback = target.nextElementSibling as HTMLElement;
+                    if (fallback) fallback.style.display = 'block';
+                  }}
+                />
+                <div 
+                  className="hidden h-24 flex items-center justify-center px-6 bg-gradient-to-r from-[#FFC700] to-yellow-500 text-black font-bold text-3xl rounded-lg"
+                  style={{ display: 'none' }}
+                >
+                  CTDHUB
+                </div>
+              </div>
             </div>
             <p className="text-gray-400 text-lg leading-relaxed">
               Your gateway to blockchain education and Web3 development.

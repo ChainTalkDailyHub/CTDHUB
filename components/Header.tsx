@@ -13,14 +13,28 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-24">
           <Link href="/" className="flex items-center group">
-            <Image 
-              src="/images/CTDHUB.png" 
-              alt="CTDHUB - Blockchain Learning Platform" 
-              width={200}
-              height={80}
-              priority
-              className="h-20 w-auto hover:opacity-90 transition-opacity duration-300"
-            />
+            <div className="relative">
+              <Image 
+                src="/images/CTDHUB.png" 
+                alt="CTDHUB - Blockchain Learning Platform" 
+                width={200}
+                height={80}
+                priority
+                className="h-20 w-auto hover:opacity-90 transition-opacity duration-300"
+                onError={(e) => {
+                  const target = e.target as HTMLElement;
+                  target.style.display = 'none';
+                  const fallback = target.nextElementSibling as HTMLElement;
+                  if (fallback) fallback.style.display = 'block';
+                }}
+              />
+              <div 
+                className="hidden h-20 flex items-center justify-center px-6 bg-gradient-to-r from-[#FFC700] to-yellow-500 text-black font-bold text-2xl rounded-lg hover:opacity-90 transition-opacity duration-300"
+                style={{ display: 'none' }}
+              >
+                CTDHUB
+              </div>
+            </div>
           </Link>
           
           <nav className="hidden md:flex items-center space-x-8">
