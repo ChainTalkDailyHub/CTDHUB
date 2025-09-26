@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import WalletButton from '../../components/WalletButton';
-import { GlobalStorage } from '@/lib/globalStorage';
 
 // Declare Ethereum interface for TypeScript
 declare global {
@@ -241,26 +240,9 @@ export default function DeveloperPage() {
       creatorProfile: developerProfile
     };
 
-    // Salvar no sistema global para que todos os usuários vejam
-    const globalCourse = {
-      id: newCourse.id,
-      slug: newCourse.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
-      title: newCourse.title,
-      description: newCourse.description,
-      thumbnail: newCourse.thumbnail || '/images/course-placeholder.jpg',
-      youtubeUrl: newCourse.lessons?.[0]?.youtubeUrl || '',
-      creator: newCourse.creator,
-      creatorAddress: developerProfile.walletAddress,
-      isSystemCourse: false,
-      difficulty: newCourse.difficulty,
-      category: newCourse.category,
-      createdAt: newCourse.createdAt
-    };
-
-    GlobalStorage.saveCourse(globalCourse);
-
     const updatedCourses = [...courses, newCourse];
     setCourses(updatedCourses);
+    localStorage.setItem('developer-courses', JSON.stringify(updatedCourses));
 
     // Reset form
     setCourseData({
@@ -278,9 +260,7 @@ export default function DeveloperPage() {
     if (confirm('Are you sure you want to delete this course?')) {
       const updatedCourses = courses.filter(c => c.id !== id);
       setCourses(updatedCourses);
-      
-      // Remover do sistema global também
-      GlobalStorage.deleteCourse(id);
+      localStorage.setItem('developer-courses', JSON.stringify(updatedCourses));
     }
   };
 
@@ -296,18 +276,9 @@ export default function DeveloperPage() {
       likes: Math.floor(Math.random() * 100)
     };
 
-    // Salvar no sistema global para que todos os usuários vejam
-    const globalVideo = {
-      ...newVideo,
-      comments: [],
-      userLiked: false,
-      creatorAddress: developerProfile?.walletAddress || ''
-    };
-
-    GlobalStorage.saveVideo(globalVideo);
-
     const updatedVideos = [...videos, newVideo];
     setVideos(updatedVideos);
+    localStorage.setItem('developer-videos', JSON.stringify(updatedVideos));
 
     setVideoData({ title: '', description: '', url: '', thumbnail: '' });
     setShowVideoForm(false);
@@ -317,9 +288,7 @@ export default function DeveloperPage() {
     if (confirm('Are you sure you want to delete this video?')) {
       const updatedVideos = videos.filter(v => v.id !== id);
       setVideos(updatedVideos);
-      
-      // Note: Não implementaremos delete de vídeos no GlobalStorage 
-      // para manter todos os vídeos públicos visíveis
+      localStorage.setItem('developer-videos', JSON.stringify(updatedVideos));
     }
   };
 
