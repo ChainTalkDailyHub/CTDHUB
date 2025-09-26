@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import WalletButton from '../../components/WalletButton';
+import { AdminSystem, ADMIN_CONFIG } from '@/lib/adminSystem';
 
 // Declare Ethereum interface for TypeScript
 declare global {
@@ -61,6 +62,7 @@ export default function DeveloperPage() {
   const [isConnected, setIsConnected] = useState(false);
   const [walletAddress, setWalletAddress] = useState('');
   const [developerProfile, setDeveloperProfile] = useState<DeveloperProfile | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   
   // Content management states
   const [activeTab, setActiveTab] = useState<'courses' | 'videos'>('courses');
@@ -107,6 +109,9 @@ export default function DeveloperPage() {
               setIsConnected(true);
               setWalletAddress(accounts[0]);
               
+              // Verificar se é admin
+              setIsAdmin(AdminSystem.isAdmin(accounts[0]));
+              
               // Load developer profile
               const savedProfile = localStorage.getItem(`developer-profile-${accounts[0]}`);
               if (savedProfile) {
@@ -129,6 +134,9 @@ export default function DeveloperPage() {
           setIsConnected(true);
           setWalletAddress(accounts[0]);
           
+          // Verificar se é admin
+          setIsAdmin(AdminSystem.isAdmin(accounts[0]));
+          
           // Load profile for new account
           const savedProfile = localStorage.getItem(`developer-profile-${accounts[0]}`);
           if (savedProfile) {
@@ -147,7 +155,74 @@ export default function DeveloperPage() {
     // Load courses and videos
     const savedCourses = localStorage.getItem('developer-courses');
     if (savedCourses) {
-      setCourses(JSON.parse(savedCourses));
+      const communityCourses = JSON.parse(savedCourses);
+      
+      // Se for admin, incluir cursos admin na lista para gerenciamento
+      if (AdminSystem.isAdmin(walletAddress)) {
+        const adminCourses = AdminSystem.getAllAdminCourses();
+        // Converter cursos admin para o formato de Course para exibição
+        const formattedAdminCourses = adminCourses.map(adminCourse => ({
+          id: adminCourse.id,
+          title: adminCourse.title,
+          description: adminCourse.description,
+          thumbnail: adminCourse.thumbnail,
+          category: adminCourse.category || 'Blockchain',
+          difficulty: (adminCourse.difficulty || 'Beginner') as 'Beginner' | 'Intermediate' | 'Advanced',
+          lessons: [{ 
+            id: '1', 
+            title: 'Aula Principal', 
+            description: adminCourse.description,
+            youtubeUrl: adminCourse.youtubeUrl 
+          }],
+          createdAt: adminCourse.createdAt,
+          views: 0,
+          likes: 0,
+          creator: adminCourse.creator,
+          creatorProfile: {
+            walletAddress: adminCourse.creatorAddress,
+            name: adminCourse.creator,
+            age: 0,
+            profession: 'Admin',
+            specialty: 'CTDHUB',
+            createdAt: adminCourse.createdAt
+          }
+        }));
+        
+        setCourses([...formattedAdminCourses, ...communityCourses]);
+      } else {
+        setCourses(communityCourses);
+      }
+    } else if (AdminSystem.isAdmin(walletAddress)) {
+      // Se for admin e não há cursos da comunidade, carregar só os cursos admin
+      const adminCourses = AdminSystem.getAllAdminCourses();
+      const formattedAdminCourses = adminCourses.map(adminCourse => ({
+        id: adminCourse.id,
+        title: adminCourse.title,
+        description: adminCourse.description,
+        thumbnail: adminCourse.thumbnail,
+        category: adminCourse.category || 'Blockchain',
+        difficulty: (adminCourse.difficulty || 'Beginner') as 'Beginner' | 'Intermediate' | 'Advanced',
+        lessons: [{ 
+          id: '1', 
+          title: 'Aula Principal', 
+          description: adminCourse.description,
+          youtubeUrl: adminCourse.youtubeUrl 
+        }],
+        createdAt: adminCourse.createdAt,
+        views: 0,
+        likes: 0,
+        creator: adminCourse.creator,
+        creatorProfile: {
+          walletAddress: adminCourse.creatorAddress,
+          name: adminCourse.creator,
+          age: 0,
+          profession: 'Admin',
+          specialty: 'CTDHUB',
+          createdAt: adminCourse.createdAt
+        }
+      }));
+      
+      setCourses(formattedAdminCourses);
     }
     
     const savedVideos = localStorage.getItem('developer-videos');
@@ -225,24 +300,46 @@ export default function DeveloperPage() {
       }
     }
     
-    const newCourse: Course = {
-      id: Date.now().toString(),
-      ...courseData,
-      thumbnail: finalThumbnail,
-      lessons: lessons.map((lesson, index) => ({
-        ...lesson,
-        id: `${Date.now()}-${index}`
-      })),
-      createdAt: new Date().toISOString(),
-      views: Math.floor(Math.random() * 1000),
-      likes: Math.floor(Math.random() * 100),
-      creator: developerProfile.name,
-      creatorProfile: developerProfile
-    };
+    if (isAdmin) {
+      // Se for admin, salvar como curso CTDHUB oficial
+      const adminCourse = {
+        id: Date.now().toString(),
+        slug: courseData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+        title: courseData.title,
+        description: courseData.description,
+        thumbnail: finalThumbnail || AdminSystem.getYouTubeThumbnail(lessons[0]?.youtubeUrl || ''),
+        youtubeUrl: lessons[0]?.youtubeUrl || '',
+        creator: ADMIN_CONFIG.ADMIN_NAME,
+        creatorAddress: walletAddress,
+        isAdminCourse: true,
+        createdAt: new Date().toISOString(),
+        category: courseData.category,
+        difficulty: courseData.difficulty
+      };
+      
+      AdminSystem.saveAdminCourse(adminCourse);
+      alert('✅ Curso CTDHUB oficial criado com sucesso!');
+    } else {
+      // Usuário comum, salvar como curso da comunidade
+      const newCourse: Course = {
+        id: Date.now().toString(),
+        ...courseData,
+        thumbnail: finalThumbnail,
+        lessons: lessons.map((lesson, index) => ({
+          ...lesson,
+          id: `${Date.now()}-${index}`
+        })),
+        createdAt: new Date().toISOString(),
+        views: Math.floor(Math.random() * 1000),
+        likes: Math.floor(Math.random() * 100),
+        creator: developerProfile.name,
+        creatorProfile: developerProfile
+      };
 
-    const updatedCourses = [...courses, newCourse];
-    setCourses(updatedCourses);
-    localStorage.setItem('developer-courses', JSON.stringify(updatedCourses));
+      const updatedCourses = [...courses, newCourse];
+      setCourses(updatedCourses);
+      localStorage.setItem('developer-courses', JSON.stringify(updatedCourses));
+    }
 
     // Reset form
     setCourseData({
@@ -258,9 +355,17 @@ export default function DeveloperPage() {
 
   const deleteCourse = (id: string) => {
     if (confirm('Are you sure you want to delete this course?')) {
-      const updatedCourses = courses.filter(c => c.id !== id);
-      setCourses(updatedCourses);
-      localStorage.setItem('developer-courses', JSON.stringify(updatedCourses));
+      // Verificar se é curso admin
+      const adminCourses = AdminSystem.getAllAdminCourses();
+      const isAdminCourse = adminCourses.some(c => c.id === id);
+      
+      if (isAdminCourse && isAdmin) {
+        AdminSystem.deleteAdminCourse(id);
+      } else {
+        const updatedCourses = courses.filter(c => c.id !== id);
+        setCourses(updatedCourses);
+        localStorage.setItem('developer-courses', JSON.stringify(updatedCourses));
+      }
     }
   };
 
@@ -300,8 +405,24 @@ export default function DeveloperPage() {
         <div className="mb-20">
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              <span className="text-[#FFC700]">Developer</span> Area
+              <span className="text-[#FFC700]">
+                {isAdmin ? 'CTDHUB Admin' : 'Developer'}
+              </span> Area
             </h1>
+            
+            {isAdmin && (
+              <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg p-4 max-w-2xl mx-auto mb-6">
+                <div className="flex items-center gap-2 justify-center">
+                  <span className="text-2xl">👑</span>
+                  <span className="text-yellow-400 font-bold">
+                    {ADMIN_CONFIG.ADMIN_NAME} - Administrador CTDHUB
+                  </span>
+                </div>
+                <p className="text-gray-300 text-sm mt-2 text-center">
+                  Você pode criar cursos oficiais na aba "Cursos CTDHUB"
+                </p>
+              </div>
+            )}
             {developerProfile ? (
               <div className="card max-w-2xl mx-auto p-6 mb-8">
                 <div className="flex items-center gap-4">

@@ -3,29 +3,57 @@ import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import CourseCard from "@/components/CourseCard"
 import { courses } from "@/lib/courses"
+import { AdminSystem } from "@/lib/adminSystem"
 
 export default function Courses() {
   const [activeTab, setActiveTab] = useState("courses")
   const [allCourses, setAllCourses] = useState<any[]>([])
 
   useEffect(() => {
-    const systemCourses = courses || []
-    const stored = localStorage.getItem("developer-courses")
-    let communityCourses = []
-    
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored)
-        communityCourses = parsed.map((course: any) => ({
-          ...course,
-          isSystemCourse: false
-        }))
-      } catch (e) {
-        console.log("Error loading community courses")
+    const loadAllCourses = () => {
+      // Cursos CTDHUB (apenas admin ChainTalkDaily pode adicionar)
+      const ctdhubCourses = AdminSystem.getAllAdminCourses().map(course => ({
+        ...course,
+        isSystemCourse: true,
+        isAdminCourse: true
+      }))
+      
+      // Cursos da Comunidade (qualquer desenvolvedor pode criar)
+      let communityCourses = []
+      const stored = localStorage.getItem("developer-courses")
+      
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored)
+          communityCourses = parsed.map((course: any) => ({
+            ...course,
+            isSystemCourse: false,
+            isAdminCourse: false
+          }))
+        } catch (e) {
+          console.log("Error loading community courses")
+        }
       }
+      
+      setAllCourses([...ctdhubCourses, ...communityCourses])
     }
     
-    setAllCourses([...systemCourses, ...communityCourses])
+    loadAllCourses()
+
+    // Escutar atualizações dos cursos admin
+    const handleAdminCoursesUpdate = () => {
+      loadAllCourses()
+    }
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('ctdhub-admin-courses-updated', handleAdminCoursesUpdate)
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('ctdhub-admin-courses-updated', handleAdminCoursesUpdate)
+      }
+    }
   }, [])
 
   return (
@@ -52,7 +80,7 @@ export default function Courses() {
                 : "text-gray-400 hover:text-white"
             }`}
           >
-             Cursos Oficiais
+                         🏢 Cursos CTDHUB
           </button>
           <button
             onClick={() => setActiveTab("community")}
@@ -71,10 +99,22 @@ export default function Courses() {
         {activeTab === "courses" && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {allCourses
-              .filter(course => course.isSystemCourse !== false)
+              .filter(course => course.isAdminCourse === true)
               .map((course: any) => (
                 <CourseCard key={course.id} course={course} />
               ))}
+            
+            {allCourses.filter(c => c.isAdminCourse === true).length === 0 && (
+              <div className="col-span-full text-center py-12">
+                <div className="text-6xl mb-4">🏢</div>
+                <h3 className="text-xl font-semibold text-white mb-2">
+                  Nenhum curso CTDHUB ainda
+                </h3>
+                <p className="text-gray-400 mb-6">
+                  Apenas <span className="text-yellow-400 font-semibold">ChainTalkDaily</span> pode adicionar cursos oficiais aqui.
+                </p>
+              </div>
+            )}
           </div>
         )}
 
@@ -82,13 +122,13 @@ export default function Courses() {
           <div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {allCourses
-                .filter(course => course.isSystemCourse === false)
+                .filter(course => course.isAdminCourse === false)
                 .map((course: any) => (
                   <CourseCard key={course.id} course={course} />
                 ))}
             </div>
 
-            {allCourses.filter(c => c.isSystemCourse === false).length === 0 && (
+            {allCourses.filter(c => c.isAdminCourse === false).length === 0 && (
               <div className="text-center py-12">
                 <div className="text-6xl mb-4"></div>
                 <h3 className="text-xl font-semibold text-white mb-2">
