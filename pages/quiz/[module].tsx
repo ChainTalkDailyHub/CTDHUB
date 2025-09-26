@@ -188,10 +188,18 @@ export default function QuizModule() {
               
               <div className="flex gap-4 justify-center">
                 <button
-                  onClick={() => router.push('/quiz')}
+                  onClick={() => {
+                    const currentModuleNum = module.id;
+                    const nextModuleNum = currentModuleNum + 1;
+                    if (nextModuleNum <= 10) {
+                      router.push(`/quiz/${nextModuleNum}`);
+                    } else {
+                      router.push('/quiz');
+                    }
+                  }}
                   className="btn-primary"
                 >
-                  Back to Quiz
+                  {module.id < 10 ? 'Next Module' : 'Complete Quiz'}
                 </button>
                 {!isCompleted && (
                   <button
