@@ -5,6 +5,19 @@ interface ChatMessage {
   content: string
 }
 
+interface OpenAIResponse {
+  choices: Array<{
+    message: {
+      content: string
+    }
+  }>
+  usage?: {
+    prompt_tokens: number
+    completion_tokens: number
+    total_tokens: number
+  }
+}
+
 // Advanced knowledge base for blockchain and DeFi topics
 const knowledgeBase = {
   ctd: {
@@ -35,10 +48,88 @@ const knowledgeBase = {
   }
 }
 
-const generateContextualResponse = (userMessage: string): string => {
+const callOpenAI = async (messages: ChatMessage[]): Promise<string> => {
+  const openaiKey = process.env.OPENAI_API_KEY
+  
+  if (!openaiKey) {
+    console.log('OpenAI key not available, using local responses')
+    return generateLocalResponse(messages[messages.length - 1].content)
+  }
+
+  try {
+    console.log('Calling OpenAI API...')
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openaiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          {
+            role: 'system',
+            content: `Você é Binno AI, o assistente especialista em blockchain da plataforma CTDHUB. 
+
+SOBRE CTDHUB:
+- Plataforma educacional de blockchain criada pela Chain Talk Daily (CTD)
+- Oferece cursos, quizzes e certificações sobre Web3, DeFi e blockchain
+- Sistema de tokens CTD na BSC (Binance Smart Chain)
+- Usuários ganham 10.000 tokens CTD ao completar todos os módulos do quiz
+
+SUAS CARACTERÍSTICAS:
+- Você é especialista em blockchain, criptomoedas, DeFi, NFTs, smart contracts
+- Responde em português brasileiro de forma educativa e amigável
+- Use emojis para tornar as respostas mais envolventes
+- Seja específico e técnico quando necessário, mas didático
+- Sempre promova educação financeira e segurança
+- Mencione riscos quando apropriado
+
+TÓPICOS QUE VOCÊ DOMINA:
+- Bitcoin, Ethereum e outras criptomoedas
+- DeFi (Uniswap, Compound, Aave, PancakeSwap)
+- NFTs e marketplaces
+- Wallets (MetaMask, hardware wallets)
+- Smart contracts e Solidity
+- Binance Smart Chain (BSC)
+- Trading e análise técnica
+- Segurança em crypto
+
+Responda de forma útil, educativa e sempre incentive o aprendizado responsável.`
+          },
+          ...messages
+        ],
+        max_tokens: 500,
+        temperature: 0.7,
+      }),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      console.error('OpenAI API Error:', response.status, errorData)
+      throw new Error(`OpenAI API Error: ${response.status}`)
+    }
+
+    const data: OpenAIResponse = await response.json()
+    
+    if (data.choices && data.choices.length > 0) {
+      console.log('OpenAI response received successfully')
+      return data.choices[0].message.content
+    } else {
+      throw new Error('No response from OpenAI')
+    }
+    
+  } catch (error) {
+    console.error('Error calling OpenAI:', error)
+    // Fallback para resposta local
+    return generateLocalResponse(messages[messages.length - 1].content)
+  }
+}
+
+const generateLocalResponse = (userMessage: string): string => {
   const message = userMessage.toLowerCase()
   
-  console.log('Processing message:', message)
+  console.log('Using local responses for message:', message)
   
   // Expanded keyword matching for more specific responses
   
@@ -215,8 +306,8 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
 
     console.log('Processing message:', lastMessage.content)
 
-    // Generate response based on content
-    const aiResponse = generateContextualResponse(lastMessage.content)
+    // Generate response using OpenAI or local fallback
+    const aiResponse = await callOpenAI([...messages, lastMessage])
 
     console.log('Generated response:', aiResponse)
 

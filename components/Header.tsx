@@ -14,22 +14,23 @@ export default function Header() {
         <div className="flex justify-between items-center h-24">
           <Link href="/" className="flex items-center group">
             <div className="relative">
-              <Image 
+              <img 
                 src="/images/CTDHUB.png" 
                 alt="CTDHUB - Blockchain Learning Platform" 
-                width={200}
-                height={80}
-                priority
                 className="h-20 w-auto hover:opacity-90 transition-opacity duration-300"
                 onError={(e) => {
+                  console.log('Logo failed to load, showing fallback');
                   const target = e.target as HTMLElement;
                   target.style.display = 'none';
                   const fallback = target.nextElementSibling as HTMLElement;
-                  if (fallback) fallback.style.display = 'block';
+                  if (fallback) fallback.style.display = 'flex';
+                }}
+                onLoad={() => {
+                  console.log('CTDHUB logo loaded successfully');
                 }}
               />
               <div 
-                className="hidden h-20 flex items-center justify-center px-6 bg-gradient-to-r from-[#FFC700] to-yellow-500 text-black font-bold text-2xl rounded-lg hover:opacity-90 transition-opacity duration-300"
+                className="hidden h-20 items-center justify-center px-6 bg-gradient-to-r from-[#FFC700] to-yellow-500 text-black font-bold text-2xl rounded-lg hover:opacity-90 transition-opacity duration-300"
                 style={{ display: 'none' }}
               >
                 CTDHUB
