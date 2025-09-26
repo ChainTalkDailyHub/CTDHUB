@@ -78,7 +78,11 @@ export default function BinnoAI() {
     setIsLoading(true)
 
     try {
-      const response = await fetch('/api/ai/chat', {
+      // Detect if running on Netlify and use appropriate endpoint
+      const isNetlify = typeof window !== 'undefined' && window.location.hostname.includes('netlify')
+      const apiEndpoint = isNetlify ? '/.netlify/functions/ai-chat' : '/api/ai/chat'
+      
+      const response = await fetch(apiEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -87,14 +91,13 @@ export default function BinnoAI() {
           messages: [...messages, userMessage].map(m => ({
             role: m.role,
             content: m.content
-          })),
-          useOpenAI: true
+          }))
         }),
       })
 
       const data = await response.json()
 
-      if (data.success) {
+      if (response.ok && data.message) {
         const assistantMessage: Message = {
           id: generateMessageId(),
           role: 'assistant',
@@ -103,7 +106,7 @@ export default function BinnoAI() {
         }
         setMessages(prev => [...prev, assistantMessage])
       } else {
-        throw new Error(data.error || 'Failed to get response')
+        throw new Error(data.error || data.message || 'Failed to get response')
       }
     } catch (error) {
       console.error('Chat error:', error)

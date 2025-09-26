@@ -49,3 +49,5 @@ Thumbs.db
 # Custom files
 test-*.js
 data/
+# Local Netlify folder
+.netlify

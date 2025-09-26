@@ -7,10 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "deploy": "vercel --prod",
-    "preview": "vercel"
+    "netlify:build": "cross-env NETLIFY=true next build",
+    "netlify:dev": "netlify dev",
+    "deploy:netlify": "netlify deploy --prod",
+    "preview:netlify": "netlify deploy"
   },
   "dependencies": {
+    "@netlify/functions": "^4.2.6",
     "dotenv": "^17.2.2",
     "ethers": "^6.13.0",
     "next": "14.2.5",
@@ -22,8 +25,10 @@
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "autoprefixer": "^10.0.1",
+    "cross-env": "^10.0.0",
     "eslint": "^8.0.0",
     "eslint-config-next": "14.2.5",
+    "http-proxy-middleware": "^3.0.5",
     "postcss": "^8.0.0",
     "tailwindcss": "^3.4.0",
     "typescript": "^5.0.0"

@@ -45,8 +45,35 @@ export default function Courses() {
   const [newComment, setNewComment] = useState('')
   const [walletAddress, setWalletAddress] = useState('')
   const [isConnected, setIsConnected] = useState(false)
+  const [allCourses, setAllCourses] = useState<any[]>([])
 
   useEffect(() => {
+    // Combinar cursos do sistema com cursos criados pelos desenvolvedores
+    const loadAllCourses = () => {
+      const systemCourses = courses || []
+      const developerCourses = JSON.parse(localStorage.getItem('developer-courses') || '[]')
+      
+      // Converter cursos do desenvolvedor para o formato esperado
+      const formattedDeveloperCourses = developerCourses.map((course: any) => ({
+        id: course.id,
+        slug: course.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+        title: course.title,
+        description: course.description,
+        thumbnail: course.thumbnail || '/images/course-placeholder.jpg',
+        youtubeUrl: course.lessons?.[0]?.youtubeUrl || '',
+        creator: course.creatorName || 'Community Developer',
+        creatorAddress: course.creatorAddress || '',
+        isSystemCourse: false,
+        difficulty: course.difficulty || 'Beginner',
+        category: course.category || 'Blockchain'
+      }))
+      
+      const combinedCourses = [...systemCourses, ...formattedDeveloperCourses]
+      setAllCourses(combinedCourses)
+    }
+    
+    loadAllCourses()
+    
     const savedVideos = localStorage.getItem('developer-videos')
     if (savedVideos) {
       const parsedVideos = JSON.parse(savedVideos)
@@ -221,44 +248,70 @@ export default function Courses() {
             </div>
           </div>
 
-          {/* Official Courses */}
+          {/* All Courses (System + Developer Created) */}
           {activeTab === 'courses' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {courses.map((course) => (
-                <div key={course.id} className="card group hover:scale-105 transition-all duration-200">
-                  <div className="relative aspect-video overflow-hidden rounded-lg mb-4">
-                    <img 
-                      src={course.thumbnail} 
-                      alt={course.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                    {course.isSystemCourse && (
-                      <div className="absolute top-4 left-4">
-                        <span className="bg-[#FFC700] text-black px-3 py-1 rounded-full text-xs font-bold">
-                          Official
-                        </span>
+            <div>
+              {allCourses.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {allCourses.map((course) => (
+                    <div key={course.id} className="card group hover:scale-105 transition-all duration-200">
+                      <div className="relative aspect-video overflow-hidden rounded-lg mb-4">
+                        <img 
+                          src={course.thumbnail} 
+                          alt={course.title}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQ1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjQ1MCIgZmlsbD0iIzFhMWExYSIvPgogIDxyZWN0IHg9IjUwIiB5PSI1MCIgd2lkdGg9IjcwMCIgaGVpZ2h0PSIzNTAiIHJ4PSIyMCIgZmlsbD0iIzJhMmEyYSIgc3Ryb2tlPSIjRkZDNzAwIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8Y2lyY2xlIGN4PSI0MDAiIGN5PSIyMjUiIHI9IjUwIiBmaWxsPSIjRkZDNzAwIi8+CiAgPHBvbHlnb24gcG9pbnRzPSIzNzUsMjAwIDM3NSwyNTAgNDI1LDIyNSIgZmlsbD0iIzAwMCIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzIwIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNDgiIGZvbnQtd2VpZ2h0PSJib2xkIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjRkZDNzAwIj5DVERIVUIKPC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMzYwIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM4ODgiPkNvdXJzZSBUaHVtYm5haWwKPC90ZXh0Pgo8L3N2Zz4=';
+                          }}
+                        />
+                        {course.isSystemCourse && (
+                          <div className="absolute top-4 left-4">
+                            <span className="bg-[#FFC700] text-black px-3 py-1 rounded-full text-xs font-bold">
+                              Official
+                            </span>
+                          </div>
+                        )}
+                        {!course.isSystemCourse && (
+                          <div className="absolute top-4 left-4">
+                            <span className="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+                              Community
+                            </span>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-[#FFC700] transition-colors">{course.title}</h3>
-                    <p className="text-gray-400 mb-6 leading-relaxed">{course.description}</p>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="text-sm text-gray-500">
-                        <span>By {course.creator || 'CTDHUB Team'}</span>
+                      
+                      <div className="p-6">
+                        <h3 className="text-xl font-bold text-white mb-3 group-hover:text-[#FFC700] transition-colors">{course.title}</h3>
+                        <p className="text-gray-400 mb-6 leading-relaxed">{course.description}</p>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="text-sm text-gray-500">
+                            <span>By {course.creator || 'CTDHUB Team'}</span>
+                          </div>
+                          <a
+                            href={`/courses/${course.slug}`}
+                            className="btn-primary"
+                          >
+                            Start Course
+                          </a>
+                        </div>
                       </div>
-                      <a
-                        href={`/courses/${course.slug}`}
-                        className="btn-primary"
-                      >
-                        Start Course
-                      </a>
                     </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
+              ) : (
+                <div className="text-center py-20">
+                  <div className="text-8xl mb-8">📚</div>
+                  <h3 className="text-3xl font-bold mb-6 text-white">No Courses Available</h3>
+                  <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto leading-relaxed">
+                    No courses have been created yet. Developers can create new courses in the Developer Area.
+                  </p>
+                  <a href="/developer" className="btn-primary">
+                    🚀 Create First Course
+                  </a>
+                </div>
+              )}
             </div>
           )}
 

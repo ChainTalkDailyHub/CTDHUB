@@ -1,0 +1,18 @@
+<svg width="800" height="450" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="450" fill="#1a1a1a"/>
+  <rect x="50" y="50" width="700" height="350" rx="20" fill="#2a2a2a" stroke="#FFC700" stroke-width="2"/>
+  
+  <!-- Play button -->
+  <circle cx="400" cy="225" r="50" fill="#FFC700"/>
+  <polygon points="375,200 375,250 425,225" fill="#000"/>
+  
+  <!-- CTDHUB logo text -->
+  <text x="400" y="320" font-family="Arial, sans-serif" font-size="48" font-weight="bold" text-anchor="middle" fill="#FFC700">
+    CTDHUB
+  </text>
+  
+  <!-- Course placeholder text -->
+  <text x="400" y="360" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#888">
+    Course Thumbnail
+  </text>
+</svg>
