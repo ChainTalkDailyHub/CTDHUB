@@ -215,9 +215,20 @@ export default function DeveloperPage() {
       return;
     }
     
+    // Auto-generate thumbnail from first YouTube video if not provided
+    let finalThumbnail = courseData.thumbnail;
+    if (!finalThumbnail && lessons[0]?.youtubeUrl) {
+      const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/;
+      const match = lessons[0].youtubeUrl.match(regex);
+      if (match && match[1]) {
+        finalThumbnail = `https://img.youtube.com/vi/${match[1]}/maxresdefault.jpg`;
+      }
+    }
+    
     const newCourse: Course = {
       id: Date.now().toString(),
       ...courseData,
+      thumbnail: finalThumbnail,
       lessons: lessons.map((lesson, index) => ({
         ...lesson,
         id: `${Date.now()}-${index}`
@@ -507,13 +518,37 @@ export default function DeveloperPage() {
 
                               <div>
                                 <label className="block text-sm font-semibold mb-2 text-yellow-400">Thumbnail URL</label>
-                                <input
-                                  type="url"
-                                  value={courseData.thumbnail}
-                                  onChange={(e) => setCourseData(prev => ({ ...prev, thumbnail: e.target.value }))}
-                                  className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                                  placeholder="https://..."
-                                />
+                                <div className="flex gap-2">
+                                  <input
+                                    type="url"
+                                    value={courseData.thumbnail}
+                                    onChange={(e) => setCourseData(prev => ({ ...prev, thumbnail: e.target.value }))}
+                                    className="flex-1 bg-gray-800 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                    placeholder="https://... or leave empty for auto-generation"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const firstVideoUrl = lessons[0]?.youtubeUrl;
+                                      if (firstVideoUrl) {
+                                        const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/;
+                                        const match = firstVideoUrl.match(regex);
+                                        if (match && match[1]) {
+                                          setCourseData(prev => ({ 
+                                            ...prev, 
+                                            thumbnail: `https://img.youtube.com/vi/${match[1]}/maxresdefault.jpg` 
+                                          }));
+                                        }
+                                      }
+                                    }}
+                                    className="px-4 py-3 bg-yellow-600 hover:bg-yellow-700 text-black font-semibold rounded-lg transition-colors"
+                                  >
+                                    Auto
+                                  </button>
+                                </div>
+                                <p className="text-xs text-gray-500 mt-1">
+                                  Leave empty and we'll auto-generate from first video, or click "Auto" to generate now
+                                </p>
                               </div>
                             </div>
                           </div>

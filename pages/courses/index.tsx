@@ -53,20 +53,40 @@ export default function Courses() {
       const systemCourses = courses || []
       const developerCourses = JSON.parse(localStorage.getItem('developer-courses') || '[]')
       
+      // Função para extrair thumbnail do YouTube
+      const getYouTubeThumbnail = (url: string): string => {
+        if (!url) return '/images/course-placeholder.jpg';
+        
+        // Extrair video ID do YouTube
+        const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/;
+        const match = url.match(regex);
+        
+        if (match && match[1]) {
+          return `https://img.youtube.com/vi/${match[1]}/maxresdefault.jpg`;
+        }
+        
+        return '/images/course-placeholder.jpg';
+      };
+
       // Converter cursos do desenvolvedor para o formato esperado
-      const formattedDeveloperCourses = developerCourses.map((course: any) => ({
-        id: course.id,
-        slug: course.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
-        title: course.title,
-        description: course.description,
-        thumbnail: course.thumbnail || '/images/course-placeholder.jpg',
-        youtubeUrl: course.lessons?.[0]?.youtubeUrl || '',
-        creator: course.creatorName || 'Community Developer',
-        creatorAddress: course.creatorAddress || '',
-        isSystemCourse: false,
-        difficulty: course.difficulty || 'Beginner',
-        category: course.category || 'Blockchain'
-      }))
+      const formattedDeveloperCourses = developerCourses.map((course: any) => {
+        const firstVideoUrl = course.lessons?.[0]?.youtubeUrl || '';
+        const thumbnailUrl = course.thumbnail || getYouTubeThumbnail(firstVideoUrl);
+        
+        return {
+          id: course.id,
+          slug: course.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+          title: course.title,
+          description: course.description,
+          thumbnail: thumbnailUrl,
+          youtubeUrl: firstVideoUrl,
+          creator: course.creator || 'Community Developer',
+          creatorAddress: course.creatorAddress || '',
+          isSystemCourse: false,
+          difficulty: course.difficulty || 'Beginner',
+          category: course.category || 'Blockchain'
+        };
+      })
       
       const combinedCourses = [...systemCourses, ...formattedDeveloperCourses]
       setAllCourses(combinedCourses)
