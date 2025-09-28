@@ -33,22 +33,22 @@ export default function Footer() {
             <h4 className="text-lg font-semibold text-ctd-text mb-6">Connect</h4>
             <ul className="space-y-3">
               <li>
-                <a href="https://t.me/ctdhub" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-3">
+                <a href="https://t.me/chaintalk_cto" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-3">
                   <FaTelegram className="w-5 h-5" /> Telegram
                 </a>
               </li>
               <li>
-                <a href="https://x.com/ctdhub" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-3">
+                <a href="https://x.com/chaintalk_cto" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-3">
                   <FaTwitter className="w-5 h-5" /> X (Twitter)
                 </a>
               </li>
               <li>
-                <a href="https://coingecko.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-3">
+                <a href="https://www.coingecko.com/en/coins/chain-talk-daily" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-3">
                   <FaCoins className="w-5 h-5" /> CoinGecko
                 </a>
               </li>
               <li>
-                <a href="https://youtube.com/@ctdhub" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-3">
+                <a href="https://www.youtube.com/@ChainTalkDaily-CTO" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-3">
                   <FaYoutube className="w-5 h-5" /> YouTube
                 </a>
               </li>
