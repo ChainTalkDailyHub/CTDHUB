@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root{
-  --bg:#0A0A0A; --panel:#0E1113; --panel2:#0B0D0F; --border:#2F3136;
-  --text:#ECECEC; --muted:#9CA3AF; --yellow:#FFC700; --ice:#00E5FF;
+  --bg:#000; --panel:#0E0E0E; --border:#2A2A2A; --text:#F2F2F2;
+  --muted:#A8A8A8; --yellow:#FFCC33; --holo:#8BE9FD;
 }
 
 * {
@@ -79,31 +79,56 @@ body.theme-neon-circuit {
   box-shadow: var(--card-shadow, 0 20px 60px rgba(0,0,0,.45)), inset 0 1px 0 rgba(255,255,255,.04);
   position: relative;
 }
+.card{
+  border-radius: 1rem;
+  border: 1px solid rgba(42,42,42,.8);
+  background-color: rgba(14,14,14,.8);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.02);
+}
+
 .btn-primary{
   display:inline-flex; align-items:center; gap:.5rem;
-  padding:.75rem 1.25rem; border-radius: 1rem;
-  background: linear-gradient(180deg, #FFD84D, var(--yellow));
-  color:#111; font-weight:700;
-  box-shadow: 0 10px 28px -8px rgba(255,199,0,.55);
-  transition: transform .15s ease, box-shadow .2s ease, filter .2s;
+  border-radius: .75rem; background-color: #FFCC33; color: #000;
+  font-weight: 600; padding: .75rem 1.25rem;
+  transition: all .2s ease;
 }
-.btn-primary:hover{ transform: translateY(-1px); filter:saturate(1.05); box-shadow: 0 14px 34px -8px rgba(255,199,0,.65); }
-.btn-primary:focus{ outline: none; box-shadow: 0 0 0 2px rgba(255,199,0,.6); }
+.btn-primary:hover{ 
+  filter: drop-shadow(0 0 14px rgba(255,204,51,.4)); 
+}
+.btn-primary:focus{ 
+  outline: none; 
+  box-shadow: 0 0 0 2px rgba(255,204,51,.6); 
+}
+
 .btn-ghost{
   display:inline-flex; align-items:center; gap:.5rem;
-  padding:.75rem 1.25rem; border-radius:1rem; border:1px solid rgba(255,199,0,.45);
-  color: var(--yellow); background: transparent;
-  transition: background .15s ease, transform .15s ease;
+  border-radius: .75rem; border: 1px solid #2A2A2A; 
+  color: #FFCC33; padding: .75rem 1.25rem;
+  transition: all .2s ease;
 }
-.btn-ghost:hover{ background: rgba(255,199,0,.08); transform: translateY(-1px); }
-
-.badge{
-  display:inline-flex; align-items:center; gap:.4rem;
-  border:1px solid rgba(255,199,0,.4); color:var(--yellow);
-  background: rgba(17,17,17,.6); border-radius:999px; padding:.35rem .7rem; font-size:.85rem;
+.btn-ghost:hover{ background-color: rgba(255,255,255,.05); }
+.btn-ghost:focus{ 
+  outline: none; 
+  box-shadow: 0 0 0 2px rgba(255,204,51,.4); 
 }
 
-.neon-text{ text-shadow: 0 0 14px rgba(255,199,0,.4); }
+.chip{ 
+  display:inline-flex; align-items:center; border-radius:9999px; 
+  border: 1px solid #2A2A2A; background-color: rgba(14,14,14,.7); 
+  padding: .25rem .75rem; font-size: .875rem; 
+}
+
+.spotlight{
+  position:relative; isolation:isolate;
+}
+.spotlight::before{
+  content:""; position:absolute; inset:auto auto 100% 50%; 
+  transform:translate(-50%, 0);
+  width:28rem; height:28rem; border-radius:9999px;
+  background:radial-gradient(circle, rgba(255,204,51,.18) 0%, transparent 60%);
+  pointer-events:none; z-index:-1; filter:blur(0.5px);
+}
 .focus-ring{ outline: none; box-shadow: 0 0 0 2px rgba(255,199,0,.5); }
 
 html,
@@ -161,30 +186,9 @@ a {
   background: linear-gradient(to bottom, #f59e0b, #ea580c);
 }
 
-@layer components {
-  .btn-primary {
-    @apply bg-[#FFC700] text-black px-8 py-4 rounded-lg font-semibold hover:bg-[#e6b300] focus:ring-4 focus:ring-[#FFC700]/50 transition-all duration-150 shadow-lg hover:shadow-xl;
-  }
-  
-  .btn-ghost {
-    @apply bg-transparent text-white border-2 border-gray-600 px-8 py-4 rounded-lg font-semibold hover:border-[#FFC700] hover:text-[#FFC700] focus:ring-4 focus:ring-gray-600/50 transition-all duration-150;
-  }
-  
-  .btn-secondary {
-    @apply bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-600 transition-colors duration-150;
-  }
-  
-  .card {
-    @apply bg-gray-900/50 backdrop-blur-sm border border-gray-800/50 rounded-xl p-8 shadow-lg hover:border-gray-700/50 transition-all duration-200;
-  }
+@layer components {}
 
-  /* Responsive buttons for mobile */
-  /* Use Tailwind's responsive classes in your HTML:
-     <button class="btn-primary px-4 py-3 text-sm md:px-8 md:py-4 md:text-base">...</button>
-     <button class="btn-secondary px-4 py-2 text-sm md:px-6 md:py-3 md:text-base">...</button>
-     <div class="card p-4 md:p-8">...</div>
-  */
-}
+
 
 @layer utilities {
   /* Animações modernas */

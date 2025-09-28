@@ -23,9 +23,9 @@ export default function Footer() {
             <h4 className="text-lg font-semibold text-ctd-text mb-6">Quick Links</h4>
             <ul className="space-y-3">
               <li><a href="/courses" className="text-ctd-mute hover:text-ctd-yellow transition-colors focus-ring">Courses</a></li>
-              <li><a href="/quiz" className="text-gray-400 hover:text-yellow-400 transition-colors">Quiz</a></li>
-              <li><a href="/binno-ai" className="text-gray-400 hover:text-yellow-400 transition-colors">Binno AI</a></li>
-              <li><a href="/dev" className="text-gray-400 hover:text-yellow-400 transition-colors">Dev Area</a></li>
+              <li><a href="/quiz" className="text-ctd-mute hover:text-ctd-yellow transition-colors">Quiz</a></li>
+              <li><a href="/binno-ai" className="text-ctd-mute hover:text-ctd-yellow transition-colors">Binno AI</a></li>
+              <li><a href="/dev" className="text-ctd-mute hover:text-ctd-yellow transition-colors">Dev Area</a></li>
             </ul>
           </div>
           
@@ -33,22 +33,22 @@ export default function Footer() {
             <h4 className="text-lg font-semibold text-ctd-text mb-6">Connect</h4>
             <ul className="space-y-3">
               <li>
-                <a href="https://t.me/chaintalk_cto" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-3">
+                <a href="https://t.me/chaintalk_cto" target="_blank" rel="noopener noreferrer" className="text-ctd-mute hover:text-ctd-yellow transition-colors flex items-center gap-3">
                   <FaTelegram className="w-5 h-5" /> Telegram
                 </a>
               </li>
               <li>
-                <a href="https://x.com/chaintalk_cto" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-3">
+                <a href="https://x.com/chaintalk_cto" target="_blank" rel="noopener noreferrer" className="text-ctd-mute hover:text-ctd-yellow transition-colors flex items-center gap-3">
                   <FaTwitter className="w-5 h-5" /> X (Twitter)
                 </a>
               </li>
               <li>
-                <a href="https://www.coingecko.com/en/coins/chain-talk-daily" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-3">
+                <a href="https://www.coingecko.com/en/coins/chain-talk-daily" target="_blank" rel="noopener noreferrer" className="text-ctd-mute hover:text-ctd-yellow transition-colors flex items-center gap-3">
                   <FaCoins className="w-5 h-5" /> CoinGecko
                 </a>
               </li>
               <li>
-                <a href="https://www.youtube.com/@ChainTalkDaily-CTO" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-3">
+                <a href="https://www.youtube.com/@ChainTalkDaily-CTO" target="_blank" rel="noopener noreferrer" className="text-ctd-mute hover:text-ctd-yellow transition-colors flex items-center gap-3">
                   <FaYoutube className="w-5 h-5" /> YouTube
                 </a>
               </li>
@@ -56,9 +56,9 @@ export default function Footer() {
           </div>
         </div>
         
-        <div className="border-t border-gray-800/50 mt-12 pt-8 text-center">
-          <p className="text-gray-400 text-lg">
-            © 2025 <span className="text-[#FFC700] font-semibold">CTDHUB</span>. All rights reserved.
+        <div className="border-t border-ctd-border/50 mt-12 pt-8 text-center">
+          <p className="text-ctd-mute text-lg">
+            © 2025 <span className="text-ctd-yellow font-semibold">CTDHUB</span>. All rights reserved.
           </p>
         </div>
       </div>

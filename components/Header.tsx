@@ -37,8 +37,8 @@ export default function Header() {
   }, [])
   
   return (
-    <header className="sticky top-0 z-40 bg-[#0B0D0F]/80 backdrop-blur border-b border-[#2F3136]">
-      <div className="h-[2px] w-full bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 opacity-60"></div>
+    <header className="sticky top-0 z-40 bg-ctd-panel/80 backdrop-blur border-b border-ctd-border">
+      <div className="h-[2px] w-full bg-gradient-to-r from-ctd-yellow via-ctd-holo to-ctd-yellow opacity-60"></div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           <Link href="/" className="flex items-center group">
@@ -59,7 +59,7 @@ export default function Header() {
                 }}
               />
               <div 
-                className="hidden h-20 items-center justify-center px-6 bg-gradient-to-r from-[#FFC700] to-yellow-500 text-black font-bold text-2xl rounded-lg hover:opacity-90 transition-opacity duration-300"
+                className="hidden h-20 items-center justify-center px-6 bg-gradient-to-r from-ctd-yellow to-ctd-holo text-black font-bold text-2xl rounded-lg hover:opacity-90 transition-opacity duration-300"
                 style={{ display: 'none' }}
               >
                 CTDHUB
@@ -68,21 +68,21 @@ export default function Header() {
           </Link>
           
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/courses" className="relative group text-gray-300 hover:text-white transition-colors duration-300 py-2">
+            <Link href="/courses" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
               <span className="relative z-10">Courses</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/0 to-orange-500/0 group-hover:from-yellow-400/10 group-hover:to-orange-500/10 rounded-lg transition-all duration-300 -mx-2"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
             </Link>
-            <Link href="/quiz" className="relative group text-gray-300 hover:text-white transition-colors duration-300 py-2">
+            <Link href="/quiz" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
               <span className="relative z-10">Quiz</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/0 to-orange-500/0 group-hover:from-yellow-400/10 group-hover:to-orange-500/10 rounded-lg transition-all duration-300 -mx-2"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
             </Link>
-            <Link href="/binno-ai" className="relative group text-gray-300 hover:text-white transition-colors duration-300 py-2">
+            <Link href="/binno-ai" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
               <span className="relative z-10">Binno AI</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/0 to-orange-500/0 group-hover:from-yellow-400/10 group-hover:to-orange-500/10 rounded-lg transition-all duration-300 -mx-2"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
             </Link>
-            <Link href="/dev" className="relative group text-gray-300 hover:text-white transition-colors duration-300 py-2">
+            <Link href="/dev" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
               <span className="relative z-10">CS HUB</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/0 to-orange-500/0 group-hover:from-yellow-400/10 group-hover:to-orange-500/10 rounded-lg transition-all duration-300 -mx-2"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
             </Link>
           </nav>
 
@@ -93,7 +93,7 @@ export default function Header() {
             {isConnected && (
               <button
                 onClick={() => setIsUserMenuOpen(true)}
-                className="relative p-3 rounded-lg bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/30 text-yellow-400 hover:text-yellow-300 hover:from-yellow-600/30 hover:to-orange-600/30 hover:border-yellow-400/50 transition-all duration-300 group"
+                className="relative p-3 rounded-lg bg-gradient-to-r from-ctd-yellow/20 to-ctd-holo/20 border border-ctd-border text-ctd-yellow hover:text-ctd-holo hover:from-ctd-yellow/30 hover:to-ctd-holo/30 hover:border-ctd-yellow/50 transition-all duration-300 group"
                 aria-label="Abrir menu do usuário"
                 title="Menu do Usuário"
               >
@@ -105,14 +105,14 @@ export default function Header() {
                 </div>
                 
                 {/* Status indicator */}
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-gray-900 animate-pulse"></div>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-ctd-holo rounded-full border-2 border-ctd-bg animate-pulse"></div>
               </button>
             )}
             
             {/* Mobile menu button */}
             <button
               onClick={toggleMobileMenu}
-              className="md:hidden p-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors"
+              className="md:hidden p-2 rounded-lg text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 transition-colors"
               aria-label="Toggle mobile menu"
               aria-expanded={isMobileMenuOpen}
             >
@@ -137,32 +137,32 @@ export default function Header() {
         
         {/* Mobile menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-gray-900/95 backdrop-blur-md border-t border-gray-700/50">
+          <div className="md:hidden bg-ctd-panel/95 backdrop-blur-md border-t border-ctd-border/50">
             <div className="px-4 py-4 space-y-2">
               <Link
                 href="/courses"
-                className="block px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-colors"
+                className="block px-4 py-3 text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 rounded-lg transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 📚 Courses
               </Link>
               <Link
                 href="/quiz"
-                className="block px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-colors"
+                className="block px-4 py-3 text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 rounded-lg transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 🧠 Quiz
               </Link>
               <Link
                 href="/binno-ai"
-                className="block px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-colors"
+                className="block px-4 py-3 text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 rounded-lg transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 🤖 Binno AI
               </Link>
               <Link
                 href="/dev"
-                className="block px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-colors"
+                className="block px-4 py-3 text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 rounded-lg transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 ⚙️ CS HUB

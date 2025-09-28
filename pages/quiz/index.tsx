@@ -60,29 +60,29 @@ export default function Quiz() {
   const allModulesCompleted = completedModules.length === 10
   
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-ctd-bg">
       <Header />
       
-      <main className="py-24">
+      <main className="py-24 spotlight">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-20">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              Blockchain <span className="text-[#FFC700]">Knowledge</span> Quiz
+            <h1 className="text-4xl md:text-6xl font-bold text-ctd-text drop-shadow-neon mb-6">
+              Blockchain <span className="text-ctd-yellow">Knowledge</span> Quiz
             </h1>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed mb-12">
+            <p className="text-xl text-ctd-mute max-w-3xl mx-auto leading-relaxed mb-12">
               Test your understanding with our comprehensive 10-module quiz system. 
               Complete all modules to unlock the burn mechanism.
             </p>
             
             {/* Progress Bar */}
             <div className="max-w-md mx-auto mb-12">
-              <div className="flex justify-between text-sm text-gray-400 mb-3">
+              <div className="flex justify-between text-sm text-ctd-mute mb-3">
                 <span>Progress</span>
                 <span>{completedModules.length}/10 modules</span>
               </div>
-              <div className="w-full bg-gray-800 rounded-full h-3">
+              <div className="w-full bg-ctd-panel rounded-full h-3">
                 <div 
-                  className="bg-[#FFC700] h-3 rounded-full transition-all duration-300"
+                  className="bg-ctd-yellow h-3 rounded-full transition-all duration-300"
                   style={{ width: `${(completedModules.length / 10) * 100}%` }}
                 ></div>
               </div>

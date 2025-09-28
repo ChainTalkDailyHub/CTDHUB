@@ -11,20 +11,20 @@ interface CourseCardProps {
 
 export default function CourseCard({ course }: CourseCardProps) {
   return (
-    <div className="card hover:shadow-xl transition-shadow">
-      <div className="aspect-video bg-gray-700 rounded-lg mb-4 overflow-hidden">
+    <div className="card hover:shadow-outline transition-shadow spotlight">
+      <div className="aspect-video bg-ctd-panel rounded-lg mb-4 overflow-hidden">
         <img
           src={course.thumbnail}
           alt={course.title}
           className="w-full h-full object-cover"
           onError={(e) => {
-            e.currentTarget.src = `https://via.placeholder.com/400x225/374151/f9fafb?text=${encodeURIComponent(course.title)}`
+            e.currentTarget.src = `https://via.placeholder.com/400x225/0E0E0E/F2F2F2?text=${encodeURIComponent(course.title)}`
           }}
         />
       </div>
       
-      <h3 className="text-xl font-semibold text-white mb-2">{course.title}</h3>
-      <p className="text-gray-400 mb-4 line-clamp-3">{course.description}</p>
+      <h3 className="text-xl font-semibold text-ctd-text mb-2">{course.title}</h3>
+      <p className="text-ctd-mute mb-4 line-clamp-3">{course.description}</p>
       
       <a 
         href={`/courses/${course.slug}`}

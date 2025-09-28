@@ -15,23 +15,23 @@ module.exports = {
         'ctd-yellow': '#FFC700',
         'ctd-yellow-dark': '#e6b300',
         ctd: {
-          bg: '#0A0A0A',
-          panel: '#0E1113',
-          panel2: '#0B0D0F',
-          border: '#2F3136',
-          text: '#ECECEC',
-          mute: '#9CA3AF',
-          yellow: '#FFC700',
-          ice: '#00E5FF'
+          bg: '#000000',
+          panel: '#0E0E0E',
+          border: '#2A2A2A',
+          text: '#F2F2F2',
+          yellow: '#FFCC33',
+          holo: '#8BE9FD',
+          mute: '#A8A8A8'
         }
       },
       boxShadow: {
         glow: '0 10px 30px -8px rgba(255,199,0,.45)',
         inner: 'inset 0 1px 0 rgba(255,255,255,.04)',
-        card: '0 20px 60px rgba(0,0,0,.45)'
+        card: '0 20px 60px rgba(0,0,0,.45)',
+        outline: '0 0 0 1px rgba(255,255,255,.02)'
       },
       dropShadow: {
-        neon: '0 0 18px rgba(255,199,0,.45)'
+        neon: '0 0 14px rgba(255,204,51,.4)'
       },
       borderRadius: {
         '2xl': '1rem',
