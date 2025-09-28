@@ -5,7 +5,7 @@ import ErrorBoundary from '@/components/ErrorBoundary'
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <ErrorBoundary>
-      <div className="grid-bg min-h-screen bg-ctd-bg text-ctd-text">
+      <div className="theme-neon-circuit neon-grid min-h-screen">
         <Component {...pageProps} />
       </div>
     </ErrorBoundary>

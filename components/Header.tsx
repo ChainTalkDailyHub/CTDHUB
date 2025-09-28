@@ -37,9 +37,10 @@ export default function Header() {
   }, [])
   
   return (
-    <header className="bg-ctd-panel/95 backdrop-blur-md border-b border-ctd-border sticky top-0 z-50">
+    <header className="sticky top-0 z-40 bg-[#0B0D0F]/80 backdrop-blur border-b border-[#2F3136]">
+      <div className="h-[2px] w-full bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 opacity-60"></div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-24">
+        <div className="flex justify-between items-center py-4">
           <Link href="/" className="flex items-center group">
             <div className="relative">
               <img 

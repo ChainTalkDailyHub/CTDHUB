@@ -9,29 +9,30 @@ export default function Home() {
       
       <main>
         {/* Hero Section */}
-        <section className="relative py-24 lg:py-32 overflow-hidden">
+        <section className="relative py-24 lg:py-32 overflow-hidden section-scan">
           {/* Background Effects */}
-          <div className="absolute inset-0 bg-ctd-bg"></div>
+          <div className="absolute inset-0"></div>
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-ctd-yellow/5 rounded-full blur-3xl"></div>
           <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-ctd-yellow/3 rounded-full blur-3xl"></div>
           
-          <div className="relative max-w-7xl mx-auto px-6 lg:px-8 text-center">
+          <div className="relative max-w-6xl mx-auto px-6 text-center">
             <div className="max-w-5xl mx-auto">
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-ctd-text neon-text mb-8 leading-tight">
+              <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight neon-text mb-8 leading-tight">
                 Learn <span className="text-ctd-yellow">Web3</span>. Ship real things.
                 {/* alt: Build on Web3. Learn by shipping. */}
                 {/* alt: Web3 skills, real-world builds. */}
               </h1>
-              <p className="text-xl md:text-2xl text-ctd-mute mb-12 leading-relaxed max-w-4xl mx-auto">
+              <p className="mt-5 text-lg text-white/80 max-w-3xl mx-auto">
                 Videos, quizzes, and an AI copilot to take you from "what is a wallet?" to shipping your first dApp.
               </p>
               
               {/* Primary CTA */}
-              <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
+              <div className="mt-10 flex flex-wrap justify-center gap-4">
                 <Link 
                   href="/courses" 
-                  className="btn-primary text-lg"
+                  className="btn-primary"
                   aria-label="Start learning blockchain development"
+                  data-animate="pulse"
                 >
                   Start Learning
                 </Link>
