@@ -151,7 +151,7 @@ export default function QuizModule() {
                   disabled={!selectedAnswers[currentQuestionIndex]}
                   className={`btn-primary ${!selectedAnswers[currentQuestionIndex] ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  {isLastQuestion ? 'Finish Quiz' : 'Next Question'}
+                  {isLastQuestion ? 'Check Answer' : 'Next'}
                 </button>
               </div>
             </div>
@@ -169,7 +169,7 @@ export default function QuizModule() {
                 </h2>
                 <p className="text-gray-300 mb-6">
                   {isCompleted 
-                    ? 'Congratulations! You passed the module.' 
+                    ? 'Nice! Progress saved.' 
                     : 'You need 70% or higher to pass. Try again!'}
                 </p>
                 

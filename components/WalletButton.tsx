@@ -9,25 +9,25 @@ export default function WalletButton({ className = '' }: WalletButtonProps) {
   const [address, setAddress] = useState<string>('')
 
   useEffect(() => {
-    const stored = localStorage.getItem('wallet_connected')
-    const storedAddress = localStorage.getItem('wallet_address')
-    if (stored && storedAddress) {
+    const stored = localStorage.getItem('ctdhub:wallet')
+    if (stored) {
       setIsConnected(true)
-      setAddress(storedAddress)
+      setAddress(stored)
     }
   }, [])
 
   const connectWallet = async () => {
-    if (typeof window !== 'undefined' && window.ethereum) {
+    if (typeof window !== 'undefined' && (window as any).ethereum) {
       try {
-        const accounts = await window.ethereum.request({ 
+        const accounts = await (window as any).ethereum.request({ 
           method: 'eth_requestAccounts' 
         })
         if (accounts[0]) {
           setIsConnected(true)
           setAddress(accounts[0])
-          localStorage.setItem('wallet_connected', 'true')
-          localStorage.setItem('wallet_address', accounts[0])
+          localStorage.setItem('ctdhub:wallet', accounts[0])
+          // Trigger storage event for other components
+          window.dispatchEvent(new Event('storage'))
         }
       } catch (error) {
         console.error('Error connecting wallet:', error)
@@ -40,8 +40,9 @@ export default function WalletButton({ className = '' }: WalletButtonProps) {
   const disconnectWallet = () => {
     setIsConnected(false)
     setAddress('')
-    localStorage.removeItem('wallet_connected')
-    localStorage.removeItem('wallet_address')
+    localStorage.removeItem('ctdhub:wallet')
+    // Trigger storage event for other components
+    window.dispatchEvent(new Event('storage'))
   }
 
   const formatAddress = (addr: string) => {
@@ -62,12 +63,6 @@ export default function WalletButton({ className = '' }: WalletButtonProps) {
           <span className="text-sm text-gray-300">
             {formatAddress(address)}
           </span>
-          <button 
-            onClick={disconnectWallet}
-            className="btn-secondary text-sm px-3 py-2"
-          >
-            Disconnect
-          </button>
         </div>
       )}
     </div>

@@ -394,7 +394,7 @@ export default function BinnoAI() {
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder="Ask about blockchain, DeFi, smart contracts, trading..."
+                    placeholder="Ask Binno anything: &quot;why does my tx keep reverting?&quot;"
                     className="flex-1 bg-gray-700 text-white border border-gray-600 rounded-lg px-4 py-3 resize-none focus:outline-none focus:border-primary min-h-[60px]"
                     rows={2}
                   />

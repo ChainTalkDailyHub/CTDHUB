@@ -75,19 +75,11 @@ a {
   }
 
   /* Responsive buttons for mobile */
-  @media (max-width: 768px) {
-    .btn-primary, .btn-ghost {
-      @apply px-4 py-3 text-sm;
-    }
-    
-    .btn-secondary {
-      @apply px-4 py-2 text-sm;
-    }
-    
-    .card {
-      @apply p-4;
-    }
-  }
+  /* Use Tailwind's responsive classes in your HTML:
+     <button class="btn-primary px-4 py-3 text-sm md:px-8 md:py-4 md:text-base">...</button>
+     <button class="btn-secondary px-4 py-2 text-sm md:px-6 md:py-3 md:text-base">...</button>
+     <div class="card p-4 md:p-8">...</div>
+  */
 }
 
 @layer utilities {

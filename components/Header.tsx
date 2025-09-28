@@ -1,12 +1,40 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import WalletButton from './WalletButton'
+import UserMenu from './UserMenuSimple'
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const [isConnected, setIsConnected] = useState(false)
+  const [userAddress, setUserAddress] = useState('')
   
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen)
+  
+  useEffect(() => {
+    const stored = localStorage.getItem('ctdhub:wallet')
+    if (stored) {
+      setIsConnected(true)
+      setUserAddress(stored)
+    }
+
+    // Listen for wallet connection changes
+    const handleStorageChange = () => {
+      const wallet = localStorage.getItem('ctdhub:wallet')
+      if (wallet) {
+        setIsConnected(true)
+        setUserAddress(wallet)
+      } else {
+        setIsConnected(false)
+        setUserAddress('')
+        setIsUserMenuOpen(false)
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
   
   return (
     <header className="bg-gray-900/80 backdrop-blur-md border-b border-gray-700/50 sticky top-0 z-50">
@@ -51,14 +79,34 @@ export default function Header() {
               <span className="relative z-10">Binno AI</span>
               <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/0 to-orange-500/0 group-hover:from-yellow-400/10 group-hover:to-orange-500/10 rounded-lg transition-all duration-300 -mx-2"></div>
             </Link>
-            <Link href="/developer" className="relative group text-gray-300 hover:text-white transition-colors duration-300 py-2">
-              <span className="relative z-10">Dev Area</span>
+            <Link href="/dev" className="relative group text-gray-300 hover:text-white transition-colors duration-300 py-2">
+              <span className="relative z-10">CS HUB</span>
               <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/0 to-orange-500/0 group-hover:from-yellow-400/10 group-hover:to-orange-500/10 rounded-lg transition-all duration-300 -mx-2"></div>
             </Link>
           </nav>
 
           <div className="flex items-center space-x-4">
             <WalletButton />
+            
+            {/* User Menu Hamburger Button - Only show when connected */}
+            {isConnected && (
+              <button
+                onClick={() => setIsUserMenuOpen(true)}
+                className="relative p-3 rounded-lg bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/30 text-yellow-400 hover:text-yellow-300 hover:from-yellow-600/30 hover:to-orange-600/30 hover:border-yellow-400/50 transition-all duration-300 group"
+                aria-label="Abrir menu do usuário"
+                title="Menu do Usuário"
+              >
+                {/* Hamburger Icon */}
+                <div className="flex flex-col space-y-1">
+                  <div className="w-5 h-0.5 bg-current rounded-full group-hover:scale-110 transition-transform"></div>
+                  <div className="w-5 h-0.5 bg-current rounded-full group-hover:scale-110 transition-transform"></div>
+                  <div className="w-5 h-0.5 bg-current rounded-full group-hover:scale-110 transition-transform"></div>
+                </div>
+                
+                {/* Status indicator */}
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-gray-900 animate-pulse"></div>
+              </button>
+            )}
             
             {/* Mobile menu button */}
             <button
@@ -112,16 +160,23 @@ export default function Header() {
                 🤖 Binno AI
               </Link>
               <Link
-                href="/developer"
+                href="/dev"
                 className="block px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                ⚙️ Dev Area
+                ⚙️ CS HUB
               </Link>
             </div>
           </div>
         )}
       </div>
+
+      {/* User Menu Sidebar */}
+      <UserMenu 
+        isOpen={isUserMenuOpen}
+        onClose={() => setIsUserMenuOpen(false)}
+        userAddress={userAddress}
+      />
     </header>
   )
 }

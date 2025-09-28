@@ -62,7 +62,7 @@ export default function QuizModuleCard({ module, isCompleted, isLocked }: QuizMo
         </Link>
       ) : (
         <div className="btn-secondary opacity-50 cursor-not-allowed text-center">
-          Locked
+          Warm-up first. Finish Module {module.id - 1} to unlock this one.
         </div>
       )}
     </div>

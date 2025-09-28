@@ -1,3 +1,34 @@
+import { v4 as uuidv4 } from 'uuid'
+
+export function short(address: string): string {
+  if (!address || address.length < 10) return address
+  return `${address.slice(0, 6)}...${address.slice(-4)}`
+}
+
+export function ytIdFromUrl(url: string): string | null {
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/,
+    /youtube\.com\/v\/([a-zA-Z0-9_-]+)/
+  ]
+  
+  for (const pattern of patterns) {
+    const match = url.match(pattern)
+    if (match && match[1]) {
+      return match[1]
+    }
+  }
+  
+  return null
+}
+
+export function ytThumb(videoId: string): string {
+  return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+}
+
+export function generateId(): string {
+  return uuidv4()
+}
+
 export interface UserProgress {
   userAddress: string
   completedModules: number[]

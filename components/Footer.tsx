@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { FaTelegram, FaTwitter, FaYoutube, FaCoins } from 'react-icons/fa'
 
 export default function Footer() {
   return (
@@ -20,26 +21,38 @@ export default function Footer() {
           
           <div>
             <h4 className="text-lg font-semibold text-white mb-6">Quick Links</h4>
-            <nav aria-label="Footer navigation">
-              <ul className="space-y-3">
-                <li><a href="/courses" className="text-gray-400 hover:text-[#FFC700] transition-colors duration-200 text-lg" aria-label="Browse blockchain courses">Courses</a></li>
-                <li><a href="/quiz" className="text-gray-400 hover:text-[#FFC700] transition-colors duration-200 text-lg" aria-label="Take knowledge quizzes">Quiz</a></li>
-                <li><a href="/binno-ai" className="text-gray-400 hover:text-[#FFC700] transition-colors duration-200 text-lg" aria-label="Chat with Binno AI assistant">Binno AI</a></li>
-                <li><a href="/developer" className="text-gray-400 hover:text-[#FFC700] transition-colors duration-200 text-lg" aria-label="Access developer tools">Dev Area</a></li>
-              </ul>
-            </nav>
+            <ul className="space-y-3">
+              <li><a href="/courses" className="text-gray-400 hover:text-yellow-400 transition-colors">Courses</a></li>
+              <li><a href="/quiz" className="text-gray-400 hover:text-yellow-400 transition-colors">Quiz</a></li>
+              <li><a href="/binno-ai" className="text-gray-400 hover:text-yellow-400 transition-colors">Binno AI</a></li>
+              <li><a href="/dev" className="text-gray-400 hover:text-yellow-400 transition-colors">Dev Area</a></li>
+            </ul>
           </div>
           
           <div>
             <h4 className="text-lg font-semibold text-white mb-6">Connect</h4>
-            <nav aria-label="Social media links">
-              <ul className="space-y-3">
-                <li><a href="https://t.me/chaintalk_cto" className="text-gray-400 hover:text-[#FFC700] transition-colors duration-200 text-lg" aria-label="Join our Telegram channel" target="_blank" rel="noopener noreferrer">📱 Telegram</a></li>
-                <li><a href="https://x.com/chaintalk_cto" className="text-gray-400 hover:text-[#FFC700] transition-colors duration-200 text-lg" aria-label="Follow us on X (Twitter)" target="_blank" rel="noopener noreferrer">🐦 X (Twitter)</a></li>
-                <li><a href="https://www.coingecko.com/en/coins/chain-talk-daily" className="text-gray-400 hover:text-[#FFC700] transition-colors duration-200 text-lg" aria-label="View CTD on CoinGecko" target="_blank" rel="noopener noreferrer">🦎 CoinGecko</a></li>
-                <li><a href="https://www.youtube.com/@ChainTalkDaily-CTO" className="text-gray-400 hover:text-[#FFC700] transition-colors duration-200 text-lg" aria-label="Subscribe to our YouTube channel" target="_blank" rel="noopener noreferrer">📺 YouTube</a></li>
-              </ul>
-            </nav>
+            <ul className="space-y-3">
+              <li>
+                <a href="https://t.me/ctdhub" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-3">
+                  <FaTelegram className="w-5 h-5" /> Telegram
+                </a>
+              </li>
+              <li>
+                <a href="https://x.com/ctdhub" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-3">
+                  <FaTwitter className="w-5 h-5" /> X (Twitter)
+                </a>
+              </li>
+              <li>
+                <a href="https://coingecko.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-3">
+                  <FaCoins className="w-5 h-5" /> CoinGecko
+                </a>
+              </li>
+              <li>
+                <a href="https://youtube.com/@ctdhub" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-3">
+                  <FaYoutube className="w-5 h-5" /> YouTube
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
         
