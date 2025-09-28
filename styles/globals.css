@@ -2,6 +2,51 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg:#0A0A0A; --panel:#101214; --border:#2F3136; --text:#EAEAEA;
+  --muted:#9CA3AF; --yellow:#FFC700; --ice:#00E5FF;
+}
+
+* {
+  scroll-behavior: smooth;
+}
+
+html,body { 
+  background: var(--bg); 
+  color: var(--text); 
+}
+
+.card { 
+  @apply rounded-2xl border border-ctd-border bg-ctd-panel/85 backdrop-blur shadow-inner; 
+}
+
+.btn-primary { 
+  @apply inline-flex items-center gap-2 rounded-xl bg-ctd-yellow text-black font-semibold px-5 py-3 shadow-glow hover:shadow-[0_12px_28px_-6px_rgba(255,199,0,.5)] hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-ctd-yellow/60 transition; 
+}
+
+.btn-ghost { 
+  @apply inline-flex items-center gap-2 rounded-xl border border-ctd-yellow/40 text-ctd-yellow px-5 py-3 hover:bg-ctd-yellow/10 focus:outline-none focus:ring-2 focus:ring-ctd-yellow/40 transition; 
+}
+
+.chip { 
+  @apply inline-flex items-center rounded-full border border-ctd-border/60 bg-ctd-panel/70 px-3 py-1 text-sm; 
+}
+
+.neon-text { 
+  text-shadow: 0 0 12px rgba(255,199,0,.25); 
+}
+
+.focus-ring { 
+  @apply focus:outline-none focus:ring-2 focus:ring-ctd-yellow/60; 
+}
+
+.grid-bg {
+  background-image:
+    linear-gradient(transparent 95%, rgba(255,199,0,.06) 96%),
+    linear-gradient(90deg, transparent 95%, rgba(255,199,0,.06) 96%);
+  background-size: 24px 24px;
+}
+
 html,
 body {
   padding: 0;

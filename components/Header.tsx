@@ -37,7 +37,7 @@ export default function Header() {
   }, [])
   
   return (
-    <header className="bg-gray-900/80 backdrop-blur-md border-b border-gray-700/50 sticky top-0 z-50">
+    <header className="bg-ctd-panel/95 backdrop-blur-md border-b border-ctd-border sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-24">
           <Link href="/" className="flex items-center group">

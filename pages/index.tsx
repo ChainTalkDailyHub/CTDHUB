@@ -11,18 +11,18 @@ export default function Home() {
         {/* Hero Section */}
         <section className="relative py-24 lg:py-32 overflow-hidden">
           {/* Background Effects */}
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900"></div>
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#FFC700]/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-[#FFC700]/3 rounded-full blur-3xl"></div>
+          <div className="absolute inset-0 bg-ctd-bg"></div>
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-ctd-yellow/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-ctd-yellow/3 rounded-full blur-3xl"></div>
           
           <div className="relative max-w-7xl mx-auto px-6 lg:px-8 text-center">
             <div className="max-w-5xl mx-auto">
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-tight">
-                Learn <span className="text-[#FFC700]">Web3</span>. Ship real things.
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-ctd-text neon-text mb-8 leading-tight">
+                Learn <span className="text-ctd-yellow">Web3</span>. Ship real things.
                 {/* alt: Build on Web3. Learn by shipping. */}
                 {/* alt: Web3 skills, real-world builds. */}
               </h1>
-              <p className="text-xl md:text-2xl text-gray-300 mb-12 leading-relaxed max-w-4xl mx-auto">
+              <p className="text-xl md:text-2xl text-ctd-mute mb-12 leading-relaxed max-w-4xl mx-auto">
                 Videos, quizzes, and an AI copilot to take you from "what is a wallet?" to shipping your first dApp.
               </p>
               
@@ -74,20 +74,20 @@ export default function Home() {
         <section className="py-24 lg:py-32">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="text-center mb-20">
-              <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Start building in three simple steps</h2>
+              <h2 className="text-3xl md:text-5xl font-bold text-ctd-text neon-text mb-6">Start building in three simple steps</h2>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16">
               {/* Step 1 */}
               <div className="text-center group">
                 <div className="relative mb-8">
-                  <div className="w-20 h-20 bg-[#FFC700] rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-200">
+                  <div className="w-20 h-20 bg-ctd-yellow rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-200 shadow-glow">
                     <span className="text-black font-bold text-2xl">1</span>
                   </div>
-                  <div className="hidden md:block absolute top-10 left-full w-full h-0.5 bg-gradient-to-r from-[#FFC700] to-transparent"></div>
+                  <div className="hidden md:block absolute top-10 left-full w-full h-0.5 bg-gradient-to-r from-ctd-yellow to-transparent"></div>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-4">Pick your path</h3>
-                <p className="text-gray-400 leading-relaxed">
+                <h3 className="text-2xl font-bold text-ctd-text mb-4">Pick your path</h3>
+                <p className="text-ctd-mute leading-relaxed">
                   Choose a track that fits your level—from fundamentals to DeFi and smart contracts.
                 </p>
               </div>

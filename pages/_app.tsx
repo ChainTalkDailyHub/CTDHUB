@@ -5,7 +5,9 @@ import ErrorBoundary from '@/components/ErrorBoundary'
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <ErrorBoundary>
-      <Component {...pageProps} />
+      <div className="grid-bg min-h-screen bg-ctd-bg text-ctd-text">
+        <Component {...pageProps} />
+      </div>
     </ErrorBoundary>
   )
 }

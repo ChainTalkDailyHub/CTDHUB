@@ -3,7 +3,7 @@ import { FaTelegram, FaTwitter, FaYoutube, FaCoins } from 'react-icons/fa'
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900/50 backdrop-blur-sm border-t border-gray-800/50 mt-24" role="contentinfo">
+    <footer className="bg-ctd-panel/50 backdrop-blur-sm border-t border-ctd-border mt-24" role="contentinfo">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           <div>
@@ -14,15 +14,15 @@ export default function Footer() {
                 className="h-24 w-auto"
               />
             </div>
-            <p className="text-gray-400 text-lg leading-relaxed">
+            <p className="text-ctd-mute text-lg leading-relaxed">
               Your gateway to blockchain education and Web3 development.
             </p>
           </div>
           
           <div>
-            <h4 className="text-lg font-semibold text-white mb-6">Quick Links</h4>
+            <h4 className="text-lg font-semibold text-ctd-text mb-6">Quick Links</h4>
             <ul className="space-y-3">
-              <li><a href="/courses" className="text-gray-400 hover:text-yellow-400 transition-colors">Courses</a></li>
+              <li><a href="/courses" className="text-ctd-mute hover:text-ctd-yellow transition-colors focus-ring">Courses</a></li>
               <li><a href="/quiz" className="text-gray-400 hover:text-yellow-400 transition-colors">Quiz</a></li>
               <li><a href="/binno-ai" className="text-gray-400 hover:text-yellow-400 transition-colors">Binno AI</a></li>
               <li><a href="/dev" className="text-gray-400 hover:text-yellow-400 transition-colors">Dev Area</a></li>
@@ -30,7 +30,7 @@ export default function Footer() {
           </div>
           
           <div>
-            <h4 className="text-lg font-semibold text-white mb-6">Connect</h4>
+            <h4 className="text-lg font-semibold text-ctd-text mb-6">Connect</h4>
             <ul className="space-y-3">
               <li>
                 <a href="https://t.me/ctdhub" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-3">
