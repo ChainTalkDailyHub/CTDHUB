@@ -22,7 +22,7 @@ export default function Footer() {
           <div>
             <h4 className="text-lg font-semibold text-ctd-text mb-6">Quick Links</h4>
             <ul className="space-y-3">
-              <li><a href="/courses" className="text-ctd-mute hover:text-ctd-yellow transition-colors focus-ring">Courses</a></li>
+              <li><a href="/courses" className="text-ctd-mute hover:text-ctd-yellow transition-colors">Courses</a></li>
               <li><a href="/quiz" className="text-ctd-mute hover:text-ctd-yellow transition-colors">Quiz</a></li>
               <li><a href="/binno-ai" className="text-ctd-mute hover:text-ctd-yellow transition-colors">Binno AI</a></li>
               <li><a href="/dev" className="text-ctd-mute hover:text-ctd-yellow transition-colors">Dev Area</a></li>
