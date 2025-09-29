@@ -20,13 +20,21 @@ export default function QuizModule() {
   
   useEffect(() => {
     // Check if module is accessible
-    if (moduleId > 1) {
+    if (moduleId && moduleId > 1) {
       const completedModules = JSON.parse(localStorage.getItem('completed_modules') || '[]')
+      console.log('Checking access to module', moduleId, 'Completed modules:', completedModules)
       if (!completedModules.includes(moduleId - 1)) {
+        console.log('Access denied to module', moduleId, 'Previous module not completed')
         router.push('/quiz')
         return
       }
     }
+    
+    // Reset state when changing modules
+    setCurrentQuestionIndex(0)
+    setSelectedAnswers([])
+    setShowResults(false)
+    setIsCompleted(false)
   }, [moduleId, router])
   
   if (!module) {
@@ -187,20 +195,29 @@ export default function QuizModule() {
               </div>
               
               <div className="flex gap-4 justify-center">
-                <button
-                  onClick={() => {
-                    const currentModuleNum = module.id;
-                    const nextModuleNum = currentModuleNum + 1;
-                    if (nextModuleNum <= 10) {
-                      router.push(`/quiz/${nextModuleNum}`);
-                    } else {
-                      router.push('/quiz');
-                    }
-                  }}
-                  className="btn-primary"
-                >
-                  {module.id < 10 ? 'Next Module' : 'Complete Quiz'}
-                </button>
+                {isCompleted ? (
+                  <button
+                    onClick={() => {
+                      const currentModuleNum = module.id;
+                      const nextModuleNum = currentModuleNum + 1;
+                      if (nextModuleNum <= 10) {
+                        router.push(`/quiz/${nextModuleNum}`);
+                      } else {
+                        router.push('/quiz');
+                      }
+                    }}
+                    className="btn-primary"
+                  >
+                    {module.id < 10 ? 'Next Module' : 'Complete Quiz'}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => router.push('/quiz')}
+                    className="btn-primary"
+                  >
+                    Back to Quiz
+                  </button>
+                )}
                 {!isCompleted && (
                   <button
                     onClick={() => window.location.reload()}
