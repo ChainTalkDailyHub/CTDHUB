@@ -114,7 +114,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: 'At least one video is required' })
       }
 
-      const courses = await readCourses()
+      // Try Supabase first, fallback to file system
+      const useSupabase = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      
+      let courses
+      if (useSupabase) {
+        console.log('Using Supabase for course update')
+        courses = await readCoursesFromSupabase()
+      } else {
+        console.log('Using file system for course update')
+        courses = await readCourses()
+      }
+
       const courseIndex = courses.findIndex(c => c.id === courseId)
 
       if (courseIndex === -1) {
@@ -153,7 +164,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           title: video.title.trim(),
           description: video.description?.trim() || '',
           youtubeUrl: video.youtubeUrl.trim(),
-          thumbnail: ytThumb(videoId),
+          thumbnail: ytThumb(videoId) || null,
           order: course.videos.length + index + 1
         }
       })
@@ -162,8 +173,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       course.totalVideos = course.videos.length
       course.updatedAt = Date.now()
 
-      courses[courseIndex] = course
-      await writeCourses(courses)
+      if (useSupabase) {
+        console.log('Updating course in Supabase')
+        // Convert to Supabase-compatible format
+        const supabaseCourse = {
+          ...course,
+          videos: course.videos.map(video => ({
+            ...video,
+            thumbnail: video.thumbnail || null
+          }))
+        }
+        const success = await writeCourseToSupabase(supabaseCourse)
+        if (!success) {
+          return res.status(500).json({ error: 'Failed to update course in database' })
+        }
+      } else {
+        console.log('Updating course in file system')
+        courses[courseIndex] = course
+        await writeCourses(courses)
+      }
 
       return res.status(200).json(course)
     }

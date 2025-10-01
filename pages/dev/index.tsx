@@ -57,47 +57,102 @@ export default function DevArea() {
   }) => {
     if (!address) throw new Error('Wallet not connected')
 
-    const response = await fetch('/api/courses', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-user-address': address
-      },
-      body: JSON.stringify(data)
-    })
+    setIsLoading(true)
+    try {
+      // First create the course
+      const courseResponse = await fetch('/api/courses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-address': address
+        },
+        body: JSON.stringify({
+          action: 'create_course',
+          courseTitle: data.title,
+          courseDescription: data.description
+        })
+      })
 
-    if (!response.ok) {
-      const error = await response.json()
-      throw new Error(error.error || 'Failed to publish course')
+      if (!courseResponse.ok) {
+        const error = await courseResponse.json()
+        throw new Error(error.error || 'Failed to create course')
+      }
+
+      const newCourse = await courseResponse.json()
+
+      // Then add videos if any
+      if (data.videos && data.videos.length > 0) {
+        const videosResponse = await fetch('/api/courses', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-user-address': address
+          },
+          body: JSON.stringify({
+            action: 'add_videos',
+            courseId: newCourse.id,
+            videos: data.videos.map(video => ({
+              title: video.title.trim(),
+              description: video.description?.trim() || '',
+              youtube_url: video.youtubeUrl.trim(),
+              thumbnail: `https://img.youtube.com/vi/${extractYouTubeId(video.youtubeUrl)}/maxresdefault.jpg`
+            }))
+          })
+        })
+
+        if (!videosResponse.ok) {
+          const error = await videosResponse.json()
+          console.warn('Failed to add videos:', error)
+        }
+      }
+
+      // Reload courses
+      await loadMyCourses(address)
+      alert('Published! It\'s live on Courses.')
+    } finally {
+      setIsLoading(false)
     }
-
-    const newCourse = await response.json()
-    setMyCourses(prev => [newCourse, ...prev])
-    
-    alert('Published! It\'s live on Courses.')
   }
 
   const handleAddToExisting = async (courseId: string, videos: Array<{title: string, description: string, youtubeUrl: string}>) => {
     if (!address) throw new Error('Wallet not connected')
 
-    const response = await fetch(`/api/courses?courseId=${courseId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-user-address': address
-      },
-      body: JSON.stringify({ videos })
-    })
+    setIsLoading(true)
+    try {
+      const response = await fetch('/api/courses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-address': address
+        },
+        body: JSON.stringify({
+          action: 'add_videos',
+          courseId,
+          videos: videos.map(video => ({
+            title: video.title.trim(),
+            description: video.description?.trim() || '',
+            youtube_url: video.youtubeUrl.trim(),
+            thumbnail: `https://img.youtube.com/vi/${extractYouTubeId(video.youtubeUrl)}/maxresdefault.jpg`
+          }))
+        })
+      })
 
-    if (!response.ok) {
-      const error = await response.json()
-      throw new Error(error.error || 'Failed to add videos')
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to add videos')
+      }
+
+      // Reload courses
+      await loadMyCourses(address)
+      alert('Videos added successfully!')
+    } finally {
+      setIsLoading(false)
     }
+  }
 
-    const updatedCourse = await response.json()
-    setMyCourses(prev => prev.map(c => c.id === courseId ? updatedCourse : c))
-    
-    alert('Published! It\'s live on Courses.')
+  const extractYouTubeId = (url: string): string => {
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/)
+    return match ? match[1] : ''
   }
 
   const formatDate = (timestamp: number) => {

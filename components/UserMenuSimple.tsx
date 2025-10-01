@@ -132,10 +132,10 @@ export default function UserMenu({ isOpen, onClose, userAddress }: UserMenuProps
               </div>
             </div>
 
-            {/* My Courses - Redirect to Dev Area */}
+            {/* My Modules */}
             <div 
               className="px-4 py-3 hover:bg-gray-800 cursor-pointer border-b border-gray-700"
-              onClick={() => { onClose(); window.location.href = '/dev' }}
+              onClick={() => { onClose(); window.location.href = '/my-modules' }}
             >
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
@@ -143,7 +143,22 @@ export default function UserMenu({ isOpen, onClose, userAddress }: UserMenuProps
                     <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
                   </svg>
                 </div>
-                <span className="text-white font-medium">My Courses</span>
+                <span className="text-white font-medium">My Modules</span>
+              </div>
+            </div>
+
+            {/* Create Content - Redirect to Dev Area */}
+            <div 
+              className="px-4 py-3 hover:bg-gray-800 cursor-pointer border-b border-gray-700"
+              onClick={() => { onClose(); window.location.href = '/dev' }}
+            >
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd"/>
+                  </svg>
+                </div>
+                <span className="text-white font-medium">Create Content</span>
               </div>
             </div>
 
