@@ -76,16 +76,14 @@ export default function Header() {
               <span className="relative z-10">Quiz</span>
               <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
             </Link>
+            <Link href="/simulator" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
+              <span className="relative z-10">Simulator</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
+            </Link>
             <Link href="/binno-ai" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
               <span className="relative z-10">Binno AI</span>
               <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
             </Link>
-            {isConnected && (
-              <Link href="/dashboard" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
-                <span className="relative z-10">Dashboard</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
-              </Link>
-            )}
             <Link href="/dev" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
               <span className="relative z-10">CS HUB</span>
               <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
