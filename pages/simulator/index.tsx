@@ -13,7 +13,7 @@ export default function SimulatorPage() {
 
   useEffect(() => {
     // Check if user is connected
-    const address = localStorage.getItem('connectedWallet')
+    const address = localStorage.getItem('ctdhub:wallet')
     if (address) {
       setUserAddress(address)
     } else {

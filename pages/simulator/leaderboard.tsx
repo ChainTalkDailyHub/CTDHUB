@@ -11,7 +11,7 @@ export default function LeaderboardPage() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const address = localStorage.getItem('connectedWallet')
+    const address = localStorage.getItem('ctdhub:wallet')
     if (address) {
       setUserAddress(address)
     }
@@ -26,7 +26,7 @@ export default function LeaderboardPage() {
         setLeaderboard(data.leaderboard)
         
         // Load user stats if connected
-        const address = localStorage.getItem('connectedWallet')
+        const address = localStorage.getItem('ctdhub:wallet')
         if (address) {
           const userResponse = await fetch(`/api/simulator/user-stats?address=${address}`)
           if (userResponse.ok) {
