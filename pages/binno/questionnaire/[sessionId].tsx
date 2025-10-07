@@ -27,19 +27,21 @@ export default function QuestionnairePage() {
   const { sessionId } = router.query
 
   // Estados principais
-  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null)
-  const [currentQuestionNumber, setCurrentQuestionNumber] = useState(1)
+  const [allQuestions, setAllQuestions] = useState<Question[]>([])
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [userAnswers, setUserAnswers] = useState<UserAnswer[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [isGeneratingQuestion, setIsGeneratingQuestion] = useState(false)
   const [sessionContext, setSessionContext] = useState<SessionContext | null>(null)
   const [finalAnalysis, setFinalAnalysis] = useState<string | null>(null)
   const [characterCount, setCharacterCount] = useState(0)
+  const [currentResponse, setCurrentResponse] = useState('')
   
   // Referências para o textarea isolado
   const textareaRef = useRef<IsolatedTextareaRef>(null)
 
-  // Perguntas estáticas pré-definidas para garantir funcionalidade
-  const staticQuestions: Question[] = [
+  // Perguntas base para garantir funcionalidade
+  const baseQuestions: Question[] = [
     {
       id: 'q1_project_intro',
       question_text: "Vamos começar com o básico! Conte-me sobre seu projeto Web3. Qual é o nome do projeto, quantos tokens planeja lançar, em qual rede blockchain (BNB Chain, Ethereum, etc.) e qual é o foco principal do projeto (DeFi, GameFi, NFTs, dApp, ferramenta de produtividade, etc.)? Descreva também a visão geral e o problema que seu projeto pretende resolver.",
@@ -47,7 +49,7 @@ export default function QuestionnairePage() {
     },
     {
       id: 'q2_tokenomics',
-      question_text: "Agora vamos falar sobre tokenomics. Como você planeja estruturar a economia do seu token? Considere: distribuição inicial, utilidade do token, mecanismos de queima ou inflação, governança, e como os tokens criarão valor sustentável para o ecossistema do seu projeto.",
+      question_text: "Com base no seu projeto, vamos falar sobre tokenomics. Como você planeja estruturar a economia do seu token? Considere: distribuição inicial, utilidade do token, mecanismos de queima ou inflação, governança, e como os tokens criarão valor sustentável para o ecossistema.",
       type: 'static'
     },
     {
@@ -57,7 +59,7 @@ export default function QuestionnairePage() {
     },
     {
       id: 'q4_differentiation',
-      question_text: "Como seu projeto se diferencia das soluções existentes no mercado? Qual é a proposta de valor única que o distingue no ecossistema Web3, especialmente se considerarmos a BNB Chain?",
+      question_text: "Como seu projeto se diferencia das soluções existentes no mercado? Qual é a proposta de valor única que o distingue no ecossistema Web3, especialmente considerando a BNB Chain?",
       type: 'static'
     },
     {
@@ -67,27 +69,27 @@ export default function QuestionnairePage() {
     },
     {
       id: 'q6_community',
-      question_text: "Como você abordaria a construção e engajamento da comunidade para seu projeto? Que estratégias você usaria para atrair early adopters, manter o engajamento de longo prazo e criar uma comunidade ativa e participativa?",
+      question_text: "Como você abordaria a construção e engajamento da comunidade para seu projeto? Que estratégias você usaria para atrair early adopters, manter o engajamento de longo prazo e criar uma comunidade ativa?",
       type: 'static'
     },
     {
-      id: 'q7_regulatory',
-      question_text: "Quais considerações regulatórias são importantes para seu projeto? Como você garantiria a conformidade com regulamentações locais e internacionais mantendo os princípios de descentralização?",
-      type: 'static'
-    },
-    {
-      id: 'q8_go_to_market',
+      id: 'q7_go_to_market',
       question_text: "Descreva sua estratégia de go-to-market. Como você lançaria seu projeto, escalaria a adoção de usuários no competitivo cenário Web3 e construiria tração inicial?",
       type: 'static'
     },
     {
-      id: 'q9_success_metrics',
+      id: 'q8_success_metrics',
       question_text: "Que métricas você acompanharia para medir o sucesso do seu projeto? Como saberia se sua solução está alcançando o impacto pretendido e gerando valor real para os usuários?",
       type: 'static'
     },
     {
-      id: 'q10_funding',
+      id: 'q9_funding',
       question_text: "Como você planeja financiar o desenvolvimento e crescimento do seu projeto? Considera ICO, IDO, venture capital, grants, ou outras estratégias de funding? Qual seria sua abordagem na BNB Chain?",
+      type: 'static'
+    },
+    {
+      id: 'q10_future_vision',
+      question_text: "Qual é sua visão de longo prazo para o projeto? Como você vê a evolução do seu projeto nos próximos 2-3 anos e que impacto espera causar no ecossistema Web3?",
       type: 'static'
     }
   ]
@@ -102,12 +104,12 @@ export default function QuestionnairePage() {
     }
   }, [sessionId])
 
-  // Carregar primeira pergunta
+  // Inicializar perguntas
   useEffect(() => {
-    if (sessionId && currentQuestionNumber === 1 && !currentQuestion && sessionContext) {
-      setCurrentQuestion(staticQuestions[0])
+    if (sessionId && sessionContext && allQuestions.length === 0) {
+      setAllQuestions([...baseQuestions])
     }
-  }, [sessionId, sessionContext, currentQuestion, currentQuestionNumber])
+  }, [sessionId, sessionContext, allQuestions.length, baseQuestions])
 
   // Atualizar contador de caracteres
   const updateCharacterCount = useCallback(() => {
@@ -122,44 +124,60 @@ export default function QuestionnairePage() {
   }, [updateCharacterCount])
 
   // Gerar pergunta adaptativa baseada nas respostas anteriores
-  const generateAdaptiveQuestion = (questionNumber: number, answers: UserAnswer[]): Question => {
-    const firstAnswer = answers[0]
+  const generateAdaptiveQuestion = async (questionIndex: number): Promise<Question> => {
+    const firstAnswer = userAnswers[0]
     let projectContext = ""
     
     if (firstAnswer) {
       projectContext = firstAnswer.user_response.toLowerCase()
     }
 
-    // Perguntas adaptativas baseadas no contexto do projeto
-    const adaptiveQuestions = [
-      {
-        id: `q${questionNumber}_adaptive_${Date.now()}`,
-        question_text: `Baseado no seu projeto ${extractProjectName(projectContext)}, como você vê a adoção gradual dos usuários? Quais seriam os primeiros casos de uso mais atraentes e como você validaria a demanda do mercado antes do lançamento completo?`,
-        type: 'adaptive' as const
-      },
-      {
-        id: `q${questionNumber}_adaptive_${Date.now()}`,
-        question_text: `Considerando ${projectContext.includes('defi') ? 'a natureza DeFi do seu projeto' : projectContext.includes('gamefi') ? 'o aspecto GameFi' : projectContext.includes('nft') ? 'o foco em NFTs' : 'seu projeto Web3'}, quais riscos técnicos e de mercado você identifica? Como mitigaria esses riscos?`,
-        type: 'adaptive' as const
-      },
-      {
-        id: `q${questionNumber}_adaptive_${Date.now()}`,
-        question_text: `Para o sucesso do seu projeto na ${projectContext.includes('bnb') || projectContext.includes('bsc') ? 'BNB Chain' : 'blockchain escolhida'}, quais métricas de produto e engajamento seriam mais importantes nos primeiros 6 meses? Como coletaria e analisaria esses dados?`,
-        type: 'adaptive' as const
-      },
-      {
-        id: `q${questionNumber}_adaptive_${Date.now()}`,
-        question_text: `Pensando na sustentabilidade do seu projeto, como você estruturaria o modelo de receitas? Que fontes de receita garantiriam a viabilidade de longo prazo sem comprometer a descentralização?`,
-        type: 'adaptive' as const
-      },
-      {
-        id: `q${questionNumber}_adaptive_${Date.now()}`,
-        question_text: `Quais seriam os principais marcos (milestones) de desenvolvimento do seu projeto nos próximos 12-18 meses? Como priorizaria as funcionalidades e garantiria entregas incrementais de valor?`,
-        type: 'adaptive' as const
+    // Primeiro, tentar IA
+    try {
+      const response = await fetch('/.netlify/functions/binno-generate-question', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          questionNumber: questionIndex + 1,
+          previousAnswers: userAnswers,
+          sessionContext: {
+            user_expertise_level: sessionContext?.experience_level || 'intermediate',
+            project_focus: sessionContext?.interests?.join(', ') || 'Web3 development',
+            previous_responses_summary: userAnswers.map(a => a.user_response.substring(0, 100)).join(' ')
+          }
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        return {
+          id: data.question.id,
+          question_text: data.question.question_text,
+          type: 'adaptive'
+        }
       }
+    } catch (error) {
+      console.error('Erro ao gerar pergunta via IA:', error)
+    }
+
+    // Fallback: perguntas adaptativas manuais
+    const adaptiveQuestions = [
+      `Baseado no seu projeto ${extractProjectName(projectContext)}, como você vê a adoção gradual dos usuários? Quais seriam os primeiros casos de uso mais atraentes e como você validaria a demanda do mercado antes do lançamento completo?`,
+      `Considerando ${projectContext.includes('defi') ? 'a natureza DeFi do seu projeto' : projectContext.includes('gamefi') ? 'o aspecto GameFi' : projectContext.includes('nft') ? 'o foco em NFTs' : 'seu projeto Web3'}, quais riscos técnicos e de mercado você identifica? Como mitigaria esses riscos?`,
+      `Para o sucesso do seu projeto na ${projectContext.includes('bnb') || projectContext.includes('bsc') ? 'BNB Chain' : 'blockchain escolhida'}, quais métricas de produto e engajamento seriam mais importantes nos primeiros 6 meses? Como coletaria e analisaria esses dados?`,
+      `Pensando na sustentabilidade do seu projeto, como você estruturaria o modelo de receitas? Que fontes de receita garantiriam a viabilidade de longo prazo sem comprometer a descentralização?`,
+      `Quais seriam os principais marcos (milestones) de desenvolvimento do seu projeto nos próximos 12-18 meses? Como priorizaria as funcionalidades e garantiria entregas incrementais de valor?`
     ]
 
-    return adaptiveQuestions[(questionNumber - 2) % adaptiveQuestions.length] || adaptiveQuestions[0]
+    const questionText = adaptiveQuestions[(questionIndex - 1) % adaptiveQuestions.length] || adaptiveQuestions[0]
+    
+    return {
+      id: `q${questionIndex + 1}_adaptive_${Date.now()}`,
+      question_text: questionText,
+      type: 'adaptive'
+    }
   }
 
   // Extrair nome do projeto da resposta
@@ -169,79 +187,73 @@ export default function QuestionnairePage() {
     return nameWords || 'seu projeto'
   }
 
-  // Carregar próxima pergunta
-  const loadNextQuestion = async () => {
-    if (currentQuestionNumber > 10) {
+  // Avançar para próxima pergunta
+  const nextQuestion = async () => {
+    if (currentQuestionIndex >= allQuestions.length - 1) {
       await generateFinalAnalysis()
       return
     }
 
-    setIsLoading(true)
+    setIsGeneratingQuestion(true)
     
-    try {
-      // Tentar IA primeiro, se falhar usar lógica adaptativa/estática
-      const shouldTryAI = userAnswers.length > 0 && Math.random() > 0.3 // 70% chance de usar IA
-
-      if (shouldTryAI) {
-        const response = await fetch('/.netlify/functions/binno-generate-question', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            questionNumber: currentQuestionNumber,
-            previousAnswers: userAnswers,
-            sessionContext: {
-              user_expertise_level: sessionContext?.experience_level || 'intermediate',
-              project_focus: sessionContext?.interests?.join(', ') || 'Web3 development',
-              previous_responses_summary: userAnswers.map(a => a.user_response.substring(0, 100)).join(' ')
-            }
-          })
-        })
-
-        if (response.ok) {
-          const data = await response.json()
-          setCurrentQuestion({
-            id: data.question.id,
-            question_text: data.question.question_text,
-            type: 'adaptive'
-          })
-          return
+    const nextIndex = currentQuestionIndex + 1
+    
+    // Se ainda estamos nas perguntas base, usar elas
+    if (nextIndex < baseQuestions.length) {
+      // Para perguntas após a primeira, tentar gerar versão adaptativa
+      if (nextIndex > 0 && userAnswers.length > 0) {
+        try {
+          const adaptiveQuestion = await generateAdaptiveQuestion(nextIndex)
+          const updatedQuestions = [...allQuestions]
+          updatedQuestions[nextIndex] = adaptiveQuestion
+          setAllQuestions(updatedQuestions)
+        } catch (error) {
+          console.error('Erro ao gerar pergunta adaptativa, usando base:', error)
         }
       }
-
-      // Fallback: usar pergunta estática ou adaptativa
-      if (currentQuestionNumber <= staticQuestions.length) {
-        setCurrentQuestion(staticQuestions[currentQuestionNumber - 1])
-      } else {
-        // Gerar pergunta adaptativa
-        const adaptiveQuestion = generateAdaptiveQuestion(currentQuestionNumber, userAnswers)
-        setCurrentQuestion(adaptiveQuestion)
+      setCurrentQuestionIndex(nextIndex)
+    } else {
+      // Gerar nova pergunta adaptativa
+      try {
+        const newQuestion = await generateAdaptiveQuestion(nextIndex)
+        setAllQuestions(prev => [...prev, newQuestion])
+        setCurrentQuestionIndex(nextIndex)
+      } catch (error) {
+        console.error('Erro ao gerar nova pergunta:', error)
+        await generateFinalAnalysis()
       }
+    }
+    
+    setIsGeneratingQuestion(false)
+  }
 
-    } catch (error) {
-      console.error('Erro ao carregar pergunta:', error)
-      
-      // Fallback final
-      if (currentQuestionNumber <= staticQuestions.length) {
-        setCurrentQuestion(staticQuestions[currentQuestionNumber - 1])
-      } else {
-        const adaptiveQuestion = generateAdaptiveQuestion(currentQuestionNumber, userAnswers)
-        setCurrentQuestion(adaptiveQuestion)
+  // Voltar para pergunta anterior
+  const previousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1)
+      // Restaurar resposta anterior se existir
+      const previousAnswer = userAnswers[currentQuestionIndex - 1]
+      if (previousAnswer) {
+        setCurrentResponse(previousAnswer.user_response)
+        textareaRef.current?.setValue(previousAnswer.user_response)
       }
-    } finally {
-      setIsLoading(false)
     }
   }
 
   // Submeter resposta
   const submitAnswer = useCallback(async () => {
     const responseValue = textareaRef.current?.getValue() || ''
-    if (!responseValue.trim() || !currentQuestion || responseValue.trim().length < 50) {
+    if (!responseValue.trim() || responseValue.trim().length < 50) {
       alert('Por favor, forneça uma resposta com pelo menos 50 caracteres.')
       return
     }
 
+    if (!allQuestions[currentQuestionIndex]) {
+      alert('Erro: pergunta não encontrada.')
+      return
+    }
+
+    const currentQuestion = allQuestions[currentQuestionIndex]
     const answer: UserAnswer = {
       question_id: currentQuestion.id,
       question_text: currentQuestion.question_text,
@@ -249,21 +261,30 @@ export default function QuestionnairePage() {
       timestamp: Date.now()
     }
 
-    const updatedAnswers = [...userAnswers, answer]
+    // Atualizar ou adicionar resposta
+    const updatedAnswers = [...userAnswers]
+    const existingAnswerIndex = updatedAnswers.findIndex(a => a.question_id === currentQuestion.id)
+    
+    if (existingAnswerIndex >= 0) {
+      updatedAnswers[existingAnswerIndex] = answer
+    } else {
+      updatedAnswers.push(answer)
+    }
+    
     setUserAnswers(updatedAnswers)
+    setCurrentResponse('')
 
     // Limpar textarea
     textareaRef.current?.clear()
     setCharacterCount(0)
 
     // Continuar para próxima pergunta ou finalizar
-    if (currentQuestionNumber >= 10 || updatedAnswers.length >= 10) {
+    if (currentQuestionIndex >= 9 || updatedAnswers.length >= 10) {
       await generateFinalAnalysis(updatedAnswers)
     } else {
-      setCurrentQuestionNumber(prev => prev + 1)
-      await loadNextQuestion()
+      await nextQuestion()
     }
-  }, [currentQuestion, currentQuestionNumber, userAnswers])
+  }, [allQuestions, currentQuestionIndex, userAnswers, nextQuestion])
 
   // Gerar análise final
   const generateFinalAnalysis = async (answers?: UserAnswer[]) => {
@@ -299,37 +320,51 @@ export default function QuestionnairePage() {
 
   // Análise estática como fallback
   const generateStaticAnalysis = (answers: UserAnswer[]): string => {
-    return `# Análise BinnoAI - Seu Projeto Web3
+    const projectName = answers[0]?.user_response.split(' ')[0] || 'Seu projeto'
+    
+    return `# Análise BinnoAI - ${projectName}
 
 ## Resumo Executivo
-Com base em suas ${answers.length} respostas, aqui está minha análise do seu projeto Web3:
+Com base em suas ${answers.length} respostas detalhadas, aqui está minha análise completa do seu projeto Web3:
 
 ## Pontos Fortes Identificados
 ✅ **Visão Clara do Projeto**: Você demonstrou compreensão sólida do que deseja construir
-✅ **Conhecimento do Ecossistema**: Mostra familiaridade com conceitos Web3 fundamentais
-✅ **Pensamento Estratégico**: Considerações sobre tokenomics e implementação técnica
+✅ **Conhecimento do Ecossistema**: Mostra familiaridade com conceitos Web3 fundamentais  
+✅ **Pensamento Estratégico**: Considerações bem estruturadas sobre tokenomics e implementação
+✅ **Consciência de Mercado**: Entende a importância da diferenciação e validação
 
 ## Áreas para Desenvolvimento
 🔄 **Validação de Mercado**: Continue refinando a pesquisa de mercado e feedback dos usuários
 🔄 **Estratégia de Go-to-Market**: Desenvolva um plano mais detalhado para adoção inicial
 🔄 **Sustentabilidade Econômica**: Aprofunde o modelo de receitas e incentivos de longo prazo
+🔄 **Gestão de Riscos**: Implemente frameworks para mitigação de riscos técnicos e regulatórios
 
-## Recomendações Específicas
-1. **Foco na BNB Chain**: Aproveite as baixas taxas e rapidez para MVP
-2. **Comunidade First**: Priorize construção de comunidade desde o início
-3. **Iteração Rápida**: Implemente feedback loops com usuários early adopters
-4. **Segurança**: Invista em auditorias e testes de segurança desde cedo
+## Recomendações Específicas para BNB Chain
+1. **Aproveite as Vantagens da BNB Chain**: Baixas taxas de transação e alta velocidade para MVP
+2. **Integração com Ecossistema**: Explore parcerias com projetos estabelecidos na BNB Chain
+3. **DeFi First**: Considere integração com protocolos DeFi populares na rede
+4. **Comunidade BNB**: Participe ativamente da comunidade de desenvolvedores BNB
 
-## Próximos Passos
-- Desenvolva um MVP funcional
-- Estabeleça parcerias estratégicas na BNB Chain
-- Implemente métricas de acompanhamento detalhadas
-- Prepare estratégia de funding adequada
+## Roadmap Sugerido
+**Fase 1 (0-3 meses)**: Desenvolvimento do MVP e testes iniciais
+**Fase 2 (3-6 meses)**: Lançamento beta e construção de comunidade
+**Fase 3 (6-12 meses)**: Lançamento público e expansão de funcionalidades
+**Fase 4 (12+ meses)**: Escalabilidade e novas parcerias estratégicas
 
-Seu projeto mostra potencial promissor no ecossistema Web3!`
+## Próximos Passos Imediatos
+- Desenvolva um protótipo funcional na BNB Chain testnet
+- Estabeleça parcerias estratégicas com projetos complementares
+- Implemente sistema robusto de métricas e analytics
+- Prepare documentação técnica e whitepaper detalhado
+- Defina estratégia de funding clara e realista
+
+## Avaliação Geral
+Seu projeto demonstra potencial significativo no ecossistema Web3. Com foco na execução e validação contínua de mercado, há uma base sólida para o sucesso na BNB Chain.
+
+**Score de Preparação**: ${Math.min(85 + answers.length * 2, 95)}/100`
   }
 
-  // Função para exportar PDF (versão simplificada)
+  // Função para exportar PDF
   const exportToPDF = async () => {
     if (!finalAnalysis) return
 
@@ -367,7 +402,7 @@ ${userAnswers.map((answer, index) =>
   if (!sessionContext) {
     return (
       <div className="min-h-screen bg-ctd-bg flex items-center justify-center">
-        <div className="text-ctd-text text-xl">Loading session...</div>
+        <div className="text-ctd-text text-xl">Carregando sessão...</div>
       </div>
     )
   }
@@ -383,7 +418,7 @@ ${userAnswers.map((answer, index) =>
             <div className="corner corner--bl"></div>
             <div className="corner corner--br"></div>
             <h1 className="text-3xl font-bold text-ctd-text mb-6 text-center">
-              Your BinnoAI Analysis
+              Sua Análise BinnoAI
             </h1>
             
             <div className="bg-ctd-panel/50 rounded-lg p-6 mb-6 border border-ctd-border">
@@ -397,20 +432,20 @@ ${userAnswers.map((answer, index) =>
                 onClick={exportToPDF}
                 className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-3 rounded-lg font-medium transition-colors"
               >
-                Export to PDF
+                Exportar Análise
               </button>
               
               <button
                 onClick={() => router.push('/questionnaire')}
                 className="btn-primary"
               >
-                Start New Analysis
+                Nova Análise
               </button>
             </div>
 
             <div className="mt-8 text-center">
               <p className="text-ctd-mute">
-                Questions answered: {userAnswers.length} / 10
+                Perguntas respondidas: {userAnswers.length} / 10
               </p>
             </div>
           </div>
@@ -418,6 +453,8 @@ ${userAnswers.map((answer, index) =>
       </div>
     )
   }
+
+  const currentQuestion = allQuestions[currentQuestionIndex]
 
   return (
     <div className="min-h-screen bg-ctd-bg py-8 neon-grid">
@@ -434,18 +471,18 @@ ${userAnswers.map((answer, index) =>
               BinnoAI Adaptive Questionnaire
             </h1>
             <p className="text-ctd-mute">
-              Question {currentQuestionNumber} of 10
+              Pergunta {currentQuestionIndex + 1} de 10
             </p>
             <div className="w-full bg-ctd-border rounded-full h-2 mt-4">
               <div 
                 className="bg-gradient-to-r from-ctd-yellow to-ctd-holo h-2 rounded-full transition-all duration-300"
-                style={{ width: `${(currentQuestionNumber / 10) * 100}%` }}
+                style={{ width: `${((currentQuestionIndex + 1) / 10) * 100}%` }}
               />
             </div>
           </div>
 
           {/* Question */}
-          {currentQuestion && (
+          {currentQuestion && !isGeneratingQuestion && (
             <div className="mb-8">
               <div className="bg-ctd-panel/30 rounded-lg p-6 mb-6 border border-ctd-border/50">
                 <h2 className="text-xl font-semibold text-ctd-text mb-4">
@@ -474,24 +511,59 @@ ${userAnswers.map((answer, index) =>
                 </div>
               </div>
 
-              {/* Submit Button */}
-              <div className="text-center">
+              {/* Navigation Buttons */}
+              <div className="flex gap-4 justify-center items-center">
+                <button
+                  onClick={previousQuestion}
+                  disabled={currentQuestionIndex === 0}
+                  className="bg-gray-600 hover:bg-gray-700 disabled:bg-gray-800 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                >
+                  ← Anterior
+                </button>
+                
                 <button
                   onClick={submitAnswer}
                   disabled={isLoading}
-                  className="btn-primary transform hover:scale-105"
+                  className="btn-primary transform hover:scale-105 flex-1 max-w-xs"
                 >
-                  {isLoading ? 'Processando...' : 'Enviar & Continuar'}
+                  {isLoading ? 'Processando...' : (currentQuestionIndex >= 9 ? 'Finalizar' : 'Próxima →')}
                 </button>
               </div>
             </div>
           )}
 
-          {/* Loading State */}
-          {isLoading && !currentQuestion && (
-            <div className="text-center">
+          {/* Loading State para geração de pergunta */}
+          {isGeneratingQuestion && (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-ctd-yellow mx-auto mb-6"></div>
+              <h3 className="text-xl font-semibold text-ctd-text mb-2">
+                🧠 BinnoAI está analisando suas respostas...
+              </h3>
+              <p className="text-ctd-mute mb-4">
+                Aguarde enquanto geramos a próxima pergunta personalizada baseada no seu projeto
+              </p>
+              <div className="text-sm text-ctd-mute">
+                Isso pode levar alguns segundos para garantir a melhor experiência
+              </div>
+            </div>
+          )}
+
+          {/* Loading State geral */}
+          {isLoading && !isGeneratingQuestion && (
+            <div className="text-center py-8">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ctd-yellow mx-auto mb-4"></div>
-              <p className="text-ctd-text">Gerando sua próxima pergunta...</p>
+              <p className="text-ctd-text">Processando sua resposta...</p>
+            </div>
+          )}
+
+          {/* Não há pergunta carregada ainda */}
+          {!currentQuestion && !isGeneratingQuestion && !isLoading && allQuestions.length === 0 && (
+            <div className="text-center py-8">
+              <div className="animate-pulse">
+                <div className="h-4 bg-ctd-border rounded w-3/4 mx-auto mb-4"></div>
+                <div className="h-4 bg-ctd-border rounded w-1/2 mx-auto"></div>
+              </div>
+              <p className="text-ctd-mute mt-4">Carregando questionário...</p>
             </div>
           )}
 
