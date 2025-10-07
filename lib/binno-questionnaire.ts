@@ -296,29 +296,44 @@ Return comprehensive analysis in this JSON format:
 
     const fallbackQuestions = [
       {
-        question_text: "Describe your Web3 project's core value proposition and how it leverages blockchain technology to solve real-world problems.",
-        context: "Understanding the fundamental purpose and blockchain integration of your project",
-        stage: "ideation"
-      },
-      {
-        question_text: "How would you design the tokenomics for your project, considering utility, governance, and incentive alignment?",
-        context: "Token economics and sustainable value creation",
+        question_text: "Based on your project description, how would you design the tokenomics? Consider utility functions, distribution model, governance mechanisms, and how tokens will create value for your ecosystem.",
+        context: "Token economics and sustainable value creation based on project details",
         stage: "tokenomics"
       },
       {
-        question_text: "What specific advantages does building on BNB Chain offer for your project compared to other blockchains?",
-        context: "BNB Chain ecosystem optimization and strategic positioning",
+        question_text: "What specific technical challenges do you anticipate in developing your project, and how do you plan to address them? Consider scalability, security, and user experience.",
+        context: "Technical implementation challenges and solutions",
         stage: "development"
       },
       {
-        question_text: "How would you approach building and managing a community around your Web3 project?",
+        question_text: "How does your project differentiate itself from existing solutions in the same category? What unique value proposition sets it apart in the Web3 ecosystem?",
+        context: "Competitive analysis and unique positioning",
+        stage: "strategy"
+      },
+      {
+        question_text: "What partnerships or integrations would be crucial for your project's success? Consider DeFi protocols, NFT marketplaces, or other Web3 infrastructure you might need.",
+        context: "Strategic partnerships and ecosystem integration",
+        stage: "partnerships"
+      },
+      {
+        question_text: "How would you approach building and engaging your community? What strategies would you use to attract early adopters and maintain long-term engagement?",
         context: "Community development and engagement strategies",
         stage: "community"
       },
       {
-        question_text: "What partnerships would be most valuable for your project's success in the BNB ecosystem?",
-        context: "Strategic partnerships and ecosystem integration",
-        stage: "partnerships"
+        question_text: "What regulatory considerations are important for your project? How would you ensure compliance while maintaining decentralization principles?",
+        context: "Regulatory compliance and risk management",
+        stage: "compliance"
+      },
+      {
+        question_text: "Describe your go-to-market strategy. How would you launch your project and scale user adoption in the competitive Web3 landscape?",
+        context: "Market entry and growth strategies",
+        stage: "launch"
+      },
+      {
+        question_text: "What metrics would you track to measure your project's success? How would you know if your solution is achieving its intended impact?",
+        context: "Success metrics and KPI tracking",
+        stage: "analytics"
       }
     ]
 

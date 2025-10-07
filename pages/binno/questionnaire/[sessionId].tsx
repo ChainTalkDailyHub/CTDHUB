@@ -75,19 +75,34 @@ export default function QuestionnairePage() {
   }, [userAnswers])
 
   // Carregar próxima pergunta
-  const loadNextQuestion = async () => {
+  const loadNextQuestion = async (updatedAnswers?: UserAnswer[]) => {
     if (currentQuestionNumber > 30) {
       await generateFinalAnalysis()
       return
     }
 
     setIsLoading(true)
+    
+    // Use as respostas atualizadas se fornecidas, senão use o estado atual
+    const answersToUse = updatedAnswers || userAnswers
+    
     try {
       // Try AI-generated questions first
       const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost'
       const apiEndpoint = isLocalhost 
         ? '/api/binno/generate-question'
         : '/.netlify/functions/binno-generate-question'
+
+      // Gerar resumo das respostas atualizadas
+      const responsesSummary = answersToUse.map(answer => 
+        `Q: ${answer.question_text}\nA: ${answer.user_response.substring(0, 200)}...`
+      ).join('\n\n')
+
+      console.log('Sending to API:', {
+        questionNumber: currentQuestionNumber,
+        previousAnswersCount: answersToUse.length,
+        responsesSummary: responsesSummary.substring(0, 100) + '...'
+      })
 
       const response = await fetch(apiEndpoint, {
         method: 'POST',
@@ -96,17 +111,18 @@ export default function QuestionnairePage() {
         },
         body: JSON.stringify({
           questionNumber: currentQuestionNumber,
-          previousAnswers: userAnswers,
+          previousAnswers: answersToUse,
           sessionContext: {
             user_expertise_level: sessionContext?.experience_level || 'intermediate',
             project_focus: sessionContext?.interests?.join(', ') || 'Web3 development',
-            previous_responses_summary: generateResponsesSummary()
+            previous_responses_summary: responsesSummary
           }
         })
       })
 
       if (response.ok) {
         const data = await response.json()
+        console.log('Question received from API:', data.question.question_text.substring(0, 50) + '...')
         setCurrentQuestion(data.question)
       } else {
         // Fallback to static questions if API fails
@@ -159,7 +175,8 @@ export default function QuestionnairePage() {
       await generateFinalAnalysis(updatedAnswers)
     } else {
       setCurrentQuestionNumber(prev => prev + 1)
-      await loadNextQuestion()
+      // Passar as respostas atualizadas para a próxima pergunta
+      await loadNextQuestion(updatedAnswers)
     }
   }, [currentQuestion, currentQuestionNumber, userAnswers])
 
