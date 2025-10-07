@@ -2,6 +2,12 @@ import type { Handler } from '@netlify/functions'
 import { BinnoAI, UserAnswer } from '../../lib/binno-questionnaire'
 
 export const handler: Handler = async (event, context) => {
+  console.log('Binno Generate Question Function - Start')
+  console.log('Environment check:', {
+    hasOpenAI: !!process.env.OPENAI_API_KEY,
+    openAIKeyLength: process.env.OPENAI_API_KEY?.length || 0
+  })
+  
   // Set CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -51,7 +57,10 @@ export const handler: Handler = async (event, context) => {
     }
 
     const binno = new BinnoAI()
+    console.log('BinnoAI instance created')
+    
     const question = await binno.generateNextQuestion(questionNumber, previousAnswers, sessionContext)
+    console.log('Question generated successfully:', question.question_text.substring(0, 50) + '...')
 
     return {
       statusCode: 200,
@@ -66,12 +75,18 @@ export const handler: Handler = async (event, context) => {
 
   } catch (error) {
     console.error('Error generating question:', error)
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    })
+    
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({ 
         error: 'Failed to generate question',
-        details: process.env.NODE_ENV === 'development' ? error : undefined
+        details: process.env.NODE_ENV === 'development' ? error : undefined,
+        fallback: 'Using static questions as fallback'
       })
     }
   }

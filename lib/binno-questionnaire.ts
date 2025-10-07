@@ -281,6 +281,19 @@ Return comprehensive analysis in this JSON format:
 
   // Fallback para quando OpenAI não está disponível
   private getFallbackQuestion(questionNumber: number): Question {
+    // Para a primeira pergunta, sempre usar a pergunta personalizada sobre o projeto
+    if (questionNumber === 1) {
+      return {
+        id: `fallback_q1_project_intro`,
+        question_text: "Let's start with the basics! Tell me about your Web3 project. What is the project name, how many tokens do you plan to launch, which blockchain network (BNB Chain, Ethereum, etc.), and what is the main focus of the project (DeFi, GameFi, NFTs, dApp, productivity tool, etc.)? Also describe the overall vision and the problem your project aims to solve.",
+        context: "Initial question to understand the complete context of the user's Web3 project",
+        stage: "project_overview",
+        difficulty_level: 'beginner',
+        bnb_relevance: 90,
+        critical_factors: ["project_name", "token_supply", "blockchain_network", "project_category", "problem_solving"]
+      }
+    }
+
     const fallbackQuestions = [
       {
         question_text: "Describe your Web3 project's core value proposition and how it leverages blockchain technology to solve real-world problems.",
@@ -309,7 +322,7 @@ Return comprehensive analysis in this JSON format:
       }
     ]
 
-    const question = fallbackQuestions[questionNumber % fallbackQuestions.length] || fallbackQuestions[0]
+    const question = fallbackQuestions[(questionNumber - 2) % fallbackQuestions.length] || fallbackQuestions[0]
     
     return {
       id: `fallback_q${questionNumber}`,
