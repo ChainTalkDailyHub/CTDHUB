@@ -1,53 +1,268 @@
-# CTDHub Platform - Rebuild
+# 🚀 CTDHUB - Web3 Learning Ecosystem
 
-# 🚀 CTDHUB Platform - Blockchain Learning Platform
+[![Deploy Status](https://api.netlify.com/api/v1/badges/687f2b27-768f-0513-1458-9568e8f9c123/deploy-status)](https://app.netlify.com/sites/extraordinary-treacle-1bc552/deploys)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-green)](https://extraordinary-treacle-1bc552.netlify.app/)
 
-<div align="center">
-  <img src="public/images/CTDHUB.png" alt="CTDHUB" width="300" />
-  
-  <p><strong>A moderna plataforma de educação blockchain construída com Next.js 14</strong></p>
-  
-  [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/SEU_USUARIO/ctdhub-platform)
-  [![Next.js](https://img.shields.io/badge/Next.js-14.2.5-black)](https://nextjs.org/)
-  [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://www.typescriptlang.org/)
-  [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.4+-38B2AC)](https://tailwindcss.com/)
-  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-</div>
+**CTDHUB** is a comprehensive educational platform focused on Web3 and blockchain development, specifically optimized for the BNB Chain ecosystem. The platform offers interactive courses, adaptive assessments, and AI-powered tools to accelerate blockchain development learning.
 
-## ✨ Características
+## ✨ Key Features
 
-- 🎯 **Educação Blockchain Completa** - Cursos, quizzes e certificações
-- 🔗 **Integração Web3** - Conecte carteiras e interaja com contratos inteligentes
-- 🤖 **AI Assistant** - Binno AI para suporte personalizado
-- 🎨 **Design Moderno** - Interface responsiva e acessível
-- ⚡ **Performance** - Build otimizado de apenas 84.4 kB
-- 🔒 **Segurança** - Validação de ambiente e error boundaries
-- 📱 **Mobile First** - Totalmente responsivo para todos dispositivos
+### 🎓 Course Management System
+- **Creator Studio**: Complete interface for course creation and management
+- **Video Player**: YouTube integration for educational content
+- **Comment System**: Interaction between students and instructors
+- **Data Persistence**: Supabase integration for automatic backup
 
-## 🚀 Características Principais
+### 🤖 Binno AI - Intelligent Assistant
+- **Web3 Advisor**: AI specialized in blockchain and DeFi
+- **Interactive Chat**: Real-time support for developers
+- **Project Analysis**: Intelligent evaluation of Web3 ideas
 
-- **Autenticação Web3**: Login via MetaMask com suporte BSC
-- **Sistema de Cursos**: 10 módulos educacionais sobre blockchain
-- **Quiz Inteligente**: Sistema de perguntas com distribuição balanceada
-- **Auto-Burn**: Mecanismo automático de queima de tokens
-- **Binno AI**: Assistente IA integrado para dúvidas blockchain
-- **Área Desenvolvedores**: Ferramentas de debug e análise
+### 🧭 Skill Compass - Adaptive Assessment
+- **Intelligent Questionnaire**: 30 adaptive questions based on previous responses
+- **Project Focus**: First question collects detailed project information (name, tokens, network, category)
+- **PDF Reports**: Complete exportable analysis
+- **Personalized Recommendations**: Next steps based on knowledge level
 
-## 🛠 Stack Tecnológica
+### 🔧 Advanced Tools
+- **Data Migration Center**: Protection against data loss during updates
+- **User Profiles**: Complete profile system with Web3 experience tracking
+- **Quiz Modules**: Blockchain knowledge tests
+- **Wallet Integration**: Web3 wallet connectivity
 
-- **Frontend**: Next.js 14.2.5, React 18, TypeScript
-- **Styling**: Tailwind CSS 3.4.1
-- **Blockchain**: Ethers.js v6, Binance Smart Chain
-- **UI/UX**: Tema escuro (preto/amarelo)
-- **Storage**: localStorage para progresso e configurações
+## 🛠 Technology Stack
 
-## 📦 Instalação
+### Frontend
+- **Next.js 14.2.5** - React framework with SSG/SSR
+- **TypeScript** - Static typing for enhanced reliability
+- **TailwindCSS** - Modern design system with dark/neon theme
+- **React Hooks** - Optimized state management
 
-### 1. Clone e Instale
+### Backend & Infrastructure
+- **Netlify Functions** - Serverless backend with TypeScript
+- **Supabase PostgreSQL** - Relational database with automatic APIs
+- **OpenAI API** - GPT-4 integration for AI functionalities
+- **Netlify Hosting** - Automatic deployment with global CDN
+
+### Integrations
+- **Web3 Wallets** - MetaMask and other wallet support
+- **YouTube API** - Video embedding and management
+- **GitHub Actions** - Automated CI/CD
+- **PDF Generation** - Exportable reports
+
+## 📋 Project Structure
+
+```
+ctdhub-rebuild/
+├── 📁 components/          # Reusable React components
+│   ├── CourseCard.tsx     # Course display card
+│   ├── Header.tsx         # Main navigation
+│   ├── UserMenu.tsx       # User profile menu
+│   └── ...
+├── 📁 pages/              # Next.js pages
+│   ├── index.tsx          # Homepage
+│   ├── courses/           # Course system
+│   ├── binno-ai/          # AI Assistant
+│   ├── questionnaire.tsx  # Skill Compass
+│   └── data-migration.tsx # Migration center
+├── 📁 netlify/functions/  # Serverless Functions
+│   ├── course-manager.ts  # Course management
+│   ├── user-profiles.ts   # Profile system
+│   ├── binno-*.ts         # AI functionalities
+│   └── data-migration.ts  # Data backup
+├── 📁 lib/                # Utilities and business logic
+│   ├── supabase.ts        # Supabase client
+│   ├── binno-questionnaire.ts # AI for questionnaires
+│   └── courses-storage.ts # Course management
+└── 📁 styles/             # Global styling
+    └── globals.css        # TailwindCSS + customizations
+```
+
+## 🚀 Local Development
+
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+- Supabase account (optional)
+- OpenAI API Key (optional)
+
+### Installation
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/wallisson-ctd/CTDHUB.git
+cd CTDHUB
+```
+
+2. **Install dependencies**
+```bash
+npm install
+```
+
+3. **Configure environment variables**
+```bash
+# Create .env.local
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_key
+OPENAI_API_KEY=your_openai_key
+```
+
+4. **Run development server**
+```bash
+npm run dev
+```
+
+5. **Access locally**
+```
+http://localhost:3000
+```
+
+## 📊 Database (Supabase)
+
+### Main Tables
+
+```sql
+-- Courses
+CREATE TABLE courses (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT,
+  author TEXT NOT NULL,
+  thumbnail TEXT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Course Videos
+CREATE TABLE course_videos (
+  id TEXT PRIMARY KEY,
+  course_id TEXT REFERENCES courses(id),
+  title TEXT NOT NULL,
+  description TEXT,
+  youtube_url TEXT NOT NULL,
+  thumbnail TEXT,
+  order_index INTEGER DEFAULT 0,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Comments
+CREATE TABLE video_comments (
+  id TEXT PRIMARY KEY,
+  video_id TEXT NOT NULL,
+  user_address TEXT NOT NULL,
+  user_name TEXT,
+  comment TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- User Profiles
+CREATE TABLE user_profiles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  wallet_address TEXT UNIQUE NOT NULL,
+  name TEXT,
+  profession TEXT,
+  web3_experience TEXT CHECK (web3_experience IN ('beginner', 'intermediate', 'advanced', 'expert')),
+  project_name TEXT,
+  bio TEXT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+## 🌐 Deployment
+
+### Netlify (Recommended)
+
+1. **Configure on Netlify**
+```bash
+# Build Command
+npm run netlify:build
+
+# Publish Directory
+out
+
+# Environment Variables
+SUPABASE_URL=your_url
+SUPABASE_ANON_KEY=your_key
+OPENAI_API_KEY=your_openai_key
+```
+
+2. **Automatic deployment**
+```bash
+# Connect your GitHub repository to Netlify
+# Commits to main branch deploy automatically
+```
+
+### Useful Commands
 
 ```bash
-cd ctdhub-rebuild
-npm install
+# Development
+npm run dev
+
+# Local build
+npm run build
+
+# Netlify deploy
+netlify deploy --prod
+
+# Lint
+npm run lint
+```
+
+## 🔒 Security & Data Protection
+
+- **Data Migration System**: Automatic protection against data loss
+- **Automatic Backup**: Real-time Supabase synchronization
+- **Input Validation**: User data sanitization
+- **CORS Protection**: Configured security headers
+- **Environment Variables**: Protected sensitive keys
+
+## 📈 Roadmap
+
+### In Development
+- [ ] NFT certifications for course completion
+- [ ] Course marketplace with crypto payments
+- [ ] Integration with more blockchains (Ethereum, Polygon)
+- [ ] Gamification with point system
+- [ ] Native mobile app
+
+### Planned Features
+- [ ] Live streaming for live classes
+- [ ] Developer collaboration tools
+- [ ] Public API for developers
+- [ ] VS Code plugin
+- [ ] Discord/Telegram integration
+
+## 🤝 Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the project
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👥 Team
+
+- **Development**: CTDHUB Team
+- **Design**: Web3-focused UI/UX
+- **AI & Backend**: OpenAI + Supabase Integration
+
+## � Contact
+
+- **Website**: [https://extraordinary-treacle-1bc552.netlify.app/](https://extraordinary-treacle-1bc552.netlify.app/)
+- **GitHub**: [https://github.com/wallisson-ctd/CTDHUB](https://github.com/wallisson-ctd/CTDHUB)
+
+---
+
+**CTDHUB** - Transforming Web3 education with AI and cutting-edge technology 🚀
+
+*Built with ❤️ for the blockchain community*
 ```
 
 ### 2. Configuração do Ambiente
