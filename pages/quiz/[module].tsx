@@ -39,11 +39,23 @@ export default function QuizModule() {
   
   if (!module) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-ctd-bg">
         <Header />
-        <div className="py-16 text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Module Not Found</h1>
-          <a href="/quiz" className="btn-primary">Back to Quiz</a>
+        <div className="py-24 text-center spotlight">
+          <div className="max-w-md mx-auto">
+            <div className="card relative">
+              <div className="corner corner--tl"></div>
+              <div className="corner corner--tr"></div>
+              <div className="corner corner--bl"></div>
+              <div className="corner corner--br"></div>
+              
+              <div className="relative z-10 p-1 text-center">
+                <h1 className="text-2xl font-bold text-ctd-text mb-4">Module Not Found</h1>
+                <p className="text-ctd-mute mb-6">The requested quiz module could not be found.</p>
+                <a href="/quiz" className="btn-primary">Back to Quiz</a>
+              </div>
+            </div>
+          </div>
         </div>
         <Footer />
       </div>
@@ -113,27 +125,27 @@ export default function QuizModule() {
   }
   
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-ctd-bg">
       <Header />
       
-      <main className="py-16">
+      <main className="py-24 spotlight">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {!showResults ? (
             <div>
               {/* Progress Header */}
               <div className="mb-8">
                 <div className="flex justify-between items-center mb-4">
-                  <h1 className="text-2xl font-bold text-white">
-                    Module {module.id}: {module.title}
+                  <h1 className="text-2xl font-bold text-ctd-text drop-shadow-neon">
+                    Module {module.id}: <span className="text-ctd-yellow">{module.title}</span>
                   </h1>
-                  <span className="text-sm text-gray-300">
+                  <span className="text-sm text-ctd-mute">
                     Question {currentQuestionIndex + 1} of {module.questions.length}
                   </span>
                 </div>
                 
-                <div className="w-full bg-gray-700 rounded-full h-2">
+                <div className="w-full bg-ctd-panel rounded-full h-3 border border-ctd-border">
                   <div 
-                    className="bg-primary h-2 rounded-full transition-all duration-300"
+                    className="bg-ctd-yellow h-3 rounded-full transition-all duration-300"
                     style={{ width: `${((currentQuestionIndex + 1) / module.questions.length) * 100}%` }}
                   ></div>
                 </div>
@@ -149,7 +161,7 @@ export default function QuizModule() {
               <div className="flex justify-between mt-8">
                 <button
                   onClick={() => router.push('/quiz')}
-                  className="btn-secondary"
+                  className="btn-ghost"
                 >
                   Back to Quiz
                 </button>
@@ -166,31 +178,40 @@ export default function QuizModule() {
           ) : (
             /* Results Screen */
             <div className="text-center">
-              <h1 className="text-3xl font-bold text-white mb-8">Quiz Results</h1>
+              <h1 className="text-3xl font-bold text-ctd-text drop-shadow-neon mb-8">
+                Quiz <span className="text-ctd-yellow">Results</span>
+              </h1>
               
-              <div className="card max-w-2xl mx-auto mb-8">
-                <div className="text-6xl mb-4">
-                  {isCompleted ? '🎉' : '😞'}
-                </div>
-                <h2 className="text-2xl font-bold text-white mb-4">
-                  Your Score: {getScore()}%
-                </h2>
-                <p className="text-gray-300 mb-6">
-                  {isCompleted 
-                    ? 'Nice! Progress saved.' 
-                    : 'You need 70% or higher to pass. Try again!'}
-                </p>
+              <div className="card max-w-2xl mx-auto mb-8 relative">
+                <div className="corner corner--tl"></div>
+                <div className="corner corner--tr"></div>
+                <div className="corner corner--bl"></div>
+                <div className="corner corner--br"></div>
                 
-                <div className="space-y-4">
-                  {module.questions.map((question, index) => (
-                    <QuizQuestion
-                      key={question.id}
-                      question={question}
-                      selectedAnswer={selectedAnswers[index] || null}
-                      onAnswerSelect={() => {}}
-                      showResult={true}
-                    />
-                  ))}
+                <div className="relative z-10 p-1 text-center">
+                  <div className="text-6xl mb-4">
+                    {isCompleted ? '🎉' : '😞'}
+                  </div>
+                  <h2 className="text-2xl font-bold text-ctd-text mb-4">
+                    Your Score: <span className="text-ctd-yellow">{getScore()}%</span>
+                  </h2>
+                  <p className="text-ctd-mute mb-6">
+                    {isCompleted 
+                      ? 'Nice! Progress saved.' 
+                      : 'You need 70% or higher to pass. Try again!'}
+                  </p>
+                  
+                  <div className="space-y-4">
+                    {module.questions.map((question, index) => (
+                      <QuizQuestion
+                        key={question.id}
+                        question={question}
+                        selectedAnswer={selectedAnswers[index] || null}
+                        onAnswerSelect={() => {}}
+                        showResult={true}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
               
@@ -221,7 +242,7 @@ export default function QuizModule() {
                 {!isCompleted && (
                   <button
                     onClick={() => window.location.reload()}
-                    className="btn-secondary"
+                    className="btn-ghost"
                   >
                     Retry Module
                   </button>

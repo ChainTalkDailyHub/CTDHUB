@@ -1,17 +1,44 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { readCourses, writeCourses, generateId, ytIdFromUrl, ytThumb } from '../../../lib/courses-storage'
-import { readCoursesFromSupabase, writeCourseToSupabase, Course, CourseVideo } from '../../../lib/supabase-storage'
+
+// Try to import Supabase functions
+let readCoursesFromSupabase: any = null
+let writeCourseToSupabase: any = null
+
+try {
+  const supabaseStorage = require('../../../lib/supabase-storage')
+  readCoursesFromSupabase = supabaseStorage.readCoursesFromSupabase
+  writeCourseToSupabase = supabaseStorage.writeCourseToSupabase
+} catch (error) {
+  console.log('Supabase storage not available, using fallback')
+}
+
+// Temporary in-memory storage for serverless environments
+let memoryStorage: any[] = []
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method === 'GET') {
-      // Try Supabase first, fallback to file system
-      const useSupabase = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      // Try Supabase first if available
+      const hasSupabaseEnv = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      
+      if (hasSupabaseEnv && readCoursesFromSupabase) {
+        console.log('Using Supabase for courses')
+        try {
+          const courses = await readCoursesFromSupabase()
+          return res.status(200).json(courses)
+        } catch (error) {
+          console.error('Supabase error, falling back:', error)
+        }
+      }
+      
+      // Fallback to memory or file storage
+      const isServerless = process.env.NETLIFY || process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME
       
       let courses
-      if (useSupabase) {
-        console.log('Using Supabase for courses')
-        courses = await readCoursesFromSupabase()
+      if (isServerless) {
+        console.log('Using memory storage for courses')
+        courses = memoryStorage.sort((a, b) => b.updatedAt - a.updatedAt)
       } else {
         console.log('Using file system for courses')
         courses = await readCourses()
@@ -22,16 +49,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     if (req.method === 'POST') {
-      console.log('POST request received:', req.body)
+      console.log('=== POST /api/courses ===')
+      console.log('Headers:', req.headers)
+      console.log('Body:', req.body)
+      
       const userAddress = req.headers['x-user-address'] as string
       
       if (!userAddress || !userAddress.startsWith('0x')) {
+        console.log('Invalid user address:', userAddress)
         return res.status(401).json({ error: 'Valid wallet address required' })
       }
 
       const { title, description, videos } = req.body
 
       if (!title || !description || !videos || !Array.isArray(videos) || videos.length === 0) {
+        console.log('Missing required fields:', { title: !!title, description: !!description, videos: videos?.length })
         return res.status(400).json({ 
           error: 'Course title, description, and at least one video are required' 
         })
@@ -54,7 +86,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
       }
 
-      const courseVideos: CourseVideo[] = videos.map((video: any, index: number) => {
+      const courseVideos = videos.map((video: any, index: number) => {
         const videoId = ytIdFromUrl(video.youtubeUrl) || 'default'
         return {
           id: generateId(),
@@ -66,7 +98,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
       })
 
-      const newCourse: Course = {
+      const newCourse = {
         id: generateId(),
         title: title.trim(),
         description: description.trim(),
@@ -77,15 +109,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         totalVideos: courseVideos.length
       }
 
-      // Try Supabase first, fallback to file system
-      const useSupabase = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      // Try Supabase first if available
+      const hasSupabaseEnv = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
       
-      if (useSupabase) {
+      if (hasSupabaseEnv && writeCourseToSupabase) {
         console.log('Saving course to Supabase')
-        const success = await writeCourseToSupabase(newCourse)
-        if (!success) {
-          return res.status(500).json({ error: 'Failed to save course to database' })
+        try {
+          const success = await writeCourseToSupabase(newCourse)
+          if (success) {
+            console.log('Course saved successfully to Supabase:', newCourse.id)
+            return res.status(201).json(newCourse)
+          } else {
+            console.log('Supabase save failed, falling back to memory storage')
+          }
+        } catch (error) {
+          console.error('Supabase error, falling back:', error)
         }
+      }
+
+      // Fallback to memory or file storage
+      const isServerless = process.env.NETLIFY || process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME
+      
+      if (isServerless) {
+        console.log('Saving course to memory storage')
+        memoryStorage.push(newCourse)
+        console.log('Course saved successfully:', newCourse.id)
+        console.log('Total courses in memory:', memoryStorage.length)
       } else {
         console.log('Saving course to file system')
         const courses = await readCourses()
@@ -114,19 +163,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: 'At least one video is required' })
       }
 
-      // Try Supabase first, fallback to file system
-      const useSupabase = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      // Use appropriate storage
+      const isServerless = process.env.NETLIFY || process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME
       
       let courses
-      if (useSupabase) {
-        console.log('Using Supabase for course update')
-        courses = await readCoursesFromSupabase()
+      if (isServerless) {
+        console.log('Using memory storage for course update')
+        courses = memoryStorage
       } else {
         console.log('Using file system for course update')
         courses = await readCourses()
       }
 
-      const courseIndex = courses.findIndex(c => c.id === courseId)
+      const courseIndex = courses.findIndex((c: any) => c.id === courseId)
 
       if (courseIndex === -1) {
         return res.status(404).json({ error: 'Course not found' })
@@ -157,7 +206,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       // Add new videos to existing course
-      const newVideos: CourseVideo[] = videos.map((video: any, index: number) => {
+      const newVideos = videos.map((video: any, index: number) => {
         const videoId = ytIdFromUrl(video.youtubeUrl)!
         return {
           id: generateId(),
@@ -173,20 +222,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       course.totalVideos = course.videos.length
       course.updatedAt = Date.now()
 
-      if (useSupabase) {
-        console.log('Updating course in Supabase')
-        // Convert to Supabase-compatible format
-        const supabaseCourse = {
-          ...course,
-          videos: course.videos.map(video => ({
-            ...video,
-            thumbnail: video.thumbnail || null
-          }))
-        }
-        const success = await writeCourseToSupabase(supabaseCourse)
-        if (!success) {
-          return res.status(500).json({ error: 'Failed to update course in database' })
-        }
+      if (isServerless) {
+        console.log('Updating course in memory storage')
+        memoryStorage[courseIndex] = course
       } else {
         console.log('Updating course in file system')
         courses[courseIndex] = course

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Header from '../../components/Header'
 import Footer from '../../components/Footer'
+import AddVideoForm from '../../components/AddVideoForm'
 import { Course } from '../../lib/courses-storage'
 import { short } from '../../lib/storage'
 
@@ -12,8 +13,18 @@ export default function CourseDetail() {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
+  const [showAddVideos, setShowAddVideos] = useState(false)
+  const [userAddress, setUserAddress] = useState('')
+  const [isConnected, setIsConnected] = useState(false)
 
   useEffect(() => {
+    // Check wallet connection
+    const stored = localStorage.getItem('ctdhub:wallet')
+    if (stored) {
+      setIsConnected(true)
+      setUserAddress(stored)
+    }
+    
     if (id) {
       loadCourse(id as string)
     }
@@ -22,7 +33,7 @@ export default function CourseDetail() {
   const loadCourse = async (courseId: string) => {
     try {
       setIsLoading(true)
-      const response = await fetch(`/api/courses/${courseId}`)
+      const response = await fetch(`/.netlify/functions/course-manager/${courseId}`)
       if (response.ok) {
         const foundCourse = await response.json()
         setCourse(foundCourse)
@@ -41,6 +52,32 @@ export default function CourseDetail() {
     const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/)?.[1]
     return videoId ? `https://www.youtube.com/embed/${videoId}` : null
   }
+
+  const handleAddVideos = async (videos: Array<{title: string, description: string, youtubeUrl: string}>) => {
+    if (!userAddress || !course) throw new Error('Authentication required')
+
+    const response = await fetch(`/.netlify/functions/course-manager?courseId=${course.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-address': userAddress
+      },
+      body: JSON.stringify({ videos })
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to add videos')
+    }
+
+    const updatedCourse = await response.json()
+    setCourse(updatedCourse)
+    setShowAddVideos(false)
+    
+    alert(`Videos added successfully! Module now has ${updatedCourse.totalVideos} videos.`)
+  }
+
+  const isOwner = course && userAddress && course.author.toLowerCase() === userAddress.toLowerCase()
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString('en-US', {
@@ -116,7 +153,37 @@ export default function CourseDetail() {
             <p className="text-gray-300 text-lg leading-relaxed mb-8">
               {course.description}
             </p>
+            
+            {/* Owner Actions */}
+            {isOwner && (
+              <div className="flex gap-4 mb-6">
+                <button
+                  onClick={() => setShowAddVideos(true)}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-4 py-2 rounded-lg transition-colors"
+                >
+                  + Add Videos
+                </button>
+                <button
+                  onClick={() => router.push(`/dev?edit=${course.id}`)}
+                  className="bg-gray-700 hover:bg-gray-600 text-white font-semibold px-4 py-2 rounded-lg transition-colors"
+                >
+                  Edit Module
+                </button>
+              </div>
+            )}
           </div>
+
+          {/* Add Videos Form */}
+          {showAddVideos && isOwner && (
+            <div className="mb-8">
+              <AddVideoForm
+                courseId={course.id}
+                courseTitle={course.title}
+                onAddVideos={handleAddVideos}
+                onCancel={() => setShowAddVideos(false)}
+              />
+            </div>
+          )}
 
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Video Player */}
@@ -149,17 +216,6 @@ export default function CourseDetail() {
                       {currentVideo.description}
                     </p>
                   )}
-                  
-                  <div className="flex gap-4">
-                    <a
-                      href={currentVideo.youtubeUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors text-sm"
-                    >
-                      Watch on YouTube
-                    </a>
-                  </div>
                 </div>
               </div>
             </div>

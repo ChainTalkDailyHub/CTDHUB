@@ -1,239 +1,25 @@
-import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions"
+import { Handler } from '@netlify/functions'
 
 interface ChatMessage {
   role: 'user' | 'assistant'
   content: string
 }
 
-interface OpenAIResponse {
-  choices: Array<{
-    message: {
-      content: string
-    }
-  }>
-  usage?: {
-    prompt_tokens: number
-    completion_tokens: number
-    total_tokens: number
-  }
-}
-
-// Advanced knowledge base for blockchain and DeFi topics
-const knowledgeBase = {
-  ctd: {
-    keywords: ['ctd', 'chain talk daily', 'ctdhub', 'ctd token', 'ctd project', 'ctd platform'],
-    responses: [
-      "🚀 **CTD (Chain Talk Daily)** is an innovative blockchain education platform that revolutionizes how people learn about Web3, DeFi, and cryptocurrency through interactive quizzes and AI-powered assistance.",
-      "💰 **CTD Token System**: Users earn 10,000 CTD tokens upon completing all quiz modules (one-time reward per wallet). CTD tokens are BEP-20 tokens on Binance Smart Chain with real utility in the ecosystem.",
-      "🎓 **CTD Platform Features**: Comprehensive quiz system with 10 modules covering blockchain fundamentals, smart contracts, DeFi protocols, trading strategies, security best practices, and advanced techniques. Each module contains 10 detailed questions with explanations.",
-      "🤖 **Binno AI Integration**: CTD Hub features Binno AI, an advanced AI assistant specialized in blockchain education, contract analysis, and personalized learning paths for users of all experience levels."
-    ]
-  },
-  binno: {
-    keywords: ['binno', 'binno ai', 'ai agent', 'ai assistant', 'intelligent agent'],
-    responses: [
-      "🤖 **Binno AI** is the flagship AI agent and main character of the CTD (Chain Talk Daily) platform. I'm designed to be your personal blockchain education companion and Web3 guide!",
-      "✨ **Binno's Capabilities**: I provide expert explanations on blockchain technology, analyze smart contracts and transactions on BSC, offer personalized learning recommendations, and guide users through complex DeFi concepts with engaging, easy-to-understand responses.",
-      "🎯 **Binno's Mission**: As CTD's AI mascot, I help democratize blockchain education by making complex Web3 concepts accessible to everyone, from complete beginners to advanced developers. I'm here to ensure every user has a successful learning journey!",
-      "🔧 **Binno's Special Powers**: Real-time contract analysis, transaction investigation, token research, risk assessment, and the ability to adapt explanations based on your experience level. I'm powered by advanced AI and constantly learning to serve you better!"
-    ]
-  },
-  blockchain: {
-    keywords: ['blockchain', 'distributed ledger', 'consensus', 'mining', 'proof of work', 'proof of stake'],
-    responses: [
-      "⛓️ **Blockchain Technology**: A revolutionary distributed ledger technology that maintains a continuously growing list of records (blocks) that are linked and secured using cryptography. Each block contains a cryptographic hash of the previous block, timestamp, and transaction data.",
-      "🔒 **Consensus Mechanisms**: Blockchain networks use consensus algorithms like Proof of Work (PoW) and Proof of Stake (PoS) to validate transactions and maintain network integrity without requiring a central authority.",
-      "🌐 **Decentralization Benefits**: Eliminates single points of failure, reduces censorship, increases transparency, and enables trustless peer-to-peer transactions without intermediaries."
-    ]
-  }
-}
-
-const callOpenAI = async (messages: ChatMessage[]): Promise<string> => {
-  const openaiKey = process.env.OPENAI_API_KEY
-  
-  if (!openaiKey) {
-    console.log('OpenAI key not available, using local responses')
-    return generateLocalResponse(messages[messages.length - 1].content)
-  }
-
-  try {
-    console.log('Calling OpenAI API...')
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openaiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
-        messages: [
-          {
-            role: 'system',
-            content: `You are Binno AI, the blockchain specialist assistant for the CTDHUB platform. 
-
-ABOUT CTDHUB:
-- Blockchain educational platform created by Chain Talk Daily (CTD)
-- Offers courses, quizzes and certifications about Web3, DeFi and blockchain
-- CTD token system on BSC (Binance Smart Chain)
-- Users earn 10,000 CTD tokens by completing all quiz modules
-
-YOUR CHARACTERISTICS:
-- You are an expert in blockchain, cryptocurrencies, DeFi, NFTs, smart contracts
-- Respond in ENGLISH by default, only use Portuguese when specifically requested
-- Use emojis to make responses more engaging
-- Be specific and technical when necessary, but educational
-- Always promote financial education and security
-- Mention risks when appropriate
-
-TOPICS YOU MASTER:
-- Bitcoin, Ethereum and other cryptocurrencies
-- DeFi (Uniswap, Compound, Aave, PancakeSwap)
-- NFTs and marketplaces
-- Wallets (MetaMask, hardware wallets)
-- Smart contracts and Solidity
-- Binance Smart Chain (BSC)
-- Trading and technical analysis
-- Crypto security
-
-Always respond in a helpful, educational way and encourage responsible learning.`
-          },
-          ...messages
-        ],
-        max_tokens: 500,
-        temperature: 0.7,
-      }),
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      console.error('OpenAI API Error:', response.status, errorData)
-      throw new Error(`OpenAI API Error: ${response.status}`)
-    }
-
-    const data: OpenAIResponse = await response.json()
-    
-    if (data.choices && data.choices.length > 0) {
-      console.log('OpenAI response received successfully')
-      return data.choices[0].message.content
-    } else {
-      throw new Error('No response from OpenAI')
-    }
-    
-  } catch (error) {
-    console.error('Error calling OpenAI:', error)
-    // Fallback para resposta local
-    return generateLocalResponse(messages[messages.length - 1].content)
-  }
-}
-
-const generateLocalResponse = (userMessage: string): string => {
-  const message = userMessage.toLowerCase()
-  
-  console.log('Using local responses for message:', message)
-  
-  // Expanded keyword matching for more specific responses
-  
-  // Bitcoin questions
-  if (message.includes('bitcoin') || message.includes('btc')) {
-    return "₿ **Bitcoin** é a primeira e mais conhecida criptomoeda, criada por Satoshi Nakamoto em 2009. É uma moeda digital descentralizada que utiliza tecnologia blockchain para permitir transações peer-to-peer sem intermediários. Bitcoin usa o algoritmo de consenso Proof of Work (PoW) e tem um suprimento limitado de 21 milhões de moedas. É considerada 'ouro digital' e serve como reserva de valor."
-  }
-  
-  // Ethereum questions
-  if (message.includes('ethereum') || message.includes('eth') || message.includes('smart contract')) {
-    return "⟐ **Ethereum** é uma plataforma blockchain que permite criar contratos inteligentes (smart contracts) e aplicações descentralizadas (DApps). Criada por Vitalik Buterin, permite programar lógica complexa na blockchain. Ethereum usa sua própria linguagem de programação (Solidity) e está migrando do Proof of Work para Proof of Stake com o Ethereum 2.0."
-  }
-  
-  // DeFi questions  
-  if (message.includes('defi') || message.includes('yield') || message.includes('liquidity') || message.includes('staking')) {
-    return "🏦 **DeFi (Decentralized Finance)** refere-se a serviços financeiros construídos em blockchain que eliminam intermediários tradicionais. Inclui: lending/borrowing, DEXs, yield farming, liquidity mining, e staking. Permite ganhos passivos através de protocolos como Compound, Aave, Uniswap, e PancakeSwap. **Cuidado com riscos**: impermanent loss, smart contract bugs, e volatilidade."
-  }
-  
-  // NFT questions
-  if (message.includes('nft') || message.includes('token não fungível')) {
-    return "🎨 **NFTs (Non-Fungible Tokens)** são tokens únicos que representam propriedade digital de arte, colecionáveis, ou outros ativos digitais. Cada NFT tem características únicas e não pode ser dividido ou substituído por outro. São populares em marketplaces como OpenSea e podem ter utilidade em jogos, metaverso, e comunidades exclusivas."
-  }
-  
-  // Trading questions
-  if (message.includes('trading') || message.includes('investir') || message.includes('comprar') || message.includes('vender')) {
-    return "📈 **Trading de Criptomoedas** envolve compra e venda de ativos digitais. **Dicas importantes**: Faça sua própria pesquisa (DYOR), nunca invista mais do que pode perder, use stop-loss, diversifique seu portfólio, e entenda análise técnica e fundamental. Exchanges populares incluem Binance, Coinbase, e Kraken. **Sempre use autenticação de dois fatores!**"
-  }
-  
-  // Wallet questions
-  if (message.includes('wallet') || message.includes('carteira') || message.includes('metamask')) {
-    return "👛 **Wallets de Criptomoedas** armazenam suas chaves privadas e permitem gerenciar seus ativos. **Tipos**: Hot wallets (online) como MetaMask, Trust Wallet; Cold wallets (offline) como Ledger, Trezor. **Segurança essencial**: Nunca compartilhe sua seed phrase, use wallets oficiais, verifique endereços antes de enviar, e mantenha backups seguros."
-  }
-  
-  // Binance Smart Chain questions
-  if (message.includes('bsc') || message.includes('binance smart chain') || message.includes('bnb')) {
-    return "🟡 **Binance Smart Chain (BSC)** é uma blockchain compatível com Ethereum criada pela Binance. Oferece transações mais rápidas e baratas que Ethereum. Usa consenso Proof of Staked Authority (PoSA). Popular para DeFi com protocolos como PancakeSwap, Venus, e Alpaca Finance. Token nativo: BNB."
-  }
-  
-  // Greeting responses
-  if (message.includes('olá') || message.includes('oi') || message.includes('hello') || message.includes('hi')) {
-    return "👋 **Olá! Sou o Binno AI, seu assistente de blockchain!** Estou aqui para ajudar com tudo relacionado a criptomoedas, DeFi, trading, e tecnologia blockchain. Pode perguntar sobre Bitcoin, Ethereum, NFTs, wallets, ou qualquer dúvida sobre o mundo Web3. Como posso ajudar você hoje? 🚀"
-  }
-  
-  // Portuguese blockchain terms
-  if (message.includes('blockchain') || message.includes('criptomoeda') || message.includes('crypto')) {
-    return "⛓️ **Blockchain** é uma tecnologia de registro distribuído que mantém uma lista crescente de registros (blocos) ligados por criptografia. Cada bloco contém hash do bloco anterior, timestamp e dados de transação. **Características**: descentralização, imutabilidade, transparência, e consenso distribuído. É a base de todas as criptomoedas e aplicações Web3."
-  }
-  
-  // Help/assistance requests
-  if (message.includes('ajuda') || message.includes('help') || message.includes('como') || message.includes('what') || message.includes('o que')) {
-    return "🤖 **Como posso ajudar?** Sou especialista em blockchain e posso explicar sobre:\n\n" +
-           "💰 **Criptomoedas**: Bitcoin, Ethereum, altcoins\n" +
-           "🏦 **DeFi**: Protocolos, yield farming, staking\n" +
-           "📊 **Trading**: Estratégias, análise técnica\n" +
-           "👛 **Wallets**: MetaMask, hardware wallets\n" +
-           "🎨 **NFTs**: Criação, marketplaces, utilidades\n" +
-           "⛓️ **Tecnologia**: Smart contracts, consenso\n\n" +
-           "Digite sua pergunta específica! 😊"
-  }
-  
-  // Check original knowledge base for matches
-  for (const [category, data] of Object.entries(knowledgeBase)) {
-    if (data.keywords.some(keyword => message.includes(keyword))) {
-      const randomResponse = data.responses[Math.floor(Math.random() * data.responses.length)]
-      return randomResponse
-    }
-  }
-  
-  // More intelligent default response based on message analysis
-  if (message.length < 5) {
-    return "🤔 **Pergunta muito curta!** Pode ser mais específico? Por exemplo: 'O que é Bitcoin?', 'Como funciona DeFi?', ou 'Como criar uma wallet?'"
-  }
-  
-  if (message.includes('?')) {
-    return "❓ **Boa pergunta!** Embora eu não tenha uma resposta específica para isso, posso ajudar com tópicos relacionados a blockchain, criptomoedas, DeFi, NFTs, wallets, e trading. Pode reformular ou perguntar sobre um tópico mais específico?"
-  }
-  
-  // Final fallback
-  return "🤖 **Binno AI aqui!** Não entendi exatamente sua pergunta, mas estou aqui para ajudar! Posso explicar sobre:\n\n" +
-         "• 💰 **Bitcoin e Ethereum** - Como funcionam\n" +
-         "• 🏦 **DeFi** - Protocolos e estratégias\n" +
-         "• 📊 **Trading** - Dicas e análises\n" +
-         "• 👛 **Wallets** - Segurança e uso\n" +
-         "• 🎨 **NFTs** - Criação e mercados\n\n" +
-         "Faça uma pergunta mais específica! 🚀"
-}
-
-export const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
-  console.log('Netlify Function - AI Chat called')
-  console.log('Event:', JSON.stringify(event, null, 2))
-  
-  // Handle CORS
+const handler: Handler = async (event) => {
+  // Set CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Content-Type': 'application/json'
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Content-Type': 'application/json',
   }
 
+  // Handle preflight request
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ message: 'OK' })
+      body: '',
     }
   }
 
@@ -241,103 +27,162 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
     return {
       statusCode: 405,
       headers,
-      body: JSON.stringify({ 
-        error: 'Method not allowed',
-        message: 'Only POST requests are supported'
-      })
+      body: JSON.stringify({ error: 'Method not allowed' }),
     }
   }
 
   try {
-    if (!event.body) {
+    const { messages } = JSON.parse(event.body || '{}')
+
+    if (!messages || !Array.isArray(messages)) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ 
-          error: 'Missing request body',
-          message: 'Request body is required'
-        })
+        body: JSON.stringify({ error: 'Invalid messages format' }),
       }
     }
 
-    console.log('Raw body:', event.body)
-    
-    let parsedBody
-    try {
-      parsedBody = JSON.parse(event.body)
-    } catch (parseError) {
-      console.error('JSON Parse Error:', parseError)
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ 
-          error: 'Invalid JSON in request body',
-          message: 'Request body must be valid JSON',
-          details: parseError instanceof Error ? parseError.message : 'Unknown parse error'
-        })
-      }
-    }
-
-    const { messages } = parsedBody as { messages: ChatMessage[] }
-
-    if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ 
-          error: 'Invalid messages format',
-          message: 'Messages must be a non-empty array'
-        })
-      }
-    }
-
+    // Get the last user message
     const lastMessage = messages[messages.length - 1]
-    
-    if (!lastMessage || !lastMessage.content) {
+    if (!lastMessage || lastMessage.role !== 'user') {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ 
-          error: 'Invalid message content',
-          message: 'Last message must have content'
-        })
+        body: JSON.stringify({ error: 'No user message found' }),
       }
     }
 
-    console.log('Processing message:', lastMessage.content)
+    const userMessage = lastMessage.content.toLowerCase()
 
-    // Generate response using OpenAI or local fallback
-    const aiResponse = await callOpenAI([...messages, lastMessage])
+    // Check for OpenAI API key
+    const openaiApiKey = process.env.OPENAI_API_KEY
+    
+    if (openaiApiKey && openaiApiKey.startsWith('sk-')) {
+      // Use OpenAI API
+      try {
+        const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${openaiApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-3.5-turbo',
+            messages: [
+              {
+                role: 'system',
+                content: `You are BinnoAI, a specialized AI assistant for blockchain, Web3, DeFi, and cryptocurrency education. You are the mascot of CTD (Chain Talk Daily) platform. 
 
-    console.log('Generated response:', aiResponse)
+Key guidelines:
+- Provide educational, accurate, and helpful responses about blockchain technology
+- Use emojis and markdown formatting for engaging responses
+- Focus on practical examples and real-world applications
+- Explain complex concepts in simple terms
+- Always maintain a friendly, professional tone
+- If discussing risks, always mention them clearly
+- Provide actionable advice when possible
+
+Topics you excel at:
+- Blockchain fundamentals and consensus mechanisms
+- Smart contracts and Solidity development
+- DeFi protocols, yield farming, and liquidity mining
+- Cryptocurrency trading strategies and analysis
+- Web3 development tools and frameworks
+- Blockchain security and best practices
+- Gas optimization techniques
+- Cross-chain technologies and interoperability
+
+Always start responses with relevant emojis and structure information clearly with headers when appropriate.`
+              },
+              ...messages.slice(-5) // Last 5 messages for context
+            ],
+            max_tokens: 1000,
+            temperature: 0.7,
+          }),
+        })
+
+        if (!openaiResponse.ok) {
+          throw new Error(`OpenAI API error: ${openaiResponse.status}`)
+        }
+
+        const openaiData = await openaiResponse.json()
+        const aiMessage = openaiData.choices[0]?.message?.content
+
+        if (aiMessage) {
+          return {
+            statusCode: 200,
+            headers,
+            body: JSON.stringify({ message: aiMessage }),
+          }
+        }
+      } catch (openaiError) {
+        console.error('OpenAI API error:', openaiError)
+        // Fall through to static responses
+      }
+    }
+
+    // Fallback to static responses
+    let response = ''
+
+    if (userMessage.includes('ctd') || userMessage.includes('chain talk daily')) {
+      response = `🚀 **CTD (Chain Talk Daily)** é uma plataforma inovadora de educação blockchain que revoluciona como as pessoas aprendem sobre Web3, DeFi e criptomoedas através de quizzes interativos e assistência de IA.
+
+💰 **Sistema de Token CTD**: Os usuários ganham 10.000 tokens CTD ao completar todos os módulos de quiz (recompensa única por carteira). Os tokens CTD são BEP-20 na Binance Smart Chain com utilidade real no ecossistema.`
+    } else if (userMessage.includes('binno')) {
+      response = `🤖 **Binno AI** é o agente de IA principal e personagem principal da plataforma CTD! Sou projetado para ser seu companheiro pessoal de educação blockchain e guia Web3!
+
+✨ **Capacidades do Binno**: Forneço explicações especializadas sobre tecnologia blockchain, analiso contratos inteligentes e transações na BSC, ofereço recomendações de aprendizado personalizadas e guio usuários através de conceitos DeFi complexos.`
+    } else if (userMessage.includes('defi')) {
+      response = `🔄 **DeFi (Decentralized Finance)** refere-se a uma forma de finanças baseada em blockchain que não depende de intermediários financeiros tradicionais.
+
+**Componentes Principais:**
+- **DEXs**: Exchanges descentralizadas como Uniswap, SushiSwap
+- **Protocolos de Empréstimo**: Compound, Aave, MakerDAO
+- **Yield Farming**: Ganhar recompensas fornecendo liquidez
+- **Ativos Sintéticos**: Mirror Protocol, Synthetix`
+    } else if (userMessage.includes('smart contract')) {
+      response = `📜 **Contratos Inteligentes** são contratos auto-executáveis com termos escritos diretamente em código.
+
+**Características Principais:**
+- **Imutáveis**: Não podem ser alterados após o deploy
+- **Transparentes**: Código é publicamente visível
+- **Automáticos**: Executam sem intermediários
+- **Globais**: Acessíveis de qualquer lugar`
+    } else if (userMessage.includes('blockchain')) {
+      response = `⛓️ **Blockchain** é uma tecnologia de livro-razão distribuído que mantém uma lista continuamente crescente de registros (blocos) ligados usando criptografia.
+
+**Características Principais:**
+- **Descentralização**: Sem ponto único de falha
+- **Imutabilidade**: Dados não podem ser alterados
+- **Transparência**: Todas as transações são públicas
+- **Consenso Distribuído**: Acordo da rede`
+    } else {
+      response = `🤖 **Olá! Sou o BinnoAI, seu especialista Web3.**
+
+Posso ajudar você com:
+- **Protocolos DeFi** e estratégias de yield farming
+- **Desenvolvimento** de contratos inteligentes
+- **Fundamentos blockchain** e mecanismos de consenso
+- **Otimização de gas** e melhores práticas
+- **Ferramentas Web3** e frameworks
+
+Experimente me perguntar sobre tópicos específicos como "Como funciona DeFi?" ou "Explique contratos inteligentes".`
+    }
 
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({
-        message: aiResponse,
-        timestamp: new Date().toISOString(),
-        status: 'success',
-        model: 'binno-ai-v1',
-        usage: {
-          prompt_tokens: lastMessage.content.length,
-          completion_tokens: aiResponse.length,
-          total_tokens: lastMessage.content.length + aiResponse.length
-        }
-      })
+      body: JSON.stringify({ message: response }),
     }
 
   } catch (error) {
-    console.error('Netlify Function Error:', error)
-    
+    console.error('Error processing request:', error)
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ 
-        error: 'Internal server error',
-        message: 'Failed to process AI chat request',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      })
+      body: JSON.stringify({ error: 'Internal server error' }),
     }
   }
 }
+
+export { handler }

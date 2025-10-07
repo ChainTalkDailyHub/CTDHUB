@@ -14,6 +14,11 @@ export interface UserProfile {
 }
 
 export async function getUserProfile(walletAddress: string): Promise<UserProfile | null> {
+  if (!supabase) {
+    console.log('Supabase not configured for user profiles')
+    return null
+  }
+
   try {
     const { data, error } = await supabase
       .from('user_profiles')
@@ -41,6 +46,11 @@ export async function createOrUpdateUserProfile(
   walletAddress: string, 
   profileData: Partial<UserProfile>
 ): Promise<UserProfile | null> {
+  if (!supabase) {
+    console.log('Supabase not configured for user profiles')
+    return null
+  }
+
   try {
     const normalizedAddress = walletAddress.toLowerCase()
     
@@ -97,6 +107,11 @@ export async function createOrUpdateUserProfile(
 }
 
 export async function getAllUserProfiles(): Promise<UserProfile[]> {
+  if (!supabase) {
+    console.log('Supabase not configured for user profiles')
+    return []
+  }
+
   try {
     const { data, error } = await supabase
       .from('user_profiles')

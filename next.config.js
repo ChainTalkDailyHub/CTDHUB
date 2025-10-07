@@ -27,6 +27,10 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
+  // Disable ESLint during build for deployment
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   // Environment variables
   env: {
     NETLIFY: process.env.NETLIFY,

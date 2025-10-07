@@ -69,7 +69,7 @@ export default function VideoPage() {
       setIsLoading(true)
       
       // Buscar todos os cursos para encontrar o vídeo específico
-      const response = await fetch('/api/courses')
+      const response = await fetch('/.netlify/functions/course-manager')
       if (response.ok) {
         const courses = await response.json()
         
@@ -152,16 +152,12 @@ export default function VideoPage() {
 
   const loadComments = async (videoId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('video_comments')
-        .select('*')
-        .eq('video_id', videoId)
-        .order('created_at', { ascending: false })
-      
-      if (error) {
-        console.error('Error loading comments:', error)
+      const response = await fetch(`/.netlify/functions/video-comments?videoId=${videoId}`)
+      if (response.ok) {
+        const comments = await response.json()
+        setComments(comments || [])
       } else {
-        setComments(data || [])
+        console.error('Failed to load comments:', response.statusText)
       }
     } catch (error) {
       console.error('Failed to load comments:', error)
@@ -174,17 +170,21 @@ export default function VideoPage() {
     try {
       setIsSubmittingComment(true)
       
-      const { error } = await supabase
-        .from('video_comments')
-        .insert([{
-          video_id: video.id,
-          user_address: userAddress,
-          user_name: userProfile?.name || `User ${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`,
+      const response = await fetch('/.netlify/functions/video-comments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          videoId: video.id,
+          userAddress: userAddress,
+          userName: userProfile?.name || userAddress.slice(0, 6) + '...' + userAddress.slice(-4),
           comment: newComment.trim()
-        }])
-      
-      if (error) {
-        throw error
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to submit comment')
       }
       
       setNewComment('')
@@ -304,14 +304,6 @@ export default function VideoPage() {
                       From: <span className="text-gray-300">{video.courseName}</span>
                     </p>
                   </div>
-                  <a
-                    href={video.youtubeUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors text-sm"
-                  >
-                    Watch on YouTube
-                  </a>
                 </div>
 
                 {video.description && (

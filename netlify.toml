@@ -1,18 +1,13 @@
-# Build settings
+# Build settings for static export
 [build]
-  publish = ".next"
-  command = "npm run build"
+  publish = "out"
+  command = "npm run netlify:build"
   functions = "netlify/functions"
 
 # Environment variables for build
 [build.environment]
   NODE_VERSION = "18"
   NPM_FLAGS = "--production=false"
-
-# Function settings
-[functions]
-  directory = "netlify/functions"
-  node_bundler = "esbuild"
 
 # Headers for security
 [[headers]]
@@ -22,25 +17,6 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:;"
-
-# Next.js catch-all redirect
-[[redirects]]
-  from = "/*"
-  to = "/404.html"
-  status = 404
-
-# API redirects for custom functions
-[[redirects]]
-  from = "/api/ai/chat"
-  to = "/.netlify/functions/ai-chat"
-  status = 200
-
-# Next.js specific redirects
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
 
 # Cache static assets
 [[headers]]
@@ -57,3 +33,9 @@
   for = "*.css"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# Next.js SPA fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

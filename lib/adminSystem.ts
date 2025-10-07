@@ -163,7 +163,7 @@ export class AdminSystem {
 
   // Utilitário para gerar thumbnail do YouTube
   static getYouTubeThumbnail(url: string): string {
-    if (!url) return '/images/course-placeholder.jpg'
+    if (!url) return '/images/course-placeholder.svg'
     
     const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/
     const match = url.match(regex)
@@ -172,7 +172,7 @@ export class AdminSystem {
       return `https://img.youtube.com/vi/${match[1]}/maxresdefault.jpg`
     }
     
-    return '/images/course-placeholder.jpg'
+    return '/images/course-placeholder.svg'
   }
 
   // Verificar status da conectividade

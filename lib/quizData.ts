@@ -35,12 +35,12 @@ export const quizModules: QuizModule[] = [
         id: 2,
         question: "What makes blockchain secure?",
         options: [
-          "Cryptographic hashing",
           "Central authority",
-          "Password protection",
-          "Firewall systems"
+          "Password protection", 
+          "Firewall systems",
+          "Cryptographic hashing"
         ],
-        correctAnswer: 1,
+        correctAnswer: 4,
         explanation: "Cryptographic hashing ensures the integrity and immutability of blockchain data."
       },
       {
@@ -59,12 +59,12 @@ export const quizModules: QuizModule[] = [
         id: 4,
         question: "What is consensus in blockchain?",
         options: [
-          "Agreement among network participants",
           "A voting system",
-          "A type of contract",
+          "A type of contract", 
+          "Agreement among network participants",
           "A mining reward"
         ],
-        correctAnswer: 1,
+        correctAnswer: 3,
         explanation: "Consensus is the agreement mechanism that ensures all network participants agree on the state of the blockchain."
       },
       {
@@ -84,11 +84,11 @@ export const quizModules: QuizModule[] = [
         question: "What is immutability in blockchain?",
         options: [
           "Ability to change data",
-          "Data cannot be altered once recorded",
           "Fast transaction processing",
-          "Low transaction fees"
+          "Low transaction fees",
+          "Data cannot be altered once recorded"
         ],
-        correctAnswer: 2,
+        correctAnswer: 4,
         explanation: "Immutability means that once data is recorded on the blockchain, it cannot be altered or deleted."
       },
       {
@@ -151,11 +151,11 @@ export const quizModules: QuizModule[] = [
         question: "What is a smart contract?",
         options: [
           "A legal document",
-          "Self-executing code on blockchain",
           "A trading algorithm",
-          "A mobile app"
+          "A mobile app",
+          "Self-executing code on blockchain"
         ],
-        correctAnswer: 2,
+        correctAnswer: 4,
         explanation: "Smart contracts are self-executing contracts with terms directly written into code."
       },
       {
@@ -174,12 +174,12 @@ export const quizModules: QuizModule[] = [
         id: 3,
         question: "What is gas in Ethereum?",
         options: [
-          "A type of fuel",
           "Transaction fee unit",
+          "A type of fuel",
           "A programming language",
           "A wallet type"
         ],
-        correctAnswer: 2,
+        correctAnswer: 1,
         explanation: "Gas is the unit used to measure the computational effort required to execute operations on Ethereum."
       },
       {
@@ -278,11 +278,11 @@ export const quizModules: QuizModule[] = [
         question: "What does DeFi stand for?",
         options: [
           "Digital Finance",
+          "Distributed Finance", 
           "Decentralized Finance",
-          "Distributed Finance",
           "Deferred Finance"
         ],
-        correctAnswer: 2,
+        correctAnswer: 3,
         explanation: "DeFi stands for Decentralized Finance, referring to financial services built on blockchain."
       },
       {
@@ -350,23 +350,23 @@ export const quizModules: QuizModule[] = [
         question: "What is governance token?",
         options: [
           "Government-issued currency",
-          "Token giving voting rights in protocol decisions",
           "Stable cryptocurrency",
-          "Mining reward token"
+          "Mining reward token",
+          "Token giving voting rights in protocol decisions"
         ],
-        correctAnswer: 2,
+        correctAnswer: 4,
         explanation: "Governance tokens give holders voting rights to participate in protocol governance and decision-making."
       },
       {
         id: 8,
         question: "What is composability in DeFi?",
         options: [
-          "Ability to combine different protocols",
           "Creating new tokens",
           "Price stability",
-          "Transaction speed"
+          "Transaction speed",
+          "Ability to combine different protocols"
         ],
-        correctAnswer: 1,
+        correctAnswer: 4,
         explanation: "Composability allows DeFi protocols to interact and build upon each other, creating complex financial products."
       },
       {
@@ -374,11 +374,11 @@ export const quizModules: QuizModule[] = [
         question: "What is a wrapped token?",
         options: [
           "Encrypted token",
-          "Token representing another asset on different blockchain",
           "Staked token",
+          "Token representing another asset on different blockchain",
           "Burned token"
         ],
-        correctAnswer: 2,
+        correctAnswer: 3,
         explanation: "Wrapped tokens represent assets from one blockchain on another blockchain, enabling cross-chain functionality."
       },
       {
@@ -405,11 +405,11 @@ export const quizModules: QuizModule[] = [
         question: "What is arbitrage in crypto trading?",
         options: [
           "Buying low and selling high",
-          "Exploiting price differences across exchanges",
           "Holding long-term",
+          "Exploiting price differences across exchanges",
           "Day trading"
         ],
-        correctAnswer: 2,
+        correctAnswer: 3,
         explanation: "Arbitrage involves exploiting price differences of the same asset across different exchanges."
       },
       {
@@ -441,11 +441,11 @@ export const quizModules: QuizModule[] = [
         question: "What is technical analysis?",
         options: [
           "Analyzing code quality",
-          "Studying price charts and patterns",
           "Reviewing fundamentals",
-          "Checking network security"
+          "Checking network security",
+          "Studying price charts and patterns"
         ],
-        correctAnswer: 2,
+        correctAnswer: 4,
         explanation: "Technical analysis involves studying price charts, patterns, and indicators to predict future price movements."
       },
       {
@@ -453,11 +453,11 @@ export const quizModules: QuizModule[] = [
         question: "What is a stop-loss order?",
         options: [
           "Order to buy at low price",
-          "Order to sell when price drops to limit losses",
           "Order to hold position",
-          "Order to increase position"
+          "Order to increase position",
+          "Order to sell when price drops to limit losses"
         ],
-        correctAnswer: 2,
+        correctAnswer: 4,
         explanation: "A stop-loss order automatically sells an asset when its price falls to a predetermined level to limit losses."
       },
       {
@@ -465,11 +465,11 @@ export const quizModules: QuizModule[] = [
         question: "What is market cap?",
         options: [
           "Maximum number of coins",
-          "Total value of all coins in circulation",
           "Daily trading volume",
+          "Total value of all coins in circulation",
           "Price per coin"
         ],
-        correctAnswer: 2,
+        correctAnswer: 3,
         explanation: "Market cap is the total value of all coins in circulation, calculated by multiplying price by circulating supply."
       },
       {
@@ -556,11 +556,11 @@ export const quizModules: QuizModule[] = [
         question: "What is a smart contract audit?",
         options: [
           "Financial review",
-          "Security review of contract code",
           "Performance testing",
+          "Security review of contract code",
           "User interface review"
         ],
-        correctAnswer: 2,
+        correctAnswer: 3,
         explanation: "A smart contract audit is a thorough security review of contract code to identify vulnerabilities and bugs."
       },
       {
@@ -568,11 +568,11 @@ export const quizModules: QuizModule[] = [
         question: "What is access control?",
         options: [
           "Network permissions",
-          "Restricting function access to authorized users",
           "File permissions",
+          "Restricting function access to authorized users",
           "Database access"
         ],
-        correctAnswer: 2,
+        correctAnswer: 3,
         explanation: "Access control ensures that only authorized users can execute certain functions in smart contracts."
       },
       {
@@ -592,11 +592,11 @@ export const quizModules: QuizModule[] = [
         question: "What is flash loan attack?",
         options: [
           "Very fast loan processing",
-          "Exploiting protocols using uncollateralized loans",
           "High-frequency lending",
+          "Exploiting protocols using uncollateralized loans",
           "Instant loan approval"
         ],
-        correctAnswer: 2,
+        correctAnswer: 3,
         explanation: "Flash loan attacks exploit DeFi protocols by borrowing large amounts without collateral within a single transaction."
       },
       {
@@ -755,11 +755,11 @@ export const quizModules: QuizModule[] = [
         question: "What is a rug pull in farming?",
         options: [
           "Carpet cleaning service",
-          "Sudden withdrawal of liquidity by developers",
           "Floor decoration strategy",
+          "Sudden withdrawal of liquidity by developers",
           "Interior design method"
         ],
-        correctAnswer: 2,
+        correctAnswer: 3,
         explanation: "A rug pull occurs when developers suddenly withdraw all liquidity from a project, leaving investors with worthless tokens."
       },
       {
@@ -786,11 +786,11 @@ export const quizModules: QuizModule[] = [
         question: "What is a liquidity pool?",
         options: [
           "A swimming pool",
-          "Collection of funds for trading",
           "A mining pool",
+          "Collection of funds for trading",
           "A wallet type"
         ],
-        correctAnswer: 2,
+        correctAnswer: 3,
         explanation: "Liquidity pools are collections of funds locked in smart contracts to facilitate trading."
       },
       {
@@ -822,11 +822,11 @@ export const quizModules: QuizModule[] = [
         question: "What causes impermanent loss?",
         options: [
           "Pool fees",
-          "Price divergence of pooled assets",
           "Network congestion",
-          "Smart contract bugs"
+          "Smart contract bugs",
+          "Price divergence of pooled assets"
         ],
-        correctAnswer: 2,
+        correctAnswer: 4,
         explanation: "Impermanent loss occurs when the price ratio of pooled assets changes compared to when they were deposited."
       },
       {
@@ -949,11 +949,11 @@ export const quizModules: QuizModule[] = [
         question: "What is statistical arbitrage?",
         options: [
           "Using statistics for trading",
-          "Exploiting statistical relationships between assets",
           "Statistical analysis of markets",
-          "Probability-based trading"
+          "Probability-based trading",
+          "Exploiting statistical relationships between assets"
         ],
-        correctAnswer: 2,
+        correctAnswer: 4,
         explanation: "Statistical arbitrage exploits pricing inefficiencies based on statistical relationships between different assets."
       },
       {
@@ -961,11 +961,11 @@ export const quizModules: QuizModule[] = [
         question: "What is latency arbitrage?",
         options: [
           "Delayed trading",
-          "Exploiting speed advantages in trade execution",
           "Late trading strategy",
+          "Exploiting speed advantages in trade execution",
           "Timezone-based arbitrage"
         ],
-        correctAnswer: 2,
+        correctAnswer: 3,
         explanation: "Latency arbitrage involves using superior speed and technology to execute trades before others react to market changes."
       },
       {
@@ -996,12 +996,12 @@ export const quizModules: QuizModule[] = [
         id: 8,
         question: "What limits arbitrage opportunities?",
         options: [
-          "Transaction fees and slippage",
           "Government regulations",
           "Market hours",
-          "Internet speed"
+          "Internet speed",
+          "Transaction fees and slippage"
         ],
-        correctAnswer: 1,
+        correctAnswer: 4,
         explanation: "Transaction fees, gas costs, and slippage can eliminate arbitrage profits, especially for small price differences."
       },
       {
@@ -1040,11 +1040,11 @@ export const quizModules: QuizModule[] = [
         question: "What is impermanent loss?",
         options: [
           "Permanent token loss",
-          "Temporary price volatility loss",
           "Transaction fees",
-          "Slippage costs"
+          "Slippage costs",
+          "Temporary price volatility loss"
         ],
-        correctAnswer: 2,
+        correctAnswer: 4,
         explanation: "Impermanent loss occurs when providing liquidity and token prices change relative to when you deposited."
       },
       {
@@ -1076,11 +1076,11 @@ export const quizModules: QuizModule[] = [
         question: "What is position sizing?",
         options: [
           "Physical size of trading position",
-          "Determining appropriate investment amount per trade",
           "Size of trading screen",
-          "Number of positions held"
+          "Number of positions held",
+          "Determining appropriate investment amount per trade"
         ],
-        correctAnswer: 2,
+        correctAnswer: 4,
         explanation: "Position sizing involves determining the appropriate amount to invest in each trade based on risk tolerance."
       },
       {
@@ -1112,11 +1112,11 @@ export const quizModules: QuizModule[] = [
         question: "What is correlation risk?",
         options: [
           "Risk of data correlation",
-          "Risk when asset prices move together during stress",
           "Risk of network correlation",
-          "Risk of user correlation"
+          "Risk of user correlation",
+          "Risk when asset prices move together during stress"
         ],
-        correctAnswer: 2,
+        correctAnswer: 4,
         explanation: "Correlation risk occurs when seemingly diversified assets become highly correlated during market stress, reducing diversification benefits."
       },
       {
@@ -1203,11 +1203,11 @@ export const quizModules: QuizModule[] = [
         question: "What is a leveraged yield farming?",
         options: [
           "Farming with leverage tools",
-          "Borrowing to increase farming position size",
           "High-yield farming strategy",
-          "Mechanical farming leverage"
+          "Mechanical farming leverage",
+          "Borrowing to increase farming position size"
         ],
-        correctAnswer: 2,
+        correctAnswer: 4,
         explanation: "Leveraged yield farming involves borrowing assets to increase the size of farming positions and potential returns."
       },
       {
@@ -1227,11 +1227,11 @@ export const quizModules: QuizModule[] = [
         question: "What is a delta-neutral strategy?",
         options: [
           "Zero-delta options",
-          "Strategy unaffected by price movements",
           "Neutral market position",
-          "Greek letter strategy"
+          "Greek letter strategy",
+          "Strategy unaffected by price movements"
         ],
-        correctAnswer: 2,
+        correctAnswer: 4,
         explanation: "Delta-neutral strategies are designed to be unaffected by small price movements in the underlying asset."
       },
       {
@@ -1251,11 +1251,11 @@ export const quizModules: QuizModule[] = [
         question: "What is a synthetic asset?",
         options: [
           "Artificial asset creation",
-          "Asset that mimics price of another asset",
           "Fake cryptocurrency",
-          "Manufactured token"
+          "Manufactured token",
+          "Asset that mimics price of another asset"
         ],
-        correctAnswer: 2,
+        correctAnswer: 4,
         explanation: "Synthetic assets are financial instruments that mimic the price and behavior of other assets without direct ownership."
       },
       {

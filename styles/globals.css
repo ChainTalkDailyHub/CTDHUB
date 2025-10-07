@@ -52,12 +52,19 @@ body.theme-neon-circuit {
 
 /* cantoneiras (ornamento nos cards) */
 .corner {
-  position:absolute; width:18px; height:18px; border:1px solid rgba(255,199,0,.5);
+  position:absolute; width:18px; height:18px; border:1px solid rgba(255,199,0,.6);
+  transition: all 0.3s ease;
 }
 .corner--tl{top:8px; left:8px; border-right:none; border-bottom:none; border-radius:6px 0 0 0;}
 .corner--tr{top:8px; right:8px; border-left:none; border-bottom:none; border-radius:0 6px 0 0;}
 .corner--bl{bottom:8px; left:8px; border-right:none; border-top:none; border-radius:0 0 0 6px;}
 .corner--br{bottom:8px; right:8px; border-left:none; border-top:none; border-radius:0 0 6px 0;}
+
+/* Hover effect para cantoneiras */
+.card:hover .corner {
+  border-color: rgba(255,199,0,.9);
+  box-shadow: 0 0 8px rgba(255,199,0,.3);
+}
 
 /* borda em gradiente real (não só cor) */
 .gradient-border {
@@ -73,18 +80,29 @@ body.theme-neon-circuit {
 
 /* utilitários de componente */
 .card {
-  border-radius: 1.25rem;
-  border: 1px solid rgba(255,255,255,.06);
-  background: linear-gradient(180deg, var(--panel), var(--panel2));
-  box-shadow: var(--card-shadow, 0 20px 60px rgba(0,0,0,.45)), inset 0 1px 0 rgba(255,255,255,.04);
   position: relative;
-}
-.card{
   border-radius: 1rem;
   border: 1px solid rgba(42,42,42,.8);
   background-color: rgba(14,14,14,.8);
   backdrop-filter: blur(8px);
-  box-shadow: 0 0 0 1px rgba(255,255,255,.02);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0), 0 4px 20px rgba(0,0,0,.3);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 0 0 1px rgba(255,199,0,.1), 0 8px 30px rgba(0,0,0,.4);
+  transform: translateY(-2px);
+}
+
+/* Variações de cards */
+.card-feature {
+  border: 1px solid rgba(255,199,0,.2);
+  background: linear-gradient(135deg, rgba(14,14,14,.9), rgba(255,199,0,.02));
+}
+
+.card-interactive:hover {
+  border-color: rgba(255,199,0,.4);
+  box-shadow: 0 0 0 1px rgba(255,199,0,.2), 0 12px 40px rgba(0,0,0,.5);
 }
 
 .btn-primary{
@@ -266,4 +284,54 @@ a {
   100% {
     background-position: 0% 50%;
   }
+}
+
+/* Prevenir scroll automático no Binno AI */
+.binno-container {
+  scroll-behavior: auto !important;
+}
+
+.binno-container button:focus,
+.binno-container textarea:focus,
+.binno-container input:focus {
+  scroll-margin-top: 0 !important;
+  scroll-margin-bottom: 0 !important;
+}
+
+.binno-container * {
+  scroll-margin: 0 !important;
+}
+
+/* Remover comportamento de scroll suave temporariamente para Binno */
+.binno-container * {
+  scroll-behavior: auto !important;
+}
+
+/* Garantir que textarea e botões sejam interativos */
+.binno-container textarea,
+.binno-container button {
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+/* Garantir que o container principal permita interação */
+.binno-container {
+  pointer-events: auto !important;
+  position: relative !important;
+}
+
+/* Força interatividade em textareas no Binno */
+.binno-textarea {
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 9999 !important;
+  background: rgba(30, 41, 59, 0.5) !important;
+  border: 1px solid rgba(148, 163, 184, 0.5) !important;
+  outline: none !important;
+}
+
+.binno-textarea:focus {
+  border-color: #facc15 !important;
+  box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.2) !important;
 }

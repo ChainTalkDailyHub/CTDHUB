@@ -126,34 +126,52 @@ export default function Home() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
-              <div className="card text-center group" role="article" aria-labelledby="feature-courses">
-                <div className="w-16 h-16 bg-ctd-yellow/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-ctd-yellow/30 transition-colors duration-200">
-                  <span className="text-3xl" role="img" aria-label="Books">📚</span>
+              <div className="card text-center group relative" role="article" aria-labelledby="feature-courses">
+                <div className="corner corner--tl"></div>
+                <div className="corner corner--tr"></div>
+                <div className="corner corner--bl"></div>
+                <div className="corner corner--br"></div>
+                <div className="p-8">
+                  <div className="w-16 h-16 bg-ctd-yellow/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-ctd-yellow/30 transition-colors duration-200">
+                    <span className="text-3xl" role="img" aria-label="Books">📚</span>
+                  </div>
+                  <h3 id="feature-courses" className="text-2xl font-bold text-ctd-text mb-4">Interactive courses</h3>
+                  <p className="text-ctd-mute leading-relaxed">
+                    Learn by doing with guided, real-world projects.
+                  </p>
                 </div>
-                <h3 id="feature-courses" className="text-2xl font-bold text-ctd-text mb-4">Interactive courses</h3>
-                <p className="text-ctd-mute leading-relaxed">
-                  Learn by doing with guided, real-world projects.
-                </p>
               </div>
               
-              <div className="card text-center group" role="article" aria-labelledby="feature-quiz">
-                <div className="w-16 h-16 bg-ctd-yellow/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-ctd-yellow/30 transition-colors duration-200">
-                  <span className="text-3xl" role="img" aria-label="Brain">🧠</span>
+              <div className="card text-center group relative" role="article" aria-labelledby="feature-quiz">
+                <div className="corner corner--tl"></div>
+                <div className="corner corner--tr"></div>
+                <div className="corner corner--bl"></div>
+                <div className="corner corner--br"></div>
+                <div className="p-8">
+                  <div className="w-16 h-16 bg-ctd-yellow/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-ctd-yellow/30 transition-colors duration-200">
+                    <span className="text-3xl" role="img" aria-label="Brain">🧠</span>
+                  </div>
+                  <h3 id="feature-quiz" className="text-2xl font-bold text-ctd-text mb-4">Smart quizzes</h3>
+                  <p className="text-ctd-mute leading-relaxed">
+                    10 progressive modules with instant feedback and retry.
+                  </p>
                 </div>
-                <h3 id="feature-quiz" className="text-2xl font-bold text-ctd-text mb-4">Smart quizzes</h3>
-                <p className="text-ctd-mute leading-relaxed">
-                  10 progressive modules with instant feedback and retry.
-                </p>
               </div>
               
-              <div className="card text-center group" role="article" aria-labelledby="feature-ai">
-                <div className="w-16 h-16 bg-ctd-yellow/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-ctd-yellow/30 transition-colors duration-200">
-                  <span className="text-3xl" role="img" aria-label="Robot">🤖</span>
+              <div className="card text-center group relative" role="article" aria-labelledby="feature-ai">
+                <div className="corner corner--tl"></div>
+                <div className="corner corner--tr"></div>
+                <div className="corner corner--bl"></div>
+                <div className="corner corner--br"></div>
+                <div className="p-8">
+                  <div className="w-16 h-16 bg-ctd-yellow/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-ctd-yellow/30 transition-colors duration-200">
+                    <span className="text-3xl" role="img" aria-label="Robot">🤖</span>
+                  </div>
+                  <h3 id="feature-ai" className="text-2xl font-bold text-ctd-text mb-4">Binno AI</h3>
+                  <p className="text-ctd-mute leading-relaxed">
+                    Ask anything. Get code hints, explanations, and next steps.
+                  </p>
                 </div>
-                <h3 id="feature-ai" className="text-2xl font-bold text-ctd-text mb-4">Binno AI</h3>
-                <p className="text-ctd-mute leading-relaxed">
-                  Ask anything. Get code hints, explanations, and next steps.
-                </p>
               </div>
             </div>
           </div>

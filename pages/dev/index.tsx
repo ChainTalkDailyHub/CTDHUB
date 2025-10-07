@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
 import Header from '../../components/Header'
 import Footer from '../../components/Footer'
 import WalletButton from '../../components/WalletButton'
@@ -7,11 +8,13 @@ import { Course } from '../../lib/courses-storage'
 import { short } from '../../lib/storage'
 
 export default function DevArea() {
+  const router = useRouter()
   const [isConnected, setIsConnected] = useState(false)
   const [address, setAddress] = useState('')
   const [myCourses, setMyCourses] = useState<Course[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [userProfile, setUserProfile] = useState<any>(null)
+  const [selectedCourseId, setSelectedCourseId] = useState('')
 
   useEffect(() => {
     const stored = localStorage.getItem('ctdhub:wallet')
@@ -21,7 +24,12 @@ export default function DevArea() {
       loadMyCourses(stored)
       loadUserProfile(stored)
     }
-  }, [])
+    
+    // Check if user wants to add videos to specific course
+    if (router.query.courseId) {
+      setSelectedCourseId(router.query.courseId as string)
+    }
+  }, [router.query])
 
   const loadUserProfile = async (address: string) => {
     try {
@@ -37,7 +45,7 @@ export default function DevArea() {
 
   const loadMyCourses = async (walletAddress: string) => {
     try {
-      const response = await fetch('/api/courses')
+      const response = await fetch('/.netlify/functions/course-manager')
       if (response.ok) {
         const allCourses = await response.json()
         const filtered = allCourses.filter((c: Course) => 
@@ -55,104 +63,73 @@ export default function DevArea() {
     description: string
     videos: Array<{title: string, description: string, youtubeUrl: string}>
   }) => {
-    if (!address) throw new Error('Wallet not connected')
-
-    setIsLoading(true)
-    try {
-      // First create the course
-      const courseResponse = await fetch('/api/courses', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-user-address': address
-        },
-        body: JSON.stringify({
-          action: 'create_course',
-          courseTitle: data.title,
-          courseDescription: data.description
-        })
-      })
-
-      if (!courseResponse.ok) {
-        const error = await courseResponse.json()
-        throw new Error(error.error || 'Failed to create course')
-      }
-
-      const newCourse = await courseResponse.json()
-
-      // Then add videos if any
-      if (data.videos && data.videos.length > 0) {
-        const videosResponse = await fetch('/api/courses', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-user-address': address
-          },
-          body: JSON.stringify({
-            action: 'add_videos',
-            courseId: newCourse.id,
-            videos: data.videos.map(video => ({
-              title: video.title.trim(),
-              description: video.description?.trim() || '',
-              youtube_url: video.youtubeUrl.trim(),
-              thumbnail: `https://img.youtube.com/vi/${extractYouTubeId(video.youtubeUrl)}/maxresdefault.jpg`
-            }))
-          })
-        })
-
-        if (!videosResponse.ok) {
-          const error = await videosResponse.json()
-          console.warn('Failed to add videos:', error)
-        }
-      }
-
-      // Reload courses
-      await loadMyCourses(address)
-      alert('Published! It\'s live on Courses.')
-    } finally {
-      setIsLoading(false)
+    console.log('=== handleCourseSubmit ===')
+    console.log('Address:', address)
+    console.log('IsConnected:', isConnected)
+    console.log('Data:', data)
+    
+    if (!address) {
+      console.log('No address available')
+      throw new Error('Wallet not connected')
     }
+
+    const response = await fetch('/.netlify/functions/course-manager', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-address': address
+      },
+      body: JSON.stringify(data)
+    })
+
+    console.log('Response status:', response.status)
+    console.log('Response headers:', response.headers)
+
+    if (!response.ok) {
+      const error = await response.json()
+      console.log('Response error:', error)
+      throw new Error(error.error || 'Failed to publish course')
+    }
+
+    const newCourse = await response.json()
+    console.log('New course created:', newCourse)
+    setMyCourses(prev => [newCourse, ...prev])
+    
+    alert('Published! It\'s live on Courses.')
   }
 
   const handleAddToExisting = async (courseId: string, videos: Array<{title: string, description: string, youtubeUrl: string}>) => {
-    if (!address) throw new Error('Wallet not connected')
-
-    setIsLoading(true)
-    try {
-      const response = await fetch('/api/courses', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-user-address': address
-        },
-        body: JSON.stringify({
-          action: 'add_videos',
-          courseId,
-          videos: videos.map(video => ({
-            title: video.title.trim(),
-            description: video.description?.trim() || '',
-            youtube_url: video.youtubeUrl.trim(),
-            thumbnail: `https://img.youtube.com/vi/${extractYouTubeId(video.youtubeUrl)}/maxresdefault.jpg`
-          }))
-        })
-      })
-
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Failed to add videos')
-      }
-
-      // Reload courses
-      await loadMyCourses(address)
-      alert('Videos added successfully!')
-    } finally {
-      setIsLoading(false)
+    console.log('=== handleAddToExisting ===')
+    console.log('Course ID:', courseId)
+    console.log('Videos to add:', videos)
+    
+    if (!address) {
+      console.log('No address available')
+      throw new Error('Wallet not connected')
     }
-  }
 
-  const extractYouTubeId = (url: string): string => {
-    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/)
-    return match ? match[1] : ''
+    const response = await fetch(`/.netlify/functions/course-manager?courseId=${courseId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-address': address
+      },
+      body: JSON.stringify({ videos })
+    })
+
+    console.log('Response status:', response.status)
+
+    if (!response.ok) {
+      const error = await response.json()
+      console.log('Response error:', error)
+      throw new Error(error.error || 'Failed to add videos')
+    }
+
+    const updatedCourse = await response.json()
+    console.log('Course updated:', updatedCourse)
+    setMyCourses(prev => prev.map(c => c.id === courseId ? updatedCourse : c))
+    
+    alert(`Videos added successfully! Module now has ${updatedCourse.totalVideos} videos.`)
   }
 
   const formatDate = (timestamp: number) => {
@@ -212,6 +189,7 @@ export default function DevArea() {
                   title: c.title,
                   totalVideos: c.totalVideos
                 }))}
+                preSelectedCourseId={selectedCourseId}
               />
             </div>
 

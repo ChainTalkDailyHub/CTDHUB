@@ -111,148 +111,185 @@ export default function DeveloperPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+    <div className="min-h-screen bg-ctd-bg">
       <Header />
-      <section className="pt-20 pb-8 px-4">
+      <section className="pt-20 pb-8 px-4 spotlight">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-white text-center mb-8">
-            Dev Area
-          </h1>
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-ctd-text drop-shadow-neon mb-4">
+              Dev <span className="text-ctd-yellow">Area</span>
+            </h1>
+            <p className="text-xl text-ctd-mute">
+              Administrative area for official CTDHUB course creation
+            </p>
+          </div>
 
           {!isConnected ? (
             <div className="text-center">
-              <button
-                onClick={connectWallet}
-                className="bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-3 rounded-lg font-semibold"
-              >
-                Conectar Carteira
-              </button>
+              <div className="card max-w-md mx-auto relative">
+                <div className="corner corner--tl"></div>
+                <div className="corner corner--tr"></div>
+                <div className="corner corner--bl"></div>
+                <div className="corner corner--br"></div>
+                
+                <div className="relative z-10 p-1 text-center">
+                  <h3 className="text-xl font-semibold text-ctd-text mb-4">Connect Your Wallet</h3>
+                  <p className="text-ctd-mute mb-6">Connect your wallet to access the developer area</p>
+                  <button
+                    onClick={connectWallet}
+                    className="btn-primary"
+                  >
+                    Connect Wallet
+                  </button>
+                </div>
+              </div>
             </div>
           ) : (
             <div className="space-y-8">
               {/* Admin Badge */}
               {isAdmin && (
-                <div className="bg-gradient-to-r from-yellow-500 to-orange-500 text-black p-6 rounded-lg text-center">
-                  <h2 className="text-2xl font-bold mb-2">🔥 Admin CTDHUB</h2>
-                  <p className="text-lg">Você tem acesso exclusivo para criar Cursos CTDHUB oficiais!</p>
-                  <p className="text-sm mt-2">Wallet: {walletAddress}</p>
+                <div className="card relative border-ctd-yellow">
+                  <div className="corner corner--tl"></div>
+                  <div className="corner corner--tr"></div>
+                  <div className="corner corner--bl"></div>
+                  <div className="corner corner--br"></div>
+                  
+                  <div className="relative z-10 p-1 text-center">
+                    <h2 className="text-2xl font-bold text-ctd-yellow mb-2">🔥 CTDHUB Admin</h2>
+                    <p className="text-lg text-ctd-text">You have exclusive access to create official CTDHUB courses!</p>
+                    <p className="text-sm text-ctd-mute mt-2">Wallet: {walletAddress}</p>
+                  </div>
                 </div>
               )}
 
               {/* Admin Course Creation */}
               {isAdmin && (
-                <div className="bg-gray-800 p-6 rounded-lg">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-xl font-bold text-white">Criar Curso CTDHUB Oficial</h3>
-                    <button
-                      onClick={() => setShowAdminForm(!showAdminForm)}
-                      className="bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded-lg font-semibold"
-                    >
-                      {showAdminForm ? 'Fechar' : 'Novo Curso'}
-                    </button>
-                  </div>
-
-                  <div className="flex gap-4 mb-6">
-                    <button
-                      onClick={syncCourses}
-                      disabled={isLoading}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg disabled:opacity-50"
-                    >
-                      {isLoading ? '🔄 Sincronizando...' : '🔄 Sincronizar Cursos'}
-                    </button>
-                  </div>
-
-                  {showAdminForm && (
-                    <form onSubmit={handleAdminCourseSubmit} className="space-y-4">
-                      <div>
-                        <label className="block text-white mb-2">Título do Curso</label>
-                        <input
-                          type="text"
-                          required
-                          value={adminCourseData.title}
-                          onChange={(e) => setAdminCourseData(prev => ({ ...prev, title: e.target.value }))}
-                          className="w-full p-3 bg-gray-700 text-white rounded-lg"
-                          placeholder="Ex: Fundamentos do Blockchain"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-white mb-2">Descrição</label>
-                        <textarea
-                          required
-                          value={adminCourseData.description}
-                          onChange={(e) => setAdminCourseData(prev => ({ ...prev, description: e.target.value }))}
-                          className="w-full p-3 bg-gray-700 text-white rounded-lg h-24"
-                          placeholder="Descrição detalhada do curso..."
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-white mb-2">URL do YouTube</label>
-                        <input
-                          type="url"
-                          required
-                          value={adminCourseData.youtubeUrl}
-                          onChange={(e) => setAdminCourseData(prev => ({ ...prev, youtubeUrl: e.target.value }))}
-                          className="w-full p-3 bg-gray-700 text-white rounded-lg"
-                          placeholder="https://youtube.com/watch?v=..."
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-white mb-2">Categoria</label>
-                          <select
-                            value={adminCourseData.category}
-                            onChange={(e) => setAdminCourseData(prev => ({ ...prev, category: e.target.value }))}
-                            className="w-full p-3 bg-gray-700 text-white rounded-lg"
-                          >
-                            <option value="Blockchain">Blockchain</option>
-                            <option value="DeFi">DeFi</option>
-                            <option value="NFT">NFT</option>
-                            <option value="Web3">Web3</option>
-                            <option value="Trading">Trading</option>
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="block text-white mb-2">Dificuldade</label>
-                          <select
-                            value={adminCourseData.difficulty}
-                            onChange={(e) => setAdminCourseData(prev => ({ ...prev, difficulty: e.target.value }))}
-                            className="w-full p-3 bg-gray-700 text-white rounded-lg"
-                          >
-                            <option value="Beginner">Iniciante</option>
-                            <option value="Intermediate">Intermediário</option>
-                            <option value="Advanced">Avançado</option>
-                          </select>
-                        </div>
-                      </div>
-
+                <div className="card relative">
+                  <div className="corner corner--tl"></div>
+                  <div className="corner corner--tr"></div>
+                  <div className="corner corner--bl"></div>
+                  <div className="corner corner--br"></div>
+                  
+                  <div className="relative z-10 p-1">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-xl font-bold text-ctd-text">Create Official CTDHUB Course</h3>
                       <button
-                        type="submit"
-                        disabled={isLoading}
-                        className="w-full bg-yellow-500 hover:bg-yellow-600 text-black py-3 rounded-lg font-semibold disabled:opacity-50"
+                        onClick={() => setShowAdminForm(!showAdminForm)}
+                        className="btn-primary"
                       >
-                        {isLoading ? '⏳ Criando Curso...' : '🚀 Criar Curso CTDHUB'}
+                        {showAdminForm ? 'Close' : 'New Course'}
                       </button>
-                    </form>
-                  )}
+                    </div>
+
+                    <div className="flex gap-4 mb-6">
+                      <button
+                        onClick={syncCourses}
+                        disabled={isLoading}
+                        className="btn-ghost disabled:opacity-50"
+                      >
+                        {isLoading ? '🔄 Syncing...' : '🔄 Sync Courses'}
+                      </button>
+                    </div>
+
+                    {showAdminForm && (
+                      <form onSubmit={handleAdminCourseSubmit} className="space-y-4">
+                        <div>
+                          <label className="block text-ctd-text mb-2 font-medium">Course Title</label>
+                          <input
+                            type="text"
+                            required
+                            value={adminCourseData.title}
+                            onChange={(e) => setAdminCourseData(prev => ({ ...prev, title: e.target.value }))}
+                            className="w-full px-4 py-3 bg-ctd-panel border border-ctd-border rounded-lg text-ctd-text placeholder-ctd-mute focus:outline-none focus:ring-2 focus:ring-ctd-yellow"
+                            placeholder="Ex: Blockchain Fundamentals"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-ctd-text mb-2 font-medium">Description</label>
+                          <textarea
+                            required
+                            value={adminCourseData.description}
+                            onChange={(e) => setAdminCourseData(prev => ({ ...prev, description: e.target.value }))}
+                            className="w-full px-4 py-3 bg-ctd-panel border border-ctd-border rounded-lg text-ctd-text placeholder-ctd-mute focus:outline-none focus:ring-2 focus:ring-ctd-yellow h-24 resize-none"
+                            placeholder="Detailed course description..."
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-ctd-text mb-2 font-medium">YouTube URL</label>
+                          <input
+                            type="url"
+                            required
+                            value={adminCourseData.youtubeUrl}
+                            onChange={(e) => setAdminCourseData(prev => ({ ...prev, youtubeUrl: e.target.value }))}
+                            className="w-full px-4 py-3 bg-ctd-panel border border-ctd-border rounded-lg text-ctd-text placeholder-ctd-mute focus:outline-none focus:ring-2 focus:ring-ctd-yellow"
+                            placeholder="https://youtube.com/watch?v=..."
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-ctd-text mb-2 font-medium">Category</label>
+                            <select
+                              value={adminCourseData.category}
+                              onChange={(e) => setAdminCourseData(prev => ({ ...prev, category: e.target.value }))}
+                              className="w-full px-4 py-3 bg-ctd-panel border border-ctd-border rounded-lg text-ctd-text focus:outline-none focus:ring-2 focus:ring-ctd-yellow"
+                            >
+                              <option value="Blockchain">Blockchain</option>
+                              <option value="DeFi">DeFi</option>
+                              <option value="NFT">NFT</option>
+                              <option value="Web3">Web3</option>
+                              <option value="Trading">Trading</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-ctd-text mb-2 font-medium">Difficulty</label>
+                            <select
+                              value={adminCourseData.difficulty}
+                              onChange={(e) => setAdminCourseData(prev => ({ ...prev, difficulty: e.target.value }))}
+                              className="w-full px-4 py-3 bg-ctd-panel border border-ctd-border rounded-lg text-ctd-text focus:outline-none focus:ring-2 focus:ring-ctd-yellow"
+                            >
+                              <option value="Beginner">Beginner</option>
+                              <option value="Intermediate">Intermediate</option>
+                              <option value="Advanced">Advanced</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <button
+                          type="submit"
+                          disabled={isLoading}
+                          className="w-full btn-primary disabled:opacity-50"
+                        >
+                          {isLoading ? '⏳ Creating Course...' : '🚀 Create CTDHUB Course'}
+                        </button>
+                      </form>
+                    )}
+                  </div>
                 </div>
               )}
 
               {/* Non-admin message */}
               {!isAdmin && (
-                <div className="bg-gray-800 p-6 rounded-lg text-center">
-                  <h2 className="text-xl font-bold text-white mb-4">Área de Desenvolvimento</h2>
-                  <p className="text-gray-300">
-                    Esta área é reservada para administradores do CTDHUB.
-                    <br />
-                    Somente a carteira ChainTalkDaily pode criar cursos oficiais.
-                  </p>
-                  <p className="text-sm text-gray-400 mt-4">
-                    Sua carteira: {walletAddress}
-                  </p>
+                <div className="card relative">
+                  <div className="corner corner--tl"></div>
+                  <div className="corner corner--tr"></div>
+                  <div className="corner corner--bl"></div>
+                  <div className="corner corner--br"></div>
+                  
+                  <div className="relative z-10 p-1 text-center">
+                    <h2 className="text-xl font-bold text-ctd-text mb-4">Development Area</h2>
+                    <p className="text-ctd-mute mb-4">
+                      This area is reserved for CTDHUB administrators.
+                      <br />
+                      Only the ChainTalkDaily wallet can create official courses.
+                    </p>
+                    <p className="text-sm text-ctd-mute">
+                      Your wallet: {walletAddress}
+                    </p>
+                  </div>
                 </div>
               )}
             </div>

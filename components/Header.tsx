@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import WalletButton from './WalletButton'
 import UserMenu from './UserMenuSimple'
+import { LOGO_DEFAULT_PROPS, LOGO_FALLBACK_TEXT } from '../lib/logo'
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -44,8 +45,8 @@ export default function Header() {
           <Link href="/" className="flex items-center group">
             <div className="relative">
               <img 
-                src="/images/CTDHUB.png" 
-                alt="CTDHUB - Blockchain Learning Platform" 
+                src={LOGO_DEFAULT_PROPS.src}
+                alt={LOGO_DEFAULT_PROPS.alt}
                 className="h-20 w-auto hover:opacity-90 transition-opacity duration-300"
                 onError={(e) => {
                   console.log('Logo failed to load, showing fallback');
@@ -62,12 +63,16 @@ export default function Header() {
                 className="hidden h-20 items-center justify-center px-6 bg-gradient-to-r from-ctd-yellow to-ctd-holo text-black font-bold text-2xl rounded-lg hover:opacity-90 transition-opacity duration-300"
                 style={{ display: 'none' }}
               >
-                CTDHUB
+                {LOGO_FALLBACK_TEXT}
               </div>
             </div>
           </Link>
           
           <nav className="hidden md:flex items-center space-x-8">
+            <Link href="/" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
+              <span className="relative z-10">Home</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
+            </Link>
             <Link href="/courses" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
               <span className="relative z-10">Courses</span>
               <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
@@ -76,16 +81,16 @@ export default function Header() {
               <span className="relative z-10">Quiz</span>
               <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
             </Link>
-            <Link href="/simulator" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
-              <span className="relative z-10">Simulator</span>
+            <Link href="/binno-ai" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
+              <span className="relative z-10">AI Chat</span>
               <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
             </Link>
-            <Link href="/binno-ai" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
-              <span className="relative z-10">Binno AI</span>
+            <Link href="/questionnaire" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
+              <span className="relative z-10">Skill Compass</span>
               <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
             </Link>
             <Link href="/dev" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
-              <span className="relative z-10">CS HUB</span>
+              <span className="relative z-10">Creator Studio</span>
               <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
             </Link>
           </nav>
@@ -144,6 +149,13 @@ export default function Header() {
           <div className="md:hidden bg-ctd-panel/95 backdrop-blur-md border-t border-ctd-border/50">
             <div className="px-4 py-4 space-y-2">
               <Link
+                href="/"
+                className="block px-4 py-3 text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 rounded-lg transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                🏠 Home
+              </Link>
+              <Link
                 href="/courses"
                 className="block px-4 py-3 text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 rounded-lg transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -162,14 +174,21 @@ export default function Header() {
                 className="block px-4 py-3 text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 rounded-lg transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                🤖 Binno AI
+                🤖 AI Chat
+              </Link>
+              <Link
+                href="/questionnaire"
+                className="block px-4 py-3 text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 rounded-lg transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                🧭 Skill Compass
               </Link>
               <Link
                 href="/dev"
                 className="block px-4 py-3 text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 rounded-lg transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                ⚙️ CS HUB
+                ⚙️ Creator Studio
               </Link>
             </div>
           </div>

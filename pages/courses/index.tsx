@@ -18,7 +18,7 @@ export default function Courses() {
   const loadCourses = async () => {
     try {
       setIsLoading(true)
-      const response = await fetch('/api/courses')
+      const response = await fetch('/.netlify/functions/course-manager')
       if (response.ok) {
         const data = await response.json()
         setCourses(data)
@@ -108,64 +108,71 @@ export default function Courses() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredCourses.map(course => (
-                <div key={course.id} className="card overflow-hidden hover:border-ctd-yellow transition-all duration-200 hover:transform hover:scale-105 spotlight">
-                  {/* Main Course Link - goes to first video if available, otherwise course page */}
-                  <Link
-                    href={course.videos.length > 0 ? `/video/${course.videos[0].id}` : `/courses/${course.id}`}
-                    className="block"
-                  >
-                    <div className="relative">
-                      {course.videos[0]?.thumbnail ? (
-                        <img
-                          src={course.videos[0].thumbnail}
-                          alt={course.title}
-                          className="w-full h-48 object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-48 bg-ctd-panel flex items-center justify-center">
-                          <div className="text-ctd-mute text-4xl">📚</div>
-                        </div>
-                      )}
-                      <div className="absolute top-4 right-4">
-                        <span className="chip">
-                          {course.totalVideos} videos
-                        </span>
-                      </div>
-                      <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                        <div className="w-16 h-16 bg-black/70 rounded-full flex items-center justify-center">
-                          <div className="w-0 h-0 border-l-[16px] border-l-white border-y-[10px] border-y-transparent ml-1"></div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="p-6">
-                      <h3 className="font-bold text-ctd-text text-lg mb-2 line-clamp-2">
-                        {course.title}
-                      </h3>
-                      
-                      <p className="text-ctd-mute text-sm mb-4 line-clamp-2">
-                        {course.description}
-                      </p>
-                      
-                      <div className="flex items-center justify-between text-xs text-ctd-mute">
-                        <span>By {short(course.author)}</span>
-                        <span>{formatDate(course.updatedAt)}</span>
-                      </div>
-                    </div>
-                  </Link>
+                <div key={course.id} className="card overflow-hidden hover:border-ctd-yellow transition-all duration-200 hover:transform hover:scale-105 spotlight relative">
+                  <div className="corner corner--tl"></div>
+                  <div className="corner corner--tr"></div>
+                  <div className="corner corner--bl"></div>
+                  <div className="corner corner--br"></div>
                   
-                  {/* Course Playlist Button */}
-                  {course.videos.length > 1 && (
-                    <div className="px-6 pb-4">
-                      <Link
-                        href={`/courses/${course.id}`}
-                        className="btn-ghost w-full text-center text-sm"
-                      >
-                        <span>📋</span>
-                        View Full Course ({course.totalVideos} videos)
-                      </Link>
-                    </div>
-                  )}
+                  <div className="relative z-10 p-1">
+                    {/* Main Course Link - goes to first video if available, otherwise course page */}
+                    <Link
+                      href={course.videos.length > 0 ? `/video/${course.videos[0].id}` : `/courses/${course.id}`}
+                      className="block"
+                    >
+                      <div className="relative">
+                        {course.videos[0]?.thumbnail ? (
+                          <img
+                            src={course.videos[0].thumbnail}
+                            alt={course.title}
+                            className="w-full h-48 object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-48 bg-ctd-panel flex items-center justify-center">
+                            <div className="text-ctd-mute text-4xl">📚</div>
+                          </div>
+                        )}
+                        <div className="absolute top-4 right-4">
+                          <span className="chip">
+                            {course.totalVideos} videos
+                          </span>
+                        </div>
+                        <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                          <div className="w-16 h-16 bg-black/70 rounded-full flex items-center justify-center">
+                            <div className="w-0 h-0 border-l-[16px] border-l-white border-y-[10px] border-y-transparent ml-1"></div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="p-6">
+                        <h3 className="font-bold text-ctd-text text-lg mb-2 line-clamp-2">
+                          {course.title}
+                        </h3>
+                        
+                        <p className="text-ctd-mute text-sm mb-4 line-clamp-2">
+                          {course.description}
+                        </p>
+                        
+                        <div className="flex items-center justify-between text-xs text-ctd-mute">
+                          <span>By {short(course.author)}</span>
+                          <span>{formatDate(course.updatedAt)}</span>
+                        </div>
+                      </div>
+                    </Link>
+                    
+                    {/* Course Playlist Button */}
+                    {course.videos.length > 1 && (
+                      <div className="px-6 pb-4">
+                        <Link
+                          href={`/courses/${course.id}`}
+                          className="btn-ghost w-full text-center text-sm"
+                        >
+                          <span>📋</span>
+                          View Full Course ({course.totalVideos} videos)
+                        </Link>
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

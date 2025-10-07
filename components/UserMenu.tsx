@@ -27,7 +27,8 @@ export default function UserMenu({ isOpen, onClose, userAddress }: UserMenuProps
 
   const loadProfile = async () => {
     try {
-      const response = await fetch(`/api/profile?walletAddress=${userAddress}`)
+      // Use Netlify Function for profile data
+      const response = await fetch(`/.netlify/functions/user-profiles?walletAddress=${userAddress}`)
       if (response.ok) {
         const data = await response.json()
         setProfile(data)
@@ -49,7 +50,8 @@ export default function UserMenu({ isOpen, onClose, userAddress }: UserMenuProps
   const handleSave = async () => {
     setIsLoading(true)
     try {
-      const response = await fetch('/api/profile', {
+      // Use Netlify Function for saving profile
+      const response = await fetch('/.netlify/functions/user-profiles', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -64,7 +66,9 @@ export default function UserMenu({ isOpen, onClose, userAddress }: UserMenuProps
         setIsEditing(false)
         alert('Profile saved successfully!')
       } else {
-        alert('Error saving profile')
+        const error = await response.json()
+        console.error('Error response:', error)
+        alert(`Error saving profile: ${error.error || 'Unknown error'}`)
       }
     } catch (error) {
       console.error('Error saving profile:', error)
@@ -131,6 +135,21 @@ export default function UserMenu({ isOpen, onClose, userAddress }: UserMenuProps
                     <p className="text-sm opacity-80">Update your information</p>
                   </div>
                 </button>
+
+                {/* Data Migration Button */}
+                <a
+                  href="/data-migration"
+                  onClick={onClose}
+                  className="w-full p-5 bg-yellow-600 hover:bg-yellow-700 text-white rounded-xl transition-all duration-200 flex items-center space-x-3 shadow-lg hover:shadow-xl"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  </svg>
+                  <div className="text-left">
+                    <p className="font-bold text-lg">Data Migration</p>
+                    <p className="text-sm opacity-80">Backup & protect your content</p>
+                  </div>
+                </a>
 
                 {/* Disconnect Button */}
                 <button

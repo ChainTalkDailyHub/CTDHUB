@@ -15,9 +15,10 @@ interface CourseFormProps {
   onAddToExisting?: (courseId: string, videos: VideoFormData[]) => Promise<void>
   existingCourses?: Array<{id: string, title: string, totalVideos: number}>
   isUpdate?: boolean
+  preSelectedCourseId?: string
 }
 
-export default function CourseForm({ onSubmit, onAddToExisting, existingCourses = [], isUpdate = false }: CourseFormProps) {
+export default function CourseForm({ onSubmit, onAddToExisting, existingCourses = [], isUpdate = false, preSelectedCourseId = '' }: CourseFormProps) {
   const [formData, setFormData] = useState({
     title: '',
     description: ''
@@ -27,8 +28,8 @@ export default function CourseForm({ onSubmit, onAddToExisting, existingCourses 
   ])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const [mode, setMode] = useState<'new' | 'existing'>('new')
-  const [selectedCourseId, setSelectedCourseId] = useState('')
+  const [mode, setMode] = useState<'new' | 'existing'>(preSelectedCourseId ? 'existing' : 'new')
+  const [selectedCourseId, setSelectedCourseId] = useState(preSelectedCourseId)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -54,12 +55,14 @@ export default function CourseForm({ onSubmit, onAddToExisting, existingCourses 
       setIsLoading(true)
 
       if (mode === 'existing' && selectedCourseId && onAddToExisting) {
+        console.log('Adding to existing course:', selectedCourseId, validVideos)
         await onAddToExisting(selectedCourseId, validVideos)
       } else {
         if (!formData.title.trim() || !formData.description.trim()) {
           setError('Course title and description are required')
           return
         }
+        console.log('Creating new course:', { ...formData, videos: validVideos })
         await onSubmit({ ...formData, videos: validVideos })
       }
 
@@ -69,7 +72,8 @@ export default function CourseForm({ onSubmit, onAddToExisting, existingCourses 
       setSelectedCourseId('')
       setMode('new')
     } catch (err: any) {
-      setError('Upload failed. Check the fields and try again.')
+      console.error('Course form error:', err)
+      setError(`Upload failed: ${err.message || 'Check the fields and try again.'}`)
     } finally {
       setIsLoading(false)
     }

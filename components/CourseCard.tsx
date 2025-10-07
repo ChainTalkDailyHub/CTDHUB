@@ -18,7 +18,7 @@ export default function CourseCard({ course }: CourseCardProps) {
           alt={course.title}
           className="w-full h-full object-cover"
           onError={(e) => {
-            e.currentTarget.src = `https://via.placeholder.com/400x225/0E0E0E/F2F2F2?text=${encodeURIComponent(course.title)}`
+            e.currentTarget.src = '/images/course-placeholder.svg'
           }}
         />
       </div>

@@ -123,7 +123,8 @@ npm run deploy:netlify
 ### Images não carregam?
 1. Imagens estão em `public/images/`
 2. Configuração `unoptimized: true` no Next.js
-3. Use caminhos absolutos: `/images/logo.png`
+3. Use caminhos absolutos: `/images/CTDHUB.png` (logo oficial)
+4. **IMPORTANTE:** SEMPRE usar `CTDHUB.png` como única logo oficial
 
 ## 📊 Comparação: Netlify vs Vercel
 

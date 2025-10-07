@@ -245,6 +245,26 @@ Para dúvidas e suporte:
 
 MIT License - veja o arquivo LICENSE para detalhes.
 
+## 🎨 Padrões de Design
+
+### Logo Oficial
+- **Arquivo único:** `public/images/CTDHUB.png`
+- **Uso obrigatório:** SEMPRE usar CTDHUB.png como primeira e única opção
+- **Fallback:** Apenas texto "CTD HUB" se a imagem falhar
+- **Dimensões:** Manter proporção original (variável por contexto)
+
+### Referências corretas:
+```tsx
+// ✅ Correto - Header/Footer
+<img src="/images/CTDHUB.png" alt="CTDHUB" />
+
+// ✅ Correto - APIs/PDFs  
+const logoPath = path.join(process.cwd(), 'public', 'images', 'CTDHUB.png')
+
+// ✅ Correto - Fallback
+onError={() => setText("CTD HUB")}
+```
+
 ---
 
 **CTDHub Platform** - Educação blockchain de qualidade com tecnologia moderna 🚀

@@ -40,7 +40,7 @@ export default function MyModules() {
   const loadMyCourses = async (walletAddress: string) => {
     try {
       setIsLoading(true)
-      const response = await fetch('/api/courses')
+      const response = await fetch('/.netlify/functions/course-manager')
       if (response.ok) {
         const allCourses = await response.json()
         const filtered = allCourses.filter((c: Course) => 
@@ -246,10 +246,10 @@ export default function MyModules() {
                       View Module
                     </button>
                     <button
-                      onClick={() => router.push(`/dev?edit=${course.id}`)}
+                      onClick={() => router.push(`/dev?courseId=${course.id}`)}
                       className="btn-ghost flex-1 text-sm py-2"
                     >
-                      Edit
+                      Add Videos
                     </button>
                   </div>
                 </div>

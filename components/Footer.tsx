@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { FaTelegram, FaTwitter, FaYoutube, FaCoins } from 'react-icons/fa'
+import { LOGO_DEFAULT_PROPS } from '../lib/logo'
 
 export default function Footer() {
   return (
@@ -9,8 +10,8 @@ export default function Footer() {
           <div>
             <div className="mb-6">
               <img 
-                src="/images/CTDHUB.png" 
-                alt="CTDHUB - Blockchain Learning Platform" 
+                src={LOGO_DEFAULT_PROPS.src}
+                alt={LOGO_DEFAULT_PROPS.alt}
                 className="h-24 w-auto"
               />
             </div>
