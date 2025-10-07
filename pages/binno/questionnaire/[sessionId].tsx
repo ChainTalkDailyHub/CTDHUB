@@ -51,7 +51,11 @@ export default function QuestionnairePage() {
   // Carregar primeira pergunta
   useEffect(() => {
     if (sessionId && currentQuestionNumber === 1 && !currentQuestion && sessionContext) {
-      loadNextQuestion()
+      // Para a primeira pergunta, sempre usar a pergunta específica do projeto
+      setCurrentQuestion({
+        id: `q1_project_intro_${Date.now()}`,
+        question_text: "Vamos começar com o básico! Conte-me sobre seu projeto Web3. Qual é o nome do projeto, quantos tokens planeja lançar, em qual rede blockchain (BNB Chain, Ethereum, etc.) e qual é o foco principal do projeto (DeFi, GameFi, NFTs, dApp, ferramenta de produtividade, etc.)? Descreva também a visão geral e o problema que seu projeto pretende resolver."
+      })
     }
   }, [sessionId, sessionContext])
 
@@ -74,6 +78,54 @@ export default function QuestionnairePage() {
     ).join('\n\n')
   }, [userAnswers])
 
+  // Gerar pergunta específica do projeto baseada nas respostas anteriores
+  const generateProjectSpecificQuestion = (questionNumber: number, answers: UserAnswer[]) => {
+    // Extrair informações do projeto da primeira resposta
+    const firstAnswer = answers[0]
+    let projectContext = ""
+    
+    if (firstAnswer) {
+      projectContext = firstAnswer.user_response
+    }
+
+    const projectSpecificQuestions = [
+      {
+        id: `project_q${questionNumber}_${Date.now()}`,
+        question_text: `Baseado no seu projeto "${projectContext.split(' ')[0] || 'Web3'}", como você planeja estruturar a tokenomics? Considere a distribuição inicial, utilidade do token, mecanismos de governança e como os tokens criarão valor para o ecossistema do seu projeto.`
+      },
+      {
+        id: `project_q${questionNumber}_${Date.now()}`,
+        question_text: `Quais são os principais desafios técnicos que você antecipa no desenvolvimento do seu projeto ${projectContext.includes('DeFi') ? 'DeFi' : projectContext.includes('GameFi') ? 'GameFi' : projectContext.includes('NFT') ? 'NFT' : 'Web3'}? Como você planeja abordar questões de escalabilidade, segurança e experiência do usuário?`
+      },
+      {
+        id: `project_q${questionNumber}_${Date.now()}`,
+        question_text: `Como seu projeto se diferencia das soluções existentes ${projectContext.includes('BNB') ? 'na BNB Chain' : 'no mercado'}? Qual é a proposta de valor única que o distingue no ecossistema Web3?`
+      },
+      {
+        id: `project_q${questionNumber}_${Date.now()}`,
+        question_text: `Que parcerias ou integrações seriam cruciais para o sucesso do seu projeto? Considere protocolos DeFi, marketplaces de NFTs, ou outras infraestruturas Web3 ${projectContext.includes('BNB') ? 'na BNB Chain' : 'relevantes'}.`
+      },
+      {
+        id: `project_q${questionNumber}_${Date.now()}`,
+        question_text: `Como você abordaria a construção e engajamento da comunidade para seu projeto? Que estratégias você usaria para atrair early adopters e manter o engajamento de longo prazo?`
+      },
+      {
+        id: `project_q${questionNumber}_${Date.now()}`,
+        question_text: `Quais considerações regulatórias são importantes para seu projeto? Como você garantiria a conformidade mantendo os princípios de descentralização?`
+      },
+      {
+        id: `project_q${questionNumber}_${Date.now()}`,
+        question_text: `Descreva sua estratégia de go-to-market. Como você lançaria seu projeto e escalaria a adoção de usuários no competitivo cenário Web3?`
+      },
+      {
+        id: `project_q${questionNumber}_${Date.now()}`,
+        question_text: `Que métricas você acompanharia para medir o sucesso do seu projeto? Como saberia se sua solução está alcançando o impacto pretendido?`
+      }
+    ]
+
+    return projectSpecificQuestions[(questionNumber - 2) % projectSpecificQuestions.length] || projectSpecificQuestions[0]
+  }
+
   // Carregar próxima pergunta
   const loadNextQuestion = async (updatedAnswers?: UserAnswer[]) => {
     if (currentQuestionNumber > 30) {
@@ -87,21 +139,18 @@ export default function QuestionnairePage() {
     const answersToUse = updatedAnswers || userAnswers
     
     try {
-      // Try AI-generated questions first
-      const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost'
-      const apiEndpoint = isLocalhost 
-        ? '/api/binno/generate-question'
-        : '/.netlify/functions/binno-generate-question'
+      // SEMPRE tentar IA primeiro - mesmo em localhost
+      const apiEndpoint = '/.netlify/functions/binno-generate-question'
 
       // Gerar resumo das respostas atualizadas
       const responsesSummary = answersToUse.map(answer => 
-        `Q: ${answer.question_text}\nA: ${answer.user_response.substring(0, 200)}...`
+        `Q: ${answer.question_text}\nA: ${answer.user_response.substring(0, 300)}...`
       ).join('\n\n')
 
-      console.log('Sending to API:', {
+      console.log('Sending to AI API:', {
         questionNumber: currentQuestionNumber,
         previousAnswersCount: answersToUse.length,
-        responsesSummary: responsesSummary.substring(0, 100) + '...'
+        responsesSummary: responsesSummary.substring(0, 150) + '...'
       })
 
       const response = await fetch(apiEndpoint, {
@@ -122,27 +171,19 @@ export default function QuestionnairePage() {
 
       if (response.ok) {
         const data = await response.json()
-        console.log('Question received from API:', data.question.question_text.substring(0, 50) + '...')
+        console.log('AI Question received:', data.question.question_text.substring(0, 80) + '...')
         setCurrentQuestion(data.question)
       } else {
-        // Fallback to static questions if API fails
-        console.log('API failed, using static questions')
-        const staticQuestion = selectQuestion(currentQuestionNumber, sessionContext?.experience_level)
-        const question = {
-          id: staticQuestion.id,
-          question_text: staticQuestion.question_text
-        }
-        setCurrentQuestion(question)
+        console.log('AI API failed, response:', response.status, response.statusText)
+        // Fallback to project-specific static questions
+        const projectSpecificQuestion = generateProjectSpecificQuestion(currentQuestionNumber, answersToUse)
+        setCurrentQuestion(projectSpecificQuestion)
       }
     } catch (error) {
-      console.error('Error loading question:', error)
-      // Fallback to static questions
-      const staticQuestion = selectQuestion(currentQuestionNumber, sessionContext?.experience_level)
-      const question = {
-        id: staticQuestion.id,
-        question_text: staticQuestion.question_text
-      }
-      setCurrentQuestion(question)
+      console.error('Error calling AI API:', error)
+      // Fallback to project-specific static questions
+      const projectSpecificQuestion = generateProjectSpecificQuestion(currentQuestionNumber, answersToUse)
+      setCurrentQuestion(projectSpecificQuestion)
     } finally {
       setIsLoading(false)
     }
