@@ -173,7 +173,7 @@ export default function ReportPage() {
           <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
             <div className="text-center mb-6">
               <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                CTD Skill Compass - Professional Analysis Report
+                Binno AI - Professional Analysis Report
               </h1>
               <p className="text-gray-600">
                 Generated on {formatDate(report.timestamp)}
@@ -189,7 +189,7 @@ export default function ReportPage() {
                 {getScoreLabel(report.overallScore)}
               </div>
               <p className="text-purple-100 mt-2">
-                Your Web3 Skill Assessment Score
+                Your Binno AI Assessment Score
               </p>
             </div>
           </div>
@@ -321,18 +321,18 @@ export default function ReportPage() {
           </div>
 
           {/* Actions */}
-          <div className="text-center space-x-4">
+          <div className="text-center">
             <button
               onClick={() => router.push('/binno-ai')}
-              className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors"
+              className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors mr-4"
             >
               Take Another Assessment
             </button>
             <button
-              onClick={() => window.print()}
-              className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
+              onClick={() => router.push('/profile')}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
             >
-              Print Report
+              View All Reports
             </button>
           </div>
         </div>

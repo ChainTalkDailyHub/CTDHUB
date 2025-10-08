@@ -124,17 +124,17 @@ export default function UserProfile() {
         ) : reports.length === 0 ? (
           <div className="text-center py-12">
             <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">📊</span>
+              <span className="text-2xl">🤖</span>
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">No Reports Yet</h3>
+            <h3 className="text-xl font-bold text-white mb-2">No Binno AI Reports Yet</h3>
             <p className="text-gray-400 mb-6">
-              Take your first project analysis to get professional insights
+              Take your first Binno AI assessment to get professional insights
             </p>
             <button
               onClick={() => router.push('/binno-ai')}
               className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-6 rounded-lg transition-colors"
             >
-              Take Analysis
+              Take Binno AI Assessment
             </button>
           </div>
         ) : (
@@ -145,7 +145,7 @@ export default function UserProfile() {
                   <div className="flex-1">
                     <div className="flex items-center gap-4 mb-4">
                       <h3 className="text-xl font-bold text-white">
-                        Project Analysis Report
+                        Binno AI Report
                       </h3>
                       <div className={`px-3 py-1 rounded-full text-sm font-medium ${getScoreBadge(report.report_data.overallScore)}`}>
                         {report.report_data.overallScore}% Score
