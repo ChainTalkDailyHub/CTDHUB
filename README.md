@@ -482,4 +482,4 @@ onError={() => setText("CTD HUB")}
 
 ---
 
-**CTDHub Platform** - Educação blockchain de qualidade com tecnologia moderna 🚀
+**CTDHub Platform** - Educação blockchain de qualidade com tecnologia moderna 🚀# Deploy trigger 10/08/2025 17:53:32
