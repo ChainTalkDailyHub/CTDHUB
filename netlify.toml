@@ -34,8 +34,8 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# Functions should work without redirects - commenting out SPA redirect temporarily
-# [[redirects]]
-#   from = "/*"
-#   to = "/index.html"
-#   status = 200
+# SPA fallback for Next.js - but exclude function paths
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
