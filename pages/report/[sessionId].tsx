@@ -41,14 +41,36 @@ export default function ProfessionalReportPage() {
   const loadReport = async (id: string) => {
     try {
       setIsLoading(true)
+      setError(null)
+      
+      console.log('🔍 Loading report for session:', id)
+      
+      // Try to load from database first
       const response = await fetch(`/.netlify/functions/analysis-reports?sessionId=${id}`)
       
-      if (!response.ok) {
-        throw new Error('Report not found')
+      if (response.ok) {
+        const reportData = await response.json()
+        console.log('✅ Report loaded from database')
+        setReport(reportData.report_data)
+        return
       }
-
-      const reportData = await response.json()
-      setReport(reportData.report_data)
+      
+      // If not found in database, try a direct regeneration attempt
+      console.log('⚠️ Report not found in database, trying alternate lookup...')
+      
+      // Wait a moment and try again (sometimes there's a timing issue)
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      const retryResponse = await fetch(`/.netlify/functions/analysis-reports?sessionId=${id}`)
+      if (retryResponse.ok) {
+        const retryData = await retryResponse.json()
+        console.log('✅ Report found on retry')
+        setReport(retryData.report_data)
+        return
+      }
+      
+      throw new Error('Report not found after retry')
+      
     } catch (error) {
       console.error('Error loading report:', error)
       setError('Failed to load report')

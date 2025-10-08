@@ -138,9 +138,6 @@ export const handler: Handler = async (event, context) => {
   try {
     console.log('🔍 Starting final analysis generation...')
     
-    // Generate session ID first
-    const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-    
     const { 
       userAnswers,
       sessionContext,
@@ -171,7 +168,7 @@ export const handler: Handler = async (event, context) => {
       }
     }
 
-    console.log('🤖 Initializing BinnoAI...')
+    console.log('🤖 Initializing analysis...')
     
     let analysis
     if (BinnoAI) {
@@ -189,11 +186,9 @@ export const handler: Handler = async (event, context) => {
     }
     
     console.log('📈 Calculating overall score...')
-    // Calculate overall score based on answers
     const overallScore = calculateOverallScore(userAnswers)
     
     console.log('📋 Creating professional report structure...')
-    // Create professional report structure
     const professionalReport: ProfessionalReport = {
       reportId: sessionId,
       userAddress: userAddress || 'anonymous',
@@ -208,27 +203,34 @@ export const handler: Handler = async (event, context) => {
       }
     }
 
-    // Save report to database if user address is provided
-    if (userAddress) {
-      try {
-        const { error: saveError } = await supabase
-          .from('user_analysis_reports')
-          .insert([{
-            user_address: userAddress.toLowerCase(),
-            session_id: sessionId,
-            report_data: professionalReport,
-            score: overallScore,
-            analysis_type: 'project_analysis'
-          }])
+    console.log('💾 Saving report to database...')
+    // Save to database BEFORE returning - this is critical!
+    try {
+      const { data: savedReport, error: saveError } = await supabase
+        .from('user_analysis_reports')
+        .insert([{
+          user_address: (userAddress || 'anonymous').toLowerCase(),
+          session_id: sessionId,
+          report_data: professionalReport,
+          score: overallScore,
+          analysis_type: 'ctd_skill_compass',
+          created_at: new Date().toISOString()
+        }])
+        .select()
+        .single()
 
-        if (saveError) {
-          console.error('Error saving report:', saveError)
-        }
-      } catch (saveError) {
-        console.error('Failed to save report:', saveError)
+      if (saveError) {
+        console.error('❌ Failed to save report:', saveError)
+        // Don't fail the request, just log the error
+      } else {
+        console.log('✅ Report saved successfully:', savedReport?.id)
       }
+    } catch (dbError) {
+      console.error('❌ Database save error:', dbError)
+      // Continue anyway - user should still get their report
     }
 
+    console.log('✅ Returning successful response')
     return {
       statusCode: 200,
       headers,
