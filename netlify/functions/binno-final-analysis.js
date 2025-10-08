@@ -186,23 +186,13 @@ exports.handler = async (event, context) => {
 
     console.log('🤖 Initializing analysis...')
     
-    let analysis
-    if (BinnoAI) {
-      try {
-        const binno = new BinnoAI()
-        console.log('🧠 Generating professional analysis with AI...')
-        analysis = await binno.generateProfessionalAnalysis(sessionId, userAnswers, sessionContext)
-      } catch (aiError) {
-        console.error('AI analysis failed, using fallback:', aiError)
-        analysis = generateFallbackAnalysis(userAnswers, sessionContext)
-      }
-    } else {
-      console.log('⚠️ BinnoAI not available, using fallback analysis')
-      analysis = generateFallbackAnalysis(userAnswers, sessionContext)
-    }
-    
+    // First, calculate score and create basic report structure
     console.log('📈 Calculating overall score...')
     const overallScore = calculateOverallScore(userAnswers)
+    
+    // Create fallback analysis first to ensure we have something to save
+    console.log('🔄 Generating fallback analysis...')
+    let analysis = generateFallbackAnalysis(userAnswers, sessionContext)
     
     console.log('📋 Creating professional report structure...')
     const professionalReport = {
@@ -219,8 +209,8 @@ exports.handler = async (event, context) => {
       }
     }
 
-    console.log('💾 Saving report to database...')
-    // Save to database BEFORE returning - this is critical!
+    console.log('💾 Saving report to database FIRST (before AI analysis)...')
+    // Save to database BEFORE AI analysis to ensure we don't lose data
     let dbSaveSuccess = false
     let dbErrorDetails = null
     
@@ -283,6 +273,39 @@ exports.handler = async (event, context) => {
       success: dbSaveSuccess,
       error: dbErrorDetails?.message || null,
       timestamp: new Date().toISOString()
+    }
+    
+    // NOW try to enhance with AI analysis if possible (but don't block on it)
+    if (BinnoAI && dbSaveSuccess) {
+      try {
+        console.log('🧠 Attempting to enhance with AI analysis...')
+        const binno = new BinnoAI()
+        const aiAnalysis = await Promise.race([
+          binno.generateProfessionalAnalysis(sessionId, userAnswers, sessionContext),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('AI timeout')), 10000))
+        ])
+        
+        // Update the analysis with AI results
+        analysis = aiAnalysis
+        professionalReport.analysis = aiAnalysis
+        
+        // Update the database with enhanced analysis
+        const { error: updateError } = await supabase
+          .from('user_analysis_reports')
+          .update({ report_data: professionalReport })
+          .eq('session_id', sessionId)
+        
+        if (updateError) {
+          console.error('⚠️ Failed to update with AI analysis:', updateError)
+        } else {
+          console.log('✅ Enhanced with AI analysis and updated database')
+        }
+      } catch (aiError) {
+        console.error('⚠️ AI analysis failed, using fallback:', aiError)
+        // Keep the fallback analysis - report already saved
+      }
+    } else {
+      console.log('⚠️ Using fallback analysis (BinnoAI not available or DB save failed)')
     }
 
     console.log('✅ Returning successful response')
