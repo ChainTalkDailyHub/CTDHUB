@@ -9,10 +9,65 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 let BinnoAI = null
 
 try {
-  const binnoModule = require('../../lib/binno-questionnaire')
-  BinnoAI = binnoModule.BinnoAI
+  // Check if we're in Netlify environment
+  if (process.env.OPENAI_API_KEY) {
+    console.log('OpenAI API key found, creating BinnoAI class...')
+    
+    // Create a minimal BinnoAI class inline
+    const OpenAI = require('openai')
+    
+    class SimpleBinnoAI {
+      constructor() {
+        this.openai = new OpenAI({
+          apiKey: process.env.OPENAI_API_KEY
+        })
+      }
+      
+      async generateProfessionalAnalysis(sessionId, userAnswers, sessionContext) {
+        const prompt = `Generate a professional Web3 skill analysis for a user with ${userAnswers.length} responses. 
+        User context: ${JSON.stringify(sessionContext)}
+        
+        Provide a comprehensive analysis in the following format:
+        {
+          "executive_summary": "Professional summary",
+          "key_strengths": ["strength1", "strength2", "strength3"],
+          "areas_for_improvement": ["area1", "area2", "area3"],
+          "personalized_recommendations": ["rec1", "rec2", "rec3"],
+          "learning_path": {
+            "short_term": "immediate goals",
+            "medium_term": "3-6 month goals", 
+            "long_term": "6+ month goals"
+          },
+          "risk_assessment": "risk evaluation",
+          "next_steps": ["step1", "step2", "step3"]
+        }`
+        
+        try {
+          const response = await this.openai.chat.completions.create({
+            model: "gpt-4",
+            messages: [{ role: "user", content: prompt }],
+            max_tokens: 1500,
+            temperature: 0.7
+          })
+          
+          const content = response.choices[0]?.message?.content
+          if (content) {
+            return JSON.parse(content)
+          }
+        } catch (error) {
+          console.error('OpenAI API error:', error)
+          throw error
+        }
+      }
+    }
+    
+    BinnoAI = SimpleBinnoAI
+    console.log('✅ BinnoAI class created successfully')
+  } else {
+    console.log('⚠️ No OpenAI API key found in environment')
+  }
 } catch (error) {
-  console.error('Warning: Could not import BinnoAI:', error)
+  console.error('Warning: Could not create BinnoAI:', error)
 }
 
 // Helper function to calculate overall score
