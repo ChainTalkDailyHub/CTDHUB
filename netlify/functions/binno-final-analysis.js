@@ -166,29 +166,68 @@ exports.handler = async (event, context) => {
 
     console.log('💾 Saving report to database...')
     // Save to database BEFORE returning - this is critical!
+    let dbSaveSuccess = false
+    let dbErrorDetails = null
+    
     try {
+      console.log('🔗 Connecting to Supabase with URL:', SUPABASE_URL)
+      console.log('📝 Preparing data for insert...')
+      
+      const insertData = {
+        user_address: (userAddress || 'anonymous').toLowerCase(),
+        session_id: sessionId,
+        report_data: professionalReport,
+        score: overallScore,
+        analysis_type: 'ctd_skill_compass',
+        created_at: new Date().toISOString()
+      }
+      
+      console.log('📊 Insert data prepared:', {
+        user_address: insertData.user_address,
+        session_id: insertData.session_id,
+        score: insertData.score,
+        analysis_type: insertData.analysis_type
+      })
+      
       const { data: savedReport, error: saveError } = await supabase
         .from('user_analysis_reports')
-        .insert([{
-          user_address: (userAddress || 'anonymous').toLowerCase(),
-          session_id: sessionId,
-          report_data: professionalReport,
-          score: overallScore,
-          analysis_type: 'ctd_skill_compass',
-          created_at: new Date().toISOString()
-        }])
+        .insert([insertData])
         .select()
         .single()
 
       if (saveError) {
-        console.error('❌ Failed to save report:', saveError)
-        // Don't fail the request, just log the error
+        console.error('❌ Supabase insert error:', saveError)
+        dbErrorDetails = saveError
       } else {
-        console.log('✅ Report saved successfully:', savedReport?.id)
+        console.log('✅ Report saved successfully!')
+        console.log('📄 Saved report ID:', savedReport?.id)
+        console.log('💾 Saved session_id:', savedReport?.session_id)
+        dbSaveSuccess = true
+        
+        // Verify the save by trying to read it back
+        console.log('🔍 Verifying save by reading back...')
+        const { data: verifyData, error: verifyError } = await supabase
+          .from('user_analysis_reports')
+          .select('*')
+          .eq('session_id', sessionId)
+          .single()
+        
+        if (verifyError) {
+          console.error('❌ Verification failed:', verifyError)
+        } else {
+          console.log('✅ Verification successful! Record exists.')
+        }
       }
     } catch (dbError) {
-      console.error('❌ Database save error:', dbError)
-      // Continue anyway - user should still get their report
+      console.error('❌ Database save exception:', dbError)
+      dbErrorDetails = dbError
+    }
+    
+    // Add database save status to response
+    professionalReport.dbSaveStatus = {
+      success: dbSaveSuccess,
+      error: dbErrorDetails?.message || null,
+      timestamp: new Date().toISOString()
     }
 
     console.log('✅ Returning successful response')
