@@ -1,0 +1,1056 @@
+import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { useRouter } from 'next/router'
+import { createClient } from '@supabase/supabase-js'
+import IsolatedTextarea, { IsolatedTextareaRef } from '../../../components/IsolatedTextarea'
+
+// Supabase client
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+
+interface Question {
+  id: string
+  text: string
+  generatedAt: number
+}
+
+interface Answer {
+  questionId: string
+  questionText: string
+  response: string
+  timestamp: number
+  characterCount: number
+}
+
+interface ProjectAnalysis {
+  projectName: string
+  blockchain: string
+  category: string
+  tokenSupply: string
+  problemSolved: string
+  marketPotential: number
+  technicalComplexity: number
+  teamReadiness: number
+  overallScore: number
+}
+
+interface SkillReport {
+  id?: string
+  userId: string
+  sessionId: string
+  projectAnalysis: ProjectAnalysis
+  answers: Answer[]
+  aiAnalysisReport: string
+  recommendations: string[]
+  nextSteps: string[]
+  strengthsIdentified: string[]
+  areasForImprovement: string[]
+  marketViability: number
+  technicalFeasibility: number
+  executionReadiness: number
+  overallGrade: string
+  createdAt: string
+  updatedAt: string
+}
+
+const FIRST_QUESTION = "Tell me about your Web3 project. What is the project name, how many tokens do you plan to launch, on which blockchain network (BNB Chain, Ethereum, etc.), and what is the main focus of the project (DeFi, GameFi, NFTs, dApp, productivity tool, etc.)? Also describe the overall vision and the problem your project aims to solve."
+
+export default function SkillCompassQuestionnaire() {
+  const router = useRouter()
+  const { sessionId } = router.query
+  const textareaRef = useRef<IsolatedTextareaRef>(null)
+
+  // Core State
+  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null)
+  const [questionNumber, setQuestionNumber] = useState(1)
+  const [answers, setAnswers] = useState<Answer[]>([])
+  const [isGeneratingQuestion, setIsGeneratingQuestion] = useState(false)
+  const [isProcessingAnswer, setIsProcessingAnswer] = useState(false)
+  const [characterCount, setCharacterCount] = useState(0)
+  const [userId, setUserId] = useState<string>('')
+  
+  // Final States
+  const [isCompleted, setIsCompleted] = useState(false)
+  const [finalReport, setFinalReport] = useState<SkillReport | null>(null)
+  const [isGeneratingReport, setIsGeneratingReport] = useState(false)
+
+  // Character count updater
+  const updateCharacterCount = useCallback(() => {
+    const count = textareaRef.current?.getValue()?.length || 0
+    setCharacterCount(count)
+  }, [])
+
+  // Initialize first question
+  useEffect(() => {
+    if (sessionId && !currentQuestion) {
+      setCurrentQuestion({
+        id: 'q1_project_intro',
+        text: FIRST_QUESTION,
+        generatedAt: Date.now()
+      })
+    }
+  }, [sessionId, currentQuestion])
+
+  // Character count polling
+  useEffect(() => {
+    const interval = setInterval(updateCharacterCount, 500)
+    return () => clearInterval(interval)
+  }, [updateCharacterCount])
+
+  // Load user ID from localStorage or generate
+  useEffect(() => {
+    const storedUserId = localStorage.getItem('ctdhub_user_id')
+    if (storedUserId) {
+      setUserId(storedUserId)
+    } else {
+      const newUserId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      localStorage.setItem('ctdhub_user_id', newUserId)
+      setUserId(newUserId)
+    }
+  }, [])
+
+  // Generate next question using OpenAI
+  const generateNextQuestion = async (previousAnswers: Answer[]): Promise<Question> => {
+    setIsGeneratingQuestion(true)
+    
+    try {
+      const response = await fetch('/.netlify/functions/binno-generate-question', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          questionNumber: questionNumber + 1,
+          totalQuestions: 15,
+          previousAnswers: previousAnswers,
+          isSkillCompass: true,
+          language: 'english'
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`AI Question Generation failed: ${response.status}`)
+      }
+
+      const data = await response.json()
+      
+      return {
+        id: `q${questionNumber + 1}_ai_${Date.now()}`,
+        text: data.question,
+        generatedAt: Date.now()
+      }
+    } catch (error) {
+      console.error('Critical Error: AI Question Generation Failed:', error)
+      throw new Error('AI question generation is mandatory. Please check your OpenAI API configuration.')
+    } finally {
+      setIsGeneratingQuestion(false)
+    }
+  }
+
+  // Submit answer and generate next question
+  const submitAnswer = async () => {
+    const responseText = textareaRef.current?.getValue() || ''
+    
+    if (!responseText.trim() || responseText.trim().length < 50) {
+      alert('Please provide a response with at least 50 characters.')
+      return
+    }
+
+    if (!currentQuestion) {
+      alert('Error: No current question found.')
+      return
+    }
+
+    setIsProcessingAnswer(true)
+
+    try {
+      const newAnswer: Answer = {
+        questionId: currentQuestion.id,
+        questionText: currentQuestion.text,
+        response: responseText.trim(),
+        timestamp: Date.now(),
+        characterCount: responseText.trim().length
+      }
+
+      const updatedAnswers = [...answers, newAnswer]
+      setAnswers(updatedAnswers)
+
+      // Clear textarea
+      textareaRef.current?.clear()
+      setCharacterCount(0)
+
+      // Check if we should finish or continue
+      if (questionNumber >= 15) {
+        await generateFinalReport(updatedAnswers)
+      } else {
+        // Generate next question using AI
+        const nextQuestion = await generateNextQuestion(updatedAnswers)
+        setCurrentQuestion(nextQuestion)
+        setQuestionNumber(prev => prev + 1)
+      }
+    } catch (error) {
+      console.error('Error processing answer:', error)
+      alert('Error processing your response. Please try again.')
+    } finally {
+      setIsProcessingAnswer(false)
+    }
+  }
+
+  // Generate comprehensive final report using AI
+  const generateFinalReport = async (finalAnswers: Answer[]) => {
+    setIsGeneratingReport(true)
+    
+    try {
+      const response = await fetch('/.netlify/functions/binno-final-analysis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          answers: finalAnswers,
+          sessionId: sessionId,
+          userId: userId,
+          isSkillCompass: true,
+          analysisType: 'comprehensive_skill_assessment',
+          language: 'english'
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`AI Analysis failed: ${response.status}`)
+      }
+
+      const analysisData = await response.json()
+      
+      const report: SkillReport = {
+        userId: userId,
+        sessionId: sessionId as string,
+        projectAnalysis: analysisData.projectAnalysis,
+        answers: finalAnswers,
+        aiAnalysisReport: analysisData.detailedReport,
+        recommendations: analysisData.recommendations,
+        nextSteps: analysisData.nextSteps,
+        strengthsIdentified: analysisData.strengths,
+        areasForImprovement: analysisData.improvements,
+        marketViability: analysisData.scores.marketViability,
+        technicalFeasibility: analysisData.scores.technicalFeasibility,
+        executionReadiness: analysisData.scores.executionReadiness,
+        overallGrade: analysisData.overallGrade,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+
+      // Save to Supabase
+      await saveReportToSupabase(report)
+      
+      setFinalReport(report)
+      setIsCompleted(true)
+    } catch (error) {
+      console.error('Error generating final report:', error)
+      alert('Error generating your skill assessment report. Please try again.')
+    } finally {
+      setIsGeneratingReport(false)
+    }
+  }
+
+  // Save report to Supabase
+  const saveReportToSupabase = async (report: SkillReport) => {
+    try {
+      const { data, error } = await supabase
+        .from('skill_compass_reports')
+        .insert([report])
+        .select()
+
+      if (error) {
+        console.error('Supabase error:', error)
+        throw error
+      }
+
+      console.log('Report saved successfully:', data)
+    } catch (error) {
+      console.error('Failed to save report to Supabase:', error)
+      // Don't throw - continue with local report display
+    }
+  }
+
+  // Export report as PDF
+  const exportReport = () => {
+    if (!finalReport) return
+
+    const reportContent = `
+CTD SKILL COMPASS - COMPREHENSIVE PROJECT ASSESSMENT
+===============================================
+
+Session ID: ${sessionId}
+User ID: ${userId}
+Generated: ${new Date().toLocaleString()}
+Overall Grade: ${finalReport.overallGrade}
+
+PROJECT ANALYSIS:
+- Project Name: ${finalReport.projectAnalysis.projectName}
+- Blockchain: ${finalReport.projectAnalysis.blockchain}
+- Category: ${finalReport.projectAnalysis.category}
+- Market Potential: ${finalReport.marketViability}/100
+- Technical Feasibility: ${finalReport.technicalFeasibility}/100
+- Execution Readiness: ${finalReport.executionReadiness}/100
+
+DETAILED AI ANALYSIS:
+${finalReport.aiAnalysisReport}
+
+RECOMMENDATIONS:
+${finalReport.recommendations.map((rec, i) => `${i + 1}. ${rec}`).join('\n')}
+
+NEXT STEPS:
+${finalReport.nextSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
+
+STRENGTHS IDENTIFIED:
+${finalReport.strengthsIdentified.map((strength, i) => `• ${strength}`).join('\n')}
+
+AREAS FOR IMPROVEMENT:
+${finalReport.areasForImprovement.map((area, i) => `• ${area}`).join('\n')}
+
+COMPLETE RESPONSES:
+${finalReport.answers.map((answer, i) => `
+Q${i + 1}: ${answer.questionText}
+A: ${answer.response}
+`).join('\n')}
+    `
+
+    const blob = new Blob([reportContent], { type: 'text/plain' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `CTD-Skill-Compass-Report-${sessionId}.txt`
+    document.body.appendChild(a)
+    a.click()
+    window.URL.revokeObjectURL(url)
+    document.body.removeChild(a)
+  }
+
+  // Render final report
+  if (isCompleted && finalReport) {
+    return (
+      <div className="min-h-screen bg-ctd-bg py-8">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <div className="card p-8 relative">
+            <div className="corner corner--tl"></div>
+            <div className="corner corner--tr"></div>
+            <div className="corner corner--bl"></div>
+            <div className="corner corner--br"></div>
+            
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold text-ctd-text mb-4">
+                🎯 CTD Skill Compass Report
+              </h1>
+              <div className="text-2xl font-semibold text-ctd-yellow mb-2">
+                Overall Grade: {finalReport.overallGrade}
+              </div>
+              <div className="text-ctd-mute">
+                Project Assessment for {finalReport.projectAnalysis.projectName}
+              </div>
+            </div>
+
+            {/* Score Dashboard */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="bg-ctd-panel/30 rounded-lg p-6 border border-ctd-border">
+                <h3 className="text-lg font-semibold text-ctd-text mb-2">Market Viability</h3>
+                <div className="text-3xl font-bold text-ctd-yellow">{finalReport.marketViability}/100</div>
+              </div>
+              <div className="bg-ctd-panel/30 rounded-lg p-6 border border-ctd-border">
+                <h3 className="text-lg font-semibold text-ctd-text mb-2">Technical Feasibility</h3>
+                <div className="text-3xl font-bold text-ctd-yellow">{finalReport.technicalFeasibility}/100</div>
+              </div>
+              <div className="bg-ctd-panel/30 rounded-lg p-6 border border-ctd-border">
+                <h3 className="text-lg font-semibold text-ctd-text mb-2">Execution Readiness</h3>
+                <div className="text-3xl font-bold text-ctd-yellow">{finalReport.executionReadiness}/100</div>
+              </div>
+            </div>
+
+            {/* AI Analysis Report */}
+            <div className="bg-ctd-panel/20 rounded-lg p-6 mb-8 border border-ctd-border">
+              <h2 className="text-2xl font-bold text-ctd-text mb-4">📊 AI Analysis Report</h2>
+              <div className="text-ctd-text whitespace-pre-wrap leading-relaxed">
+                {finalReport.aiAnalysisReport}
+              </div>
+            </div>
+
+            {/* Recommendations & Next Steps */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div className="bg-ctd-panel/20 rounded-lg p-6 border border-ctd-border">
+                <h3 className="text-xl font-bold text-ctd-text mb-4">💡 Recommendations</h3>
+                <ul className="text-ctd-text space-y-2">
+                  {finalReport.recommendations.map((rec, i) => (
+                    <li key={i} className="flex items-start">
+                      <span className="text-ctd-yellow mr-2">•</span>
+                      {rec}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              
+              <div className="bg-ctd-panel/20 rounded-lg p-6 border border-ctd-border">
+                <h3 className="text-xl font-bold text-ctd-text mb-4">🎯 Next Steps</h3>
+                <ol className="text-ctd-text space-y-2">
+                  {finalReport.nextSteps.map((step, i) => (
+                    <li key={i} className="flex items-start">
+                      <span className="text-ctd-yellow mr-2">{i + 1}.</span>
+                      {step}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={exportReport}
+                className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-8 py-3 rounded-lg font-medium transition-colors"
+              >
+                📄 Export Report
+              </button>
+              
+              <button
+                onClick={() => router.push('/binno-ai')}
+                className="btn-primary"
+              >
+                🔄 New Assessment
+              </button>
+            </div>
+
+            <div className="mt-8 text-center text-ctd-mute">
+              <p>Report saved to your CTD Hub profile • Session: {sessionId}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Render generating report state
+  if (isGeneratingReport) {
+    return (
+      <div className="min-h-screen bg-ctd-bg flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-20 w-20 border-b-4 border-ctd-yellow mx-auto mb-6"></div>
+          <h2 className="text-2xl font-bold text-ctd-text mb-4">
+            🤖 AI is Analyzing Your Project...
+          </h2>
+          <p className="text-ctd-mute text-lg mb-2">
+            Generating comprehensive skill assessment report
+          </p>
+          <p className="text-ctd-mute">
+            This may take up to 30 seconds for detailed analysis
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Main questionnaire interface
+  return (
+    <div className="min-h-screen bg-ctd-bg py-8 neon-grid">
+      <div className="container mx-auto px-4 max-w-4xl">
+        <div className="card p-8 relative">
+          <div className="corner corner--tl"></div>
+          <div className="corner corner--tr"></div>
+          <div className="corner corner--bl"></div>
+          <div className="corner corner--br"></div>
+          
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-ctd-text mb-2">
+              🧭 CTD Skill Compass
+            </h1>
+            <p className="text-ctd-mute text-lg mb-4">
+              AI-Powered Web3 Project Assessment
+            </p>
+            <p className="text-ctd-mute">
+              Question {questionNumber} of 15
+            </p>
+            <div className="w-full bg-ctd-border rounded-full h-3 mt-4">
+              <div 
+                className="bg-gradient-to-r from-ctd-yellow to-ctd-holo h-3 rounded-full transition-all duration-500"
+                style={{ width: `${(questionNumber / 15) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Question Display */}
+          {currentQuestion && !isGeneratingQuestion && (
+            <div className="mb-8">
+              <div className="bg-ctd-panel/30 rounded-lg p-6 mb-6 border border-ctd-border/50">
+                <div className="flex items-center mb-4">
+                  <span className="bg-ctd-yellow text-ctd-bg px-3 py-1 rounded-full text-sm font-bold mr-3">
+                    Q{questionNumber}
+                  </span>
+                  <span className="text-sm text-ctd-mute">
+                    {questionNumber === 1 ? 'Project Introduction' : 'AI-Generated Question'}
+                  </span>
+                </div>
+                <h2 className="text-xl font-semibold text-ctd-text leading-relaxed">
+                  {currentQuestion.text}
+                </h2>
+              </div>
+
+              {/* Response Area */}
+              <div className="mb-6">
+                <label className="block text-ctd-text font-medium mb-3">
+                  Your Response (minimum 50 characters):
+                </label>
+                <IsolatedTextarea
+                  ref={textareaRef}
+                  placeholder="Share your detailed thoughts, experiences, and insights about your Web3 project..."
+                  className="w-full h-40 p-4 bg-ctd-panel border border-ctd-border rounded-lg text-ctd-text placeholder-ctd-mute resize-none focus:outline-none focus:ring-2 focus:ring-ctd-yellow focus:border-transparent text-lg leading-relaxed"
+                />
+                <div className="flex justify-between items-center mt-3">
+                  <span className="text-ctd-mute text-sm">
+                    Characters: {characterCount}
+                  </span>
+                  <span className="text-ctd-mute text-sm">
+                    Powered by OpenAI GPT-4
+                  </span>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <div className="text-center">
+                <button
+                  onClick={submitAnswer}
+                  disabled={isProcessingAnswer}
+                  className="btn-primary transform hover:scale-105 px-8 py-4 text-lg font-semibold"
+                >
+                  {isProcessingAnswer ? (
+                    <>
+                      <span className="animate-spin inline-block mr-2">⚡</span>
+                      Processing...
+                    </>
+                  ) : questionNumber === 15 ? (
+                    '🎯 Complete Assessment'
+                  ) : (
+                    '➡️ Continue to Next Question'
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* AI Question Generation Loading */}
+          {isGeneratingQuestion && (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-3 border-ctd-yellow mx-auto mb-6"></div>
+              <h3 className="text-xl font-semibold text-ctd-text mb-3">
+                🤖 AI is Crafting Your Next Question...
+              </h3>
+              <p className="text-ctd-mute mb-2">
+                Analyzing your previous responses to generate a personalized question
+              </p>
+              <div className="text-sm text-ctd-mute">
+                This ensures each question is unique and relevant to your project
+              </div>
+            </div>
+          )}
+
+          {/* Progress Info */}
+          <div className="mt-8 text-center text-ctd-mute">
+            <p>Responses completed: {answers.length} • Session ID: {sessionId}</p>
+            {answers.length > 0 && (
+              <p className="text-sm mt-2">
+                Last response: {new Date(answers[answers.length - 1]?.timestamp).toLocaleTimeString()}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+  // Carregar contexto da sessão
+  useEffect(() => {
+    if (sessionId && typeof sessionId === 'string') {
+      const contextData = localStorage.getItem(`questionnaire_context_${sessionId}`)
+      if (contextData) {
+        setSessionContext(JSON.parse(contextData))
+      }
+    }
+  }, [sessionId])
+
+  // Inicializar perguntas
+  useEffect(() => {
+    if (sessionId && sessionContext && allQuestions.length === 0) {
+      setAllQuestions([...baseQuestions])
+    }
+  }, [sessionId, sessionContext, allQuestions.length, baseQuestions])
+
+  // Atualizar contador de caracteres
+  const updateCharacterCount = useCallback(() => {
+    const count = textareaRef.current?.getValue()?.length || 0
+    setCharacterCount(count)
+  }, [])
+
+  // Configurar listener para atualizar contador
+  useEffect(() => {
+    const interval = setInterval(updateCharacterCount, 500)
+    return () => clearInterval(interval)
+  }, [updateCharacterCount])
+
+  // Gerar pergunta adaptativa baseada nas respostas anteriores
+  const generateAdaptiveQuestion = async (questionIndex: number): Promise<Question> => {
+    const firstAnswer = userAnswers[0]
+    let projectContext = ""
+    
+    if (firstAnswer) {
+      projectContext = firstAnswer.user_response.toLowerCase()
+    }
+
+    // Primeiro, tentar IA
+    try {
+      const response = await fetch('/.netlify/functions/binno-generate-question', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          questionNumber: questionIndex + 1,
+          previousAnswers: userAnswers,
+          sessionContext: {
+            user_expertise_level: sessionContext?.experience_level || 'intermediate',
+            project_focus: sessionContext?.interests?.join(', ') || 'Web3 development',
+            previous_responses_summary: userAnswers.map(a => a.user_response.substring(0, 100)).join(' ')
+          }
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        return {
+          id: data.question.id,
+          question_text: data.question.question_text,
+          type: 'adaptive'
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao gerar pergunta via IA:', error)
+    }
+
+    // Fallback: perguntas adaptativas manuais
+    const adaptiveQuestions = [
+      `Baseado no seu projeto ${extractProjectName(projectContext)}, como você vê a adoção gradual dos usuários? Quais seriam os primeiros casos de uso mais atraentes e como você validaria a demanda do mercado antes do lançamento completo?`,
+      `Considerando ${projectContext.includes('defi') ? 'a natureza DeFi do seu projeto' : projectContext.includes('gamefi') ? 'o aspecto GameFi' : projectContext.includes('nft') ? 'o foco em NFTs' : 'seu projeto Web3'}, quais riscos técnicos e de mercado você identifica? Como mitigaria esses riscos?`,
+      `Para o sucesso do seu projeto na ${projectContext.includes('bnb') || projectContext.includes('bsc') ? 'BNB Chain' : 'blockchain escolhida'}, quais métricas de produto e engajamento seriam mais importantes nos primeiros 6 meses? Como coletaria e analisaria esses dados?`,
+      `Pensando na sustentabilidade do seu projeto, como você estruturaria o modelo de receitas? Que fontes de receita garantiriam a viabilidade de longo prazo sem comprometer a descentralização?`,
+      `Quais seriam os principais marcos (milestones) de desenvolvimento do seu projeto nos próximos 12-18 meses? Como priorizaria as funcionalidades e garantiria entregas incrementais de valor?`
+    ]
+
+    const questionText = adaptiveQuestions[(questionIndex - 1) % adaptiveQuestions.length] || adaptiveQuestions[0]
+    
+    return {
+      id: `q${questionIndex + 1}_adaptive_${Date.now()}`,
+      question_text: questionText,
+      type: 'adaptive'
+    }
+  }
+
+  // Extrair nome do projeto da resposta
+  const extractProjectName = (response: string): string => {
+    const words = response.split(' ')
+    const nameWords = words.slice(0, 3).join(' ')
+    return nameWords || 'seu projeto'
+  }
+
+  // Avançar para próxima pergunta
+  const nextQuestion = async () => {
+    if (currentQuestionIndex >= allQuestions.length - 1) {
+      await generateFinalAnalysis()
+      return
+    }
+
+    setIsGeneratingQuestion(true)
+    
+    const nextIndex = currentQuestionIndex + 1
+    
+    // Se ainda estamos nas perguntas base, usar elas
+    if (nextIndex < baseQuestions.length) {
+      // Para perguntas após a primeira, tentar gerar versão adaptativa
+      if (nextIndex > 0 && userAnswers.length > 0) {
+        try {
+          const adaptiveQuestion = await generateAdaptiveQuestion(nextIndex)
+          const updatedQuestions = [...allQuestions]
+          updatedQuestions[nextIndex] = adaptiveQuestion
+          setAllQuestions(updatedQuestions)
+        } catch (error) {
+          console.error('Erro ao gerar pergunta adaptativa, usando base:', error)
+        }
+      }
+      setCurrentQuestionIndex(nextIndex)
+    } else {
+      // Gerar nova pergunta adaptativa
+      try {
+        const newQuestion = await generateAdaptiveQuestion(nextIndex)
+        setAllQuestions(prev => [...prev, newQuestion])
+        setCurrentQuestionIndex(nextIndex)
+      } catch (error) {
+        console.error('Erro ao gerar nova pergunta:', error)
+        await generateFinalAnalysis()
+      }
+    }
+    
+    setIsGeneratingQuestion(false)
+  }
+
+  // Voltar para pergunta anterior
+  const previousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1)
+      // Restaurar resposta anterior se existir
+      const previousAnswer = userAnswers[currentQuestionIndex - 1]
+      if (previousAnswer) {
+        setCurrentResponse(previousAnswer.user_response)
+        textareaRef.current?.setValue(previousAnswer.user_response)
+      }
+    }
+  }
+
+  // Submeter resposta
+  const submitAnswer = useCallback(async () => {
+    const responseValue = textareaRef.current?.getValue() || ''
+    if (!responseValue.trim() || responseValue.trim().length < 50) {
+      alert('Por favor, forneça uma resposta com pelo menos 50 caracteres.')
+      return
+    }
+
+    if (!allQuestions[currentQuestionIndex]) {
+      alert('Erro: pergunta não encontrada.')
+      return
+    }
+
+    const currentQuestion = allQuestions[currentQuestionIndex]
+    const answer: UserAnswer = {
+      question_id: currentQuestion.id,
+      question_text: currentQuestion.question_text,
+      user_response: responseValue.trim(),
+      timestamp: Date.now()
+    }
+
+    // Atualizar ou adicionar resposta
+    const updatedAnswers = [...userAnswers]
+    const existingAnswerIndex = updatedAnswers.findIndex(a => a.question_id === currentQuestion.id)
+    
+    if (existingAnswerIndex >= 0) {
+      updatedAnswers[existingAnswerIndex] = answer
+    } else {
+      updatedAnswers.push(answer)
+    }
+    
+    setUserAnswers(updatedAnswers)
+    setCurrentResponse('')
+
+    // Limpar textarea
+    textareaRef.current?.clear()
+    setCharacterCount(0)
+
+    // Continuar para próxima pergunta ou finalizar
+    if (currentQuestionIndex >= 9 || updatedAnswers.length >= 10) {
+      await generateFinalAnalysis(updatedAnswers)
+    } else {
+      await nextQuestion()
+    }
+  }, [allQuestions, currentQuestionIndex, userAnswers, nextQuestion])
+
+  // Gerar análise final
+  const generateFinalAnalysis = async (answers?: UserAnswer[]) => {
+    const finalAnswers = answers || userAnswers
+    setIsLoading(true)
+    
+    try {
+      const response = await fetch('/.netlify/functions/binno-final-analysis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userAnswers: finalAnswers,
+          sessionContext: sessionContext
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setFinalAnalysis(data.analysis)
+      } else {
+        // Fallback para análise estática
+        setFinalAnalysis(generateStaticAnalysis(finalAnswers))
+      }
+    } catch (error) {
+      console.error('Erro ao gerar análise:', error)
+      setFinalAnalysis(generateStaticAnalysis(finalAnswers))
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Análise estática como fallback
+  const generateStaticAnalysis = (answers: UserAnswer[]): string => {
+    const projectName = answers[0]?.user_response.split(' ')[0] || 'Seu projeto'
+    
+    return `# Análise BinnoAI - ${projectName}
+
+## Resumo Executivo
+Com base em suas ${answers.length} respostas detalhadas, aqui está minha análise completa do seu projeto Web3:
+
+## Pontos Fortes Identificados
+✅ **Visão Clara do Projeto**: Você demonstrou compreensão sólida do que deseja construir
+✅ **Conhecimento do Ecossistema**: Mostra familiaridade com conceitos Web3 fundamentais  
+✅ **Pensamento Estratégico**: Considerações bem estruturadas sobre tokenomics e implementação
+✅ **Consciência de Mercado**: Entende a importância da diferenciação e validação
+
+## Áreas para Desenvolvimento
+🔄 **Validação de Mercado**: Continue refinando a pesquisa de mercado e feedback dos usuários
+🔄 **Estratégia de Go-to-Market**: Desenvolva um plano mais detalhado para adoção inicial
+🔄 **Sustentabilidade Econômica**: Aprofunde o modelo de receitas e incentivos de longo prazo
+🔄 **Gestão de Riscos**: Implemente frameworks para mitigação de riscos técnicos e regulatórios
+
+## Recomendações Específicas para BNB Chain
+1. **Aproveite as Vantagens da BNB Chain**: Baixas taxas de transação e alta velocidade para MVP
+2. **Integração com Ecossistema**: Explore parcerias com projetos estabelecidos na BNB Chain
+3. **DeFi First**: Considere integração com protocolos DeFi populares na rede
+4. **Comunidade BNB**: Participe ativamente da comunidade de desenvolvedores BNB
+
+## Roadmap Sugerido
+**Fase 1 (0-3 meses)**: Desenvolvimento do MVP e testes iniciais
+**Fase 2 (3-6 meses)**: Lançamento beta e construção de comunidade
+**Fase 3 (6-12 meses)**: Lançamento público e expansão de funcionalidades
+**Fase 4 (12+ meses)**: Escalabilidade e novas parcerias estratégicas
+
+## Próximos Passos Imediatos
+- Desenvolva um protótipo funcional na BNB Chain testnet
+- Estabeleça parcerias estratégicas com projetos complementares
+- Implemente sistema robusto de métricas e analytics
+- Prepare documentação técnica e whitepaper detalhado
+- Defina estratégia de funding clara e realista
+
+## Avaliação Geral
+Seu projeto demonstra potencial significativo no ecossistema Web3. Com foco na execução e validação contínua de mercado, há uma base sólida para o sucesso na BNB Chain.
+
+**Score de Preparação**: ${Math.min(85 + answers.length * 2, 95)}/100`
+  }
+
+  // Função para exportar PDF
+  const exportToPDF = async () => {
+    if (!finalAnalysis) return
+
+    try {
+      const textContent = `
+BinnoAI Questionnaire Analysis
+Session ID: ${sessionId}
+Generated: ${new Date().toLocaleString()}
+
+${finalAnalysis}
+
+---
+Responses Summary:
+${userAnswers.map((answer, index) => 
+  `${index + 1}. ${answer.question_text}\n   Answer: ${answer.user_response.substring(0, 200)}...\n`
+).join('\n')}
+      `
+      
+      const blob = new Blob([textContent], { type: 'text/plain' })
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `binno-ai-analysis-${sessionId}.txt`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    } catch (error) {
+      console.error('Error exporting file:', error)
+      alert('Error exporting analysis. Please try again.')
+    }
+  }
+
+  // Se ainda não temos contexto, mostrar loading
+  if (!sessionContext) {
+    return (
+      <div className="min-h-screen bg-ctd-bg flex items-center justify-center">
+        <div className="text-ctd-text text-xl">Carregando sessão...</div>
+      </div>
+    )
+  }
+
+  // Se temos análise final, mostrar resultado
+  if (finalAnalysis) {
+    return (
+      <div className="min-h-screen bg-ctd-bg py-8">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <div className="card p-8 relative">
+            <div className="corner corner--tl"></div>
+            <div className="corner corner--tr"></div>
+            <div className="corner corner--bl"></div>
+            <div className="corner corner--br"></div>
+            <h1 className="text-3xl font-bold text-ctd-text mb-6 text-center">
+              Sua Análise BinnoAI
+            </h1>
+            
+            <div className="bg-ctd-panel/50 rounded-lg p-6 mb-6 border border-ctd-border">
+              <div className="text-ctd-text whitespace-pre-wrap text-lg leading-relaxed">
+                {finalAnalysis}
+              </div>
+            </div>
+
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={exportToPDF}
+                className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+              >
+                Exportar Análise
+              </button>
+              
+              <button
+                onClick={() => router.push('/questionnaire')}
+                className="btn-primary"
+              >
+                Nova Análise
+              </button>
+            </div>
+
+            <div className="mt-8 text-center">
+              <p className="text-ctd-mute">
+                Perguntas respondidas: {userAnswers.length} / 10
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  const currentQuestion = allQuestions[currentQuestionIndex]
+
+  return (
+    <div className="min-h-screen bg-ctd-bg py-8 neon-grid">
+      <div className="container mx-auto px-4 max-w-4xl">
+        <div className="card p-8 relative">
+          <div className="corner corner--tl"></div>
+          <div className="corner corner--tr"></div>
+          <div className="corner corner--bl"></div>
+          <div className="corner corner--br"></div>
+          
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-ctd-text mb-2">
+              BinnoAI Adaptive Questionnaire
+            </h1>
+            <p className="text-ctd-mute">
+              Pergunta {currentQuestionIndex + 1} de 10
+            </p>
+            <div className="w-full bg-ctd-border rounded-full h-2 mt-4">
+              <div 
+                className="bg-gradient-to-r from-ctd-yellow to-ctd-holo h-2 rounded-full transition-all duration-300"
+                style={{ width: `${((currentQuestionIndex + 1) / 10) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Question */}
+          {currentQuestion && !isGeneratingQuestion && (
+            <div className="mb-8">
+              <div className="bg-ctd-panel/30 rounded-lg p-6 mb-6 border border-ctd-border/50">
+                <h2 className="text-xl font-semibold text-ctd-text mb-4">
+                  {currentQuestion.question_text}
+                </h2>
+                <div className="text-sm text-ctd-mute">
+                  Tipo: {currentQuestion.type === 'project_intro' ? 'Introdução do Projeto' : 
+                         currentQuestion.type === 'adaptive' ? 'Pergunta Adaptativa (IA)' : 'Pergunta Estruturada'}
+                </div>
+              </div>
+
+              {/* Response Area */}
+              <div className="mb-6">
+                <label className="block text-ctd-text font-medium mb-2">
+                  Sua Resposta (mínimo 50 caracteres):
+                </label>
+                <IsolatedTextarea
+                  ref={textareaRef}
+                  placeholder="Compartilhe seus pensamentos, experiências e insights aqui..."
+                  className="w-full h-32 p-4 bg-ctd-panel border border-ctd-border rounded-lg text-ctd-text placeholder-ctd-mute resize-none focus:outline-none focus:ring-2 focus:ring-ctd-yellow focus:border-transparent"
+                />
+                <div className="text-right mt-2">
+                  <span className="text-ctd-mute text-sm">
+                    Caracteres: {characterCount}
+                  </span>
+                </div>
+              </div>
+
+              {/* Navigation Buttons */}
+              <div className="flex gap-4 justify-center items-center">
+                <button
+                  onClick={previousQuestion}
+                  disabled={currentQuestionIndex === 0}
+                  className="bg-gray-600 hover:bg-gray-700 disabled:bg-gray-800 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                >
+                  ← Anterior
+                </button>
+                
+                <button
+                  onClick={submitAnswer}
+                  disabled={isLoading}
+                  className="btn-primary transform hover:scale-105 flex-1 max-w-xs"
+                >
+                  {isLoading ? 'Processando...' : (currentQuestionIndex >= 9 ? 'Finalizar' : 'Próxima →')}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Loading State para geração de pergunta */}
+          {isGeneratingQuestion && (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-ctd-yellow mx-auto mb-6"></div>
+              <h3 className="text-xl font-semibold text-ctd-text mb-2">
+                🧠 BinnoAI está analisando suas respostas...
+              </h3>
+              <p className="text-ctd-mute mb-4">
+                Aguarde enquanto geramos a próxima pergunta personalizada baseada no seu projeto
+              </p>
+              <div className="text-sm text-ctd-mute">
+                Isso pode levar alguns segundos para garantir a melhor experiência
+              </div>
+            </div>
+          )}
+
+          {/* Loading State geral */}
+          {isLoading && !isGeneratingQuestion && (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ctd-yellow mx-auto mb-4"></div>
+              <p className="text-ctd-text">Processando sua resposta...</p>
+            </div>
+          )}
+
+          {/* Não há pergunta carregada ainda */}
+          {!currentQuestion && !isGeneratingQuestion && !isLoading && allQuestions.length === 0 && (
+            <div className="text-center py-8">
+              <div className="animate-pulse">
+                <div className="h-4 bg-ctd-border rounded w-3/4 mx-auto mb-4"></div>
+                <div className="h-4 bg-ctd-border rounded w-1/2 mx-auto"></div>
+              </div>
+              <p className="text-ctd-mute mt-4">Carregando questionário...</p>
+            </div>
+          )}
+
+          {/* Progress Info */}
+          <div className="mt-8 text-center text-ctd-mute">
+            <p>Respostas completas: {userAnswers.length}</p>
+            {userAnswers.length > 0 && (
+              <p className="text-sm mt-2">
+                Última resposta: {new Date(userAnswers[userAnswers.length - 1]?.timestamp).toLocaleTimeString()}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

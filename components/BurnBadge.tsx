@@ -10,7 +10,9 @@ export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
   const [burnResult, setBurnResult] = useState<{
     success: boolean
     txHash?: string
+    amount?: string
     error?: string
+    details?: string
     alreadyBurned?: boolean
   } | null>(null)
 
@@ -19,7 +21,9 @@ export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
     
     setIsLoading(true)
     try {
-      const response = await fetch('/api/burn-on-completion', {
+      console.log('🔥 Iniciando processo de burn para:', userAddress)
+      
+      const response = await fetch('/.netlify/functions/burn-on-completion', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -28,12 +32,15 @@ export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
       })
       
       const result = await response.json()
+      console.log('🔥 Resultado do burn:', result)
+      
       setBurnResult(result)
       
       if (result.success && result.txHash) {
         localStorage.setItem(`burn_tx_${userAddress}`, result.txHash)
       }
     } catch (error) {
+      console.error('❌ Erro no burn:', error)
       setBurnResult({
         success: false,
         error: 'Failed to process burn transaction'
@@ -73,12 +80,12 @@ export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
 
   if (!userAddress) {
     return (
-      <div className="card max-w-md mx-auto text-center">
-        <h3 className="text-xl font-semibold text-primary mb-4">Burn Proof</h3>
-        <p className="text-gray-300 mb-4">
+      <div className="bg-ctd-panel border border-ctd-border rounded-2xl p-6 max-w-md mx-auto text-center">
+        <h3 className="text-xl font-semibold text-ctd-text mb-4">🔥 Burn Proof</h3>
+        <p className="text-ctd-mute mb-4">
           Connect your wallet to unlock the burn mechanism
         </p>
-        <button className="btn-secondary opacity-50 cursor-not-allowed">
+        <button className="px-6 py-3 bg-ctd-border text-ctd-mute rounded-lg opacity-50 cursor-not-allowed">
           Connect Wallet Required
         </button>
       </div>
@@ -86,8 +93,8 @@ export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
   }
 
   return (
-    <div className="card max-w-md mx-auto text-center">
-      <h3 className="text-xl font-semibold text-primary mb-4">Burn Proof</h3>
+    <div className="bg-ctd-panel border border-ctd-border rounded-2xl p-6 max-w-md mx-auto text-center">
+      <h3 className="text-xl font-semibold text-ctd-text mb-4">🔥 Burn Proof</h3>
       
       {burnResult?.success ? (
         <div>
@@ -96,15 +103,20 @@ export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
             </svg>
           </div>
-          <p className="text-gray-300 mb-4">
-            Burn transaction completed successfully!
+          <p className="text-ctd-mute mb-4">
+            ✅ Burn transaction completed successfully!
+            {burnResult.amount && (
+              <span className="block text-ctd-yellow font-medium mt-2">
+                🔥 {burnResult.amount} CTD tokens burned
+              </span>
+            )}
           </p>
           {burnResult.txHash && (
             <a
               href={`https://bscscan.com/tx/${burnResult.txHash}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-primary text-sm"
+              className="px-6 py-3 bg-ctd-yellow text-black rounded-lg hover:bg-ctd-yellow-dark transition-colors font-medium"
             >
               View on BSCScan
             </a>
@@ -118,25 +130,30 @@ export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
             </svg>
           </div>
           <p className="text-red-400 mb-4 text-sm">{burnResult.error}</p>
+          {burnResult.details && (
+            <p className="text-red-300 mb-4 text-xs opacity-70">
+              Debug: {burnResult.details}
+            </p>
+          )}
           {!burnResult.alreadyBurned ? (
             <button
               onClick={handleBurn}
-              className="btn-primary"
+              className="px-6 py-3 bg-ctd-yellow text-black rounded-lg hover:bg-ctd-yellow-dark transition-colors font-medium"
               disabled={!isEnabled}
             >
               Retry Burn
             </button>
           ) : (
-            <div className="text-gray-400 text-sm">
-              <p>⚠️ <strong>Regra:</strong> Apenas 1 queima por carteira</p>
+            <div className="text-ctd-mute text-sm">
+              <p>⚠️ <strong>Rule:</strong> Only 1 burn per wallet</p>
               {burnResult.txHash && (
                 <a
                   href={`https://bscscan.com/tx/${burnResult.txHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn-secondary text-sm mt-2 inline-block"
+                  className="px-4 py-2 bg-ctd-border text-ctd-text rounded-lg hover:bg-ctd-border/70 transition-colors text-sm mt-2 inline-block"
                 >
-                  Ver Transação Anterior
+                  View Previous Transaction
                 </a>
               )}
             </div>
@@ -144,18 +161,22 @@ export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
         </div>
       ) : (
         <div>
-          <p className="text-gray-300 mb-4">
+          <p className="text-ctd-mute mb-4">
             {isEnabled 
-              ? "Complete the burn mechanism to prove your knowledge!"
-              : "Complete all 10 quiz modules to unlock burn"
+              ? "🔥 Execute o burn de tokens CTD reais para provar seu conhecimento!"
+              : "📚 Complete todos os 10 módulos do quiz para desbloquear o burn"
             }
           </p>
           <button
             onClick={handleBurn}
             disabled={!isEnabled || isLoading}
-            className={`btn-primary ${!isEnabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`px-6 py-3 bg-ctd-yellow text-black rounded-lg font-medium transition-colors ${
+              !isEnabled || isLoading 
+                ? 'opacity-50 cursor-not-allowed' 
+                : 'hover:bg-ctd-yellow-dark'
+            }`}
           >
-            {isLoading ? 'Processing...' : 'Execute Burn'}
+            {isLoading ? '🔥 Processing...' : '🔥 Execute Burn'}
           </button>
         </div>
       )}

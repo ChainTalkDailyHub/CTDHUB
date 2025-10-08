@@ -25,9 +25,18 @@ export default function MyModules() {
     }
   }, [])
 
+  // Buscar views para cada curso quando os cursos carregarem
+  useEffect(() => {
+    if (myCourses.length > 0) {
+      myCourses.forEach(course => {
+        fetchCourseViews(course.id)
+      })
+    }
+  }, [myCourses])
+
   const loadUserProfile = async (address: string) => {
     try {
-      const response = await fetch(`/api/profile?walletAddress=${address}`)
+      const response = await fetch(`/.netlify/functions/user-profiles?walletAddress=${address}`)
       if (response.ok) {
         const profile = await response.json()
         setUserProfile(profile)
@@ -63,9 +72,31 @@ export default function MyModules() {
     })
   }
 
+  const [courseViews, setCourseViews] = useState<Record<string, number>>({})
+
   const getTotalViews = (course: Course) => {
-    // Placeholder for future analytics
-    return Math.floor(Math.random() * 1000) + 50
+    return courseViews[course.id] || 0
+  }
+
+  // Função para buscar views reais do curso
+  const fetchCourseViews = async (courseId: string) => {
+    try {
+      const response = await fetch(`/.netlify/functions/video-analytics?course_id=${courseId}`)
+      if (response.ok) {
+        const analytics = await response.json()
+        setCourseViews(prev => ({
+          ...prev,
+          [courseId]: analytics.total_views || 0
+        }))
+      }
+    } catch (error) {
+      console.error('Error fetching course views:', error)
+      // Fallback para número estático se der erro
+      setCourseViews(prev => ({
+        ...prev,
+        [courseId]: 0
+      }))
+    }
   }
 
   if (!isConnected) {
@@ -120,14 +151,22 @@ export default function MyModules() {
             {/* Author Info */}
             <div className="card max-w-2xl mx-auto p-6">
               <div className="flex items-center justify-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-ctd-yellow rounded-full flex items-center justify-center">
-                  <span className="text-black font-bold text-lg">
-                    {userProfile?.displayName?.[0] || address[2]?.toUpperCase() || 'A'}
-                  </span>
+                <div className="w-12 h-12 bg-ctd-yellow rounded-full flex items-center justify-center overflow-hidden">
+                  {userProfile?.avatar_url ? (
+                    <img 
+                      src={userProfile.avatar_url} 
+                      alt="Profile" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-black font-bold text-lg">
+                      {userProfile?.name?.[0]?.toUpperCase() || address[2]?.toUpperCase() || 'A'}
+                    </span>
+                  )}
                 </div>
                 <div className="text-left">
                   <h3 className="text-lg font-semibold text-ctd-text">
-                    {userProfile?.displayName || 'Anonymous Creator'}
+                    {userProfile?.name || 'Anonymous Creator'}
                   </h3>
                   <p className="text-ctd-mute text-sm">
                     {short(address)} • {myCourses.length} {myCourses.length === 1 ? 'module' : 'modules'}

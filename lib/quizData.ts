@@ -694,12 +694,12 @@ export const quizModules: QuizModule[] = [
         id: 4,
         question: "What is farming strategy optimization?",
         options: [
-          "Crop rotation techniques",
           "Maximizing yield while minimizing risks",
+          "Crop rotation techniques", 
           "Farm equipment upgrade",
           "Seasonal planning"
         ],
-        correctAnswer: 2,
+        correctAnswer: 1,
         explanation: "Farming strategy optimization involves finding the best balance between high yields and acceptable risk levels."
       },
       {
@@ -707,23 +707,23 @@ export const quizModules: QuizModule[] = [
         question: "What is auto-compounding?",
         options: [
           "Automatic farm expansion",
-          "Automatically reinvesting earned rewards",
           "Mechanical farming",
-          "Compound fertilizer"
+          "Compound fertilizer",
+          "Automatically reinvesting earned rewards"
         ],
-        correctAnswer: 2,
+        correctAnswer: 4,
         explanation: "Auto-compounding automatically reinvests earned rewards to maximize returns through compound interest."
       },
       {
         id: 6,
         question: "What is pool2 farming?",
         options: [
-          "Swimming pool investment",
           "Farming with LP tokens of project's own token",
+          "Swimming pool investment",
           "Second-tier farming",
           "Double pool strategy"
         ],
-        correctAnswer: 2,
+        correctAnswer: 1,
         explanation: "Pool2 farming involves providing liquidity using a project's own governance token paired with another asset."
       },
       {
@@ -731,11 +731,11 @@ export const quizModules: QuizModule[] = [
         question: "What is vampire attack in yield farming?",
         options: [
           "Night trading strategy",
-          "Protocol attracting liquidity from competitors",
           "Blood-sucking investment",
+          "Protocol attracting liquidity from competitors",
           "Dark pool trading"
         ],
-        correctAnswer: 2,
+        correctAnswer: 3,
         explanation: "Vampire attacks involve new protocols offering higher yields to attract liquidity away from established competitors."
       },
       {
@@ -743,11 +743,11 @@ export const quizModules: QuizModule[] = [
         question: "What is mercenary capital?",
         options: [
           "Military funding",
-          "Capital that moves for highest yields without loyalty",
           "Private military investment",
-          "War economy investment"
+          "War economy investment",
+          "Capital that moves for highest yields without loyalty"
         ],
-        correctAnswer: 2,
+        correctAnswer: 4,
         explanation: "Mercenary capital refers to funds that quickly move between protocols seeking the highest yields without long-term commitment."
       },
       {
@@ -756,10 +756,10 @@ export const quizModules: QuizModule[] = [
         options: [
           "Carpet cleaning service",
           "Floor decoration strategy",
-          "Sudden withdrawal of liquidity by developers",
-          "Interior design method"
+          "Interior design method",
+          "Sudden withdrawal of liquidity by developers"
         ],
-        correctAnswer: 3,
+        correctAnswer: 4,
         explanation: "A rug pull occurs when developers suddenly withdraw all liquidity from a project, leaving investors with worthless tokens."
       },
       {
@@ -767,11 +767,11 @@ export const quizModules: QuizModule[] = [
         question: "What is yield optimization protocol?",
         options: [
           "Farming equipment automation",
+          "Crop yield prediction", 
           "Protocol automatically finding best yield opportunities",
-          "Crop yield prediction",
           "Agricultural optimization"
         ],
-        correctAnswer: 2,
+        correctAnswer: 3,
         explanation: "Yield optimization protocols automatically move funds between different farming opportunities to maximize returns."
       }
     ]
@@ -810,11 +810,11 @@ export const quizModules: QuizModule[] = [
         question: "What is the constant product formula?",
         options: [
           "x + y = k",
-          "x * y = k",
           "x - y = k",
-          "x / y = k"
+          "x / y = k",
+          "x * y = k"
         ],
-        correctAnswer: 2,
+        correctAnswer: 4,
         explanation: "The constant product formula (x * y = k) is used by AMMs to determine asset prices based on pool reserves."
       },
       {
@@ -833,24 +833,24 @@ export const quizModules: QuizModule[] = [
         id: 5,
         question: "What is pool depth?",
         options: [
-          "Physical depth of pool",
           "Amount of liquidity available for trading",
+          "Physical depth of pool",
           "Number of pool participants",
           "Pool creation date"
         ],
-        correctAnswer: 2,
+        correctAnswer: 1,
         explanation: "Pool depth refers to the total amount of liquidity available, affecting price impact of large trades."
       },
       {
         id: 6,
         question: "What is a concentrated liquidity pool?",
         options: [
-          "Pool with high concentration of users",
           "Pool where liquidity is focused in specific price ranges",
+          "Pool with high concentration of users",
           "Pool with concentrated ownership",
           "Pool with high token concentration"
         ],
-        correctAnswer: 2,
+        correctAnswer: 1,
         explanation: "Concentrated liquidity allows providers to allocate liquidity within specific price ranges for capital efficiency."
       },
       {
@@ -870,11 +870,11 @@ export const quizModules: QuizModule[] = [
         question: "What is just-in-time (JIT) liquidity?",
         options: [
           "Fast liquidity provision",
-          "Adding liquidity right before large trades",
           "Emergency liquidity",
+          "Adding liquidity right before large trades",
           "Instant liquidity removal"
         ],
-        correctAnswer: 2,
+        correctAnswer: 3,
         explanation: "JIT liquidity involves adding liquidity just before large trades to capture fees, then immediately removing it."
       },
       {
@@ -882,23 +882,23 @@ export const quizModules: QuizModule[] = [
         question: "What is a bonding curve?",
         options: [
           "Bond investment strategy",
-          "Mathematical function determining token price",
           "Curve for bond trading",
-          "Interest rate curve"
+          "Interest rate curve",
+          "Mathematical function determining token price"
         ],
-        correctAnswer: 2,
+        correctAnswer: 4,
         explanation: "Bonding curves are mathematical functions that determine token prices based on supply and demand dynamics."
       },
       {
         id: 10,
         question: "What is liquidity bootstrapping?",
         options: [
-          "Starting a computer",
           "Initial process of adding liquidity to new pools",
+          "Starting a computer",
           "Boot-shaped liquidity",
           "Emergency liquidity provision"
         ],
-        correctAnswer: 2,
+        correctAnswer: 1,
         explanation: "Liquidity bootstrapping involves gradually building up liquidity in new pools to establish stable trading pairs."
       }
     ]

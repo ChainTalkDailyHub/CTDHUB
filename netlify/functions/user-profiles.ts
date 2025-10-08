@@ -1,14 +1,25 @@
 import { Handler } from '@netlify/functions'
 import { createClient } from '@supabase/supabase-js'
 
-// Initialize Supabase
-const supabaseUrl = process.env.SUPABASE_URL
-const supabaseKey = process.env.SUPABASE_ANON_KEY
+// Initialize Supabase with multiple fallback options
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 
+                   process.env.SUPABASE_URL || 
+                   'https://srqgmflodlowmybgxxeu.supabase.co'
+
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 
+                   process.env.SUPABASE_ANON_KEY || 
+                   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNycWdtZmxvZGxvd215Ymd4eGV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwMDM2MjgsImV4cCI6MjA3NDU3OTYyOH0.yI4PQXcmd96JVMoG46gh85G3hFVr0L3L7jBHWlJzAlQ'
 
 let supabase: any = null
 
-if (supabaseUrl && supabaseKey) {
+try {
   supabase = createClient(supabaseUrl, supabaseKey)
+  console.log('✅ Supabase initialized successfully')
+  console.log('📍 URL:', supabaseUrl.substring(0, 30) + '...')
+} catch (error) {
+  console.error('❌ Supabase initialization failed:', error)
+  console.log('URL:', supabaseUrl ? 'Present' : 'Missing')
+  console.log('KEY:', supabaseKey ? 'Present' : 'Missing')
 }
 
 interface UserProfile {
@@ -140,7 +151,7 @@ const handler: Handler = async (event, context) => {
         }
       }
 
-      const { name, profession, web3_experience, project_name, bio } = body
+      const { name, profession, web3_experience, project_name, bio, avatar_url } = body
 
       // Validate experience level
       const validExperiences = ['beginner', 'intermediate', 'advanced', 'expert']
@@ -160,17 +171,24 @@ const handler: Handler = async (event, context) => {
       if (web3_experience !== undefined) profileData.web3_experience = web3_experience
       if (project_name !== undefined) profileData.project_name = project_name.trim()
       if (bio !== undefined) profileData.bio = bio.trim()
+      if (avatar_url !== undefined) profileData.avatar_url = avatar_url
 
       if (!supabase) {
-        console.log('Supabase not configured, returning mock success')
+        console.log('Supabase not configured, using local storage simulation')
+        
+        // Create a mock profile response
+        const mockProfile = {
+          id: `mock_${userAddress}`,
+          wallet_address: userAddress,
+          ...profileData,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }
+
         return {
           statusCode: 200,
           headers,
-          body: JSON.stringify({
-            wallet_address: userAddress,
-            ...profileData,
-            updated_at: new Date().toISOString()
-          }),
+          body: JSON.stringify(mockProfile),
         }
       }
 

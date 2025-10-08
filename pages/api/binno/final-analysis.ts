@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { BinnoAI, UserAnswer, FinalAnalysis } from '../../../lib/binno-questionnaire'
+import { BinnoAI, UserAnswer, SkillAssessmentReport } from '../../../lib/binno-questionnaire'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -22,7 +22,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.log('Generating final analysis for', answers.length, 'answers')
 
     const binno = new BinnoAI()
-    const analysis = await binno.generateFinalAnalysis(answers)
+    const sessionId = `api_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    const analysis = await binno.generateFinalAnalysis(sessionId, answers)
 
     console.log('Analysis generated successfully')
 
@@ -44,7 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 // Função para salvar no banco (implementar conforme necessário)
 async function saveAnalysisToDatabase(
   sessionId: string, 
-  analysis: FinalAnalysis, 
+  analysis: SkillAssessmentReport, 
   userAnswers: UserAnswer[]
 ) {
   // Implementar salvamento no Supabase ou outro banco

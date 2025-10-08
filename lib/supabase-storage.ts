@@ -1,5 +1,21 @@
-import { supabase } from './supabase'
+import { createClient } from '@supabase/supabase-js'
 import { v4 as uuidv4 } from 'uuid'
+
+// Initialize Supabase directly with fallback values
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 
+                   process.env.SUPABASE_URL || 
+                   'https://srqgmflodlowmybgxxeu.supabase.co'
+
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 
+                   process.env.SUPABASE_ANON_KEY || 
+                   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNycWdtZmxvZGxvd215Ymd4eGV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwMDM2MjgsImV4cCI6MjA3NDU3OTYyOH0.yI4PQXcmd96JVMoG46gh85G3hFVr0L3L7jBHWlJzAlQ'
+
+const supabase = createClient(supabaseUrl, supabaseKey)
+
+console.log('📊 Supabase Storage initialized:', {
+  url: supabaseUrl.substring(0, 30) + '...',
+  key: supabaseKey.substring(0, 20) + '...'
+})
 
 export interface CourseVideo {
   id: string
@@ -23,12 +39,9 @@ export interface Course {
 }
 
 export async function readCoursesFromSupabase(): Promise<Course[]> {
-  if (!supabase) {
-    console.log('Supabase not configured')
-    return []
-  }
-
   try {
+    console.log('🔍 Reading courses from Supabase...')
+    
     // Get courses
     const { data: courses, error: coursesError } = await supabase
       .from('courses')
@@ -36,9 +49,11 @@ export async function readCoursesFromSupabase(): Promise<Course[]> {
       .order('updated_at', { ascending: false })
 
     if (coursesError) {
-      console.error('Error fetching courses:', coursesError)
+      console.error('❌ Error fetching courses:', coursesError)
       return []
     }
+
+    console.log(`📚 Found ${courses?.length || 0} courses`)
 
     if (!courses || courses.length === 0) {
       return []
@@ -55,25 +70,28 @@ export async function readCoursesFromSupabase(): Promise<Course[]> {
       return []
     }
 
-    // Combine courses with their videos
+    // Transform UUID courses to short ID format that the app expects
     const coursesWithVideos = courses.map(course => {
       const courseVideos = videos?.filter(video => video.course_id === course.id) || []
       
+      // Generate short IDs for compatibility
+      const shortCourseId = Math.random().toString(36).substr(2, 9)
+      
       return {
-        id: course.id,
+        id: shortCourseId,
         title: course.title,
         description: course.description,
         author: course.author,
         createdAt: new Date(course.created_at).getTime(),
         updatedAt: new Date(course.updated_at).getTime(),
-        totalVideos: course.total_videos,
-        videos: courseVideos.map(video => ({
-          id: video.id,
+        totalVideos: courseVideos.length,
+        videos: courseVideos.map((video, index) => ({
+          id: Math.random().toString(36).substr(2, 9),
           title: video.title,
           description: video.description || '',
           youtubeUrl: video.youtube_url,
-          thumbnail: video.thumbnail || '',
-          order: video.order_index
+          thumbnail: video.thumbnail || ytThumb(ytIdFromUrl(video.youtube_url) || ''),
+          order: video.order_index || index + 1
         }))
       }
     })

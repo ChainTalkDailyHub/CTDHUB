@@ -162,6 +162,49 @@ export default function DeveloperPage() {
                 </div>
               )}
 
+              {/* Database Management */}
+              {isAdmin && (
+                <div className="card relative border-blue-500">
+                  <div className="corner corner--tl"></div>
+                  <div className="corner corner--tr"></div>
+                  <div className="corner corner--bl"></div>
+                  <div className="corner corner--br"></div>
+                  
+                  <div className="relative z-10 p-1">
+                    <h3 className="text-xl font-bold text-ctd-text mb-4 flex items-center">
+                      <span className="mr-3">🗄️</span>
+                      Database Management
+                    </h3>
+                    <p className="text-ctd-mute mb-6">
+                      Manage the persistent database to ensure data survives deployments
+                    </p>
+                    
+                    <div className="flex gap-4">
+                      <a
+                        href="/database-setup"
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                      >
+                        🔧 Database Setup
+                      </a>
+                      <a
+                        href="/data-migration"
+                        className="px-4 py-2 bg-ctd-border hover:bg-ctd-border/70 text-ctd-text rounded-lg transition-colors"
+                      >
+                        📊 Data Migration
+                      </a>
+                    </div>
+
+                    <div className="mt-4 p-4 bg-yellow-900/20 border border-yellow-500 rounded-lg">
+                      <h4 className="text-yellow-400 font-semibold mb-2">⚠️ Important</h4>
+                      <p className="text-yellow-300 text-sm">
+                        Without proper database setup, all user data and courses will be lost on each deployment. 
+                        Use the Database Setup tool to ensure data persistence.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Admin Course Creation */}
               {isAdmin && (
                 <div className="card relative">

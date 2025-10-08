@@ -15,12 +15,24 @@ export default function DevArea() {
   const [isLoading, setIsLoading] = useState(false)
   const [userProfile, setUserProfile] = useState<any>(null)
   const [selectedCourseId, setSelectedCourseId] = useState('')
+  const [isFirstVisit, setIsFirstVisit] = useState(true)
 
   useEffect(() => {
     const stored = localStorage.getItem('ctdhub:wallet')
     if (stored) {
       setIsConnected(true)
       setAddress(stored)
+      
+      // Check if it's first visit to Creator Studio for this user
+      const visitKey = `ctdhub:creator-visited:${stored}`
+      const hasVisited = localStorage.getItem(visitKey)
+      setIsFirstVisit(!hasVisited)
+      
+      // Mark as visited
+      if (!hasVisited) {
+        localStorage.setItem(visitKey, 'true')
+      }
+      
       loadMyCourses(stored)
       loadUserProfile(stored)
     }
@@ -33,13 +45,29 @@ export default function DevArea() {
 
   const loadUserProfile = async (address: string) => {
     try {
-      const response = await fetch(`/api/profile?walletAddress=${address}`)
+      const response = await fetch(`/.netlify/functions/user-profiles?walletAddress=${address}`)
       if (response.ok) {
         const profile = await response.json()
         setUserProfile(profile)
       }
     } catch (error) {
       console.error('Error loading user profile:', error)
+    }
+  }
+
+  const getWelcomeMessage = () => {
+    const userName = userProfile?.name || 'Creator'
+    
+    if (isFirstVisit) {
+      return {
+        greeting: `Welcome ${userName}`,
+        subtitle: `Great to have you in the Creator Studio! Let's build something amazing.`
+      }
+    } else {
+      return {
+        greeting: `Good to see you back here, ${userName}`,
+        subtitle: `Ready to create more incredible content?`
+      }
     }
   }
 
@@ -169,12 +197,18 @@ export default function DevArea() {
             <h1 className="text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-4">
               Creator Studio
             </h1>
-            <p className="text-xl text-gray-300 mb-2">
-              Welcome <span className="text-yellow-400 font-semibold">
-                {userProfile?.name || 'Creator'}
-              </span>, <span className="text-gray-400 text-base">{short(address)}</span>.
-            </p>
-            <p className="text-gray-300 leading-relaxed text-lg">
+            <div className="mb-4">
+              <p className="text-2xl text-white font-semibold mb-2">
+                {getWelcomeMessage().greeting}
+                <span className="text-gray-400 text-base font-normal ml-2">
+                  {short(address)}
+                </span>
+              </p>
+              <p className="text-lg text-gray-300 mb-2">
+                {getWelcomeMessage().subtitle}
+              </p>
+            </div>
+            <p className="text-gray-300 leading-relaxed">
               Create, edit, and publish your lessons. Published videos appear on the Courses page.
             </p>
           </div>
@@ -226,7 +260,7 @@ export default function DevArea() {
                             {formatDate(course.updatedAt)}
                           </span>
                           <a
-                            href={`/courses/${course.id}`}
+                            href="/my-modules"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-yellow-400 hover:text-yellow-300"

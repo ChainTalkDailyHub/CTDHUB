@@ -1,5 +1,6 @@
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { CTDTokenCard } from '@/components/ContractCard'
 import Link from 'next/link'
 
 export default function Home() {
@@ -173,6 +174,25 @@ export default function Home() {
                   </p>
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTD Token Info Section */}
+        <section className="py-16 lg:py-20">
+          <div className="max-w-4xl mx-auto px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-ctd-text mb-6">
+                CTD Token Contract
+              </h2>
+              <p className="text-lg text-ctd-mute max-w-2xl mx-auto">
+                The official CTD token contract address on Binance Smart Chain. 
+                Copy the address to add CTD to your wallet or verify transactions.
+              </p>
+            </div>
+            
+            <div className="max-w-lg mx-auto">
+              <CTDTokenCard />
             </div>
           </div>
         </section>

@@ -85,7 +85,7 @@ export default function BinnoMentorPage() {
             onClick={() => router.push('/questionnaire')}
             className="px-6 py-3 bg-amber-500 text-black rounded-lg hover:bg-amber-600 transition-colors"
           >
-            Return to Skill Compass
+            Return to CTD Skill Compass
           </button>
         </div>
       </div>
@@ -355,7 +355,7 @@ export default function BinnoMentorPage() {
                   onClick={() => router.push('/questionnaire')}
                   className="px-8 py-3 bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold rounded-lg hover:from-green-600 hover:to-blue-600 transition-all duration-200"
                 >
-                  Try Skill Compass
+                  Try CTD Skill Compass
                 </button>
                 <button
                   onClick={() => router.push('/binno-ai')}

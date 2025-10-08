@@ -75,7 +75,28 @@ export default async (req: Request, context: Context) => {
         })
       }
 
-      return new Response(JSON.stringify(comments || []), {
+      // Enrich comments with user names from profiles
+      const enrichedComments = await Promise.all((comments || []).map(async (comment: any) => {
+        if (!comment.user_name || comment.user_name.includes('...')) {
+          // Try to get the real name from user_profiles
+          try {
+            const { data: profile } = await supabase
+              .from('user_profiles')
+              .select('name')
+              .eq('wallet_address', comment.user_address.toLowerCase())
+              .single()
+            
+            if (profile?.name) {
+              comment.user_name = profile.name
+            }
+          } catch (profileError) {
+            // Keep existing user_name if profile fetch fails
+          }
+        }
+        return comment
+      }))
+
+      return new Response(JSON.stringify(enrichedComments || []), {
         status: 200,
         headers: {
           'Content-Type': 'application/json',
@@ -98,12 +119,32 @@ export default async (req: Request, context: Context) => {
         })
       }
 
+      // Try to get the real name from user_profiles if not provided
+      let finalUserName = userName
+      if (!userName || userName.includes('...')) {
+        try {
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('name')
+            .eq('wallet_address', userAddress.toLowerCase())
+            .single()
+          
+          if (profile?.name) {
+            finalUserName = profile.name
+          } else {
+            finalUserName = userAddress.slice(0, 6) + '...' + userAddress.slice(-4)
+          }
+        } catch (profileError) {
+          finalUserName = userAddress.slice(0, 6) + '...' + userAddress.slice(-4)
+        }
+      }
+
       const { data: newComment, error } = await supabase
         .from('video_comments')
         .insert([{
           video_id: videoId,
           user_address: userAddress,
-          user_name: userName || userAddress.slice(0, 6) + '...' + userAddress.slice(-4),
+          user_name: finalUserName,
           comment: comment.trim()
         }])
         .select()

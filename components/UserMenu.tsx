@@ -50,6 +50,9 @@ export default function UserMenu({ isOpen, onClose, userAddress }: UserMenuProps
   const handleSave = async () => {
     setIsLoading(true)
     try {
+      console.log('Saving profile for address:', userAddress)
+      console.log('Profile data:', formData)
+
       // Use Netlify Function for saving profile
       const response = await fetch('/.netlify/functions/user-profiles', {
         method: 'POST',
@@ -60,19 +63,31 @@ export default function UserMenu({ isOpen, onClose, userAddress }: UserMenuProps
         body: JSON.stringify(formData)
       })
 
+      console.log('Response status:', response.status)
+      
       if (response.ok) {
         const updatedProfile = await response.json()
+        console.log('Profile saved successfully:', updatedProfile)
         setProfile(updatedProfile)
         setIsEditing(false)
-        alert('Profile saved successfully!')
+        alert('✅ Profile saved successfully!')
       } else {
-        const error = await response.json()
-        console.error('Error response:', error)
-        alert(`Error saving profile: ${error.error || 'Unknown error'}`)
+        const errorText = await response.text()
+        console.error('Error response:', errorText)
+        
+        let errorMessage = 'Unknown error'
+        try {
+          const errorJson = JSON.parse(errorText)
+          errorMessage = errorJson.error || errorMessage
+        } catch {
+          errorMessage = errorText
+        }
+        
+        alert(`❌ Error saving profile: ${errorMessage}`)
       }
     } catch (error) {
-      console.error('Error saving profile:', error)
-      alert('Error saving profile')
+      console.error('Network error saving profile:', error)
+      alert('❌ Network error saving profile. Please check your connection and try again.')
     } finally {
       setIsLoading(false)
     }

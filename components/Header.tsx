@@ -47,7 +47,7 @@ export default function Header() {
               <img 
                 src={LOGO_DEFAULT_PROPS.src}
                 alt={LOGO_DEFAULT_PROPS.alt}
-                className="h-20 w-auto hover:opacity-90 transition-opacity duration-300"
+                className="h-32 w-auto hover:opacity-90 transition-opacity duration-300"
                 onError={(e) => {
                   console.log('Logo failed to load, showing fallback');
                   const target = e.target as HTMLElement;
@@ -60,7 +60,7 @@ export default function Header() {
                 }}
               />
               <div 
-                className="hidden h-20 items-center justify-center px-6 bg-gradient-to-r from-ctd-yellow to-ctd-holo text-black font-bold text-2xl rounded-lg hover:opacity-90 transition-opacity duration-300"
+                className="hidden h-32 items-center justify-center px-6 bg-gradient-to-r from-ctd-yellow to-ctd-holo text-black font-bold text-3xl rounded-lg hover:opacity-90 transition-opacity duration-300"
                 style={{ display: 'none' }}
               >
                 {LOGO_FALLBACK_TEXT}
@@ -86,7 +86,7 @@ export default function Header() {
               <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
             </Link>
             <Link href="/questionnaire" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
-              <span className="relative z-10">Skill Compass</span>
+              <span className="relative z-10">CTD Skill Compass</span>
               <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
             </Link>
             <Link href="/dev" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
@@ -181,7 +181,7 @@ export default function Header() {
                 className="block px-4 py-3 text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 rounded-lg transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                🧭 Skill Compass
+                🧭 CTD Skill Compass
               </Link>
               <Link
                 href="/dev"

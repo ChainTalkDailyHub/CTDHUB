@@ -14,9 +14,45 @@ export default function UserMenu({ isOpen, onClose, userAddress }: UserMenuProps
     profession: '',
     web3_experience: 'beginner' as 'beginner' | 'intermediate' | 'advanced' | 'expert',
     project_name: '',
-    bio: ''
+    bio: '',
+    avatar_url: ''
   })
   const [isLoading, setIsLoading] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState(false)
+
+  const handleImageUpload = async (file: File) => {
+    setUploadingImage(true)
+    try {
+      // Convert file to base64 for simple storage
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const base64 = e.target?.result as string
+        setFormData(prev => ({ ...prev, avatar_url: base64 }))
+        setUploadingImage(false)
+      }
+      reader.readAsDataURL(file)
+    } catch (error) {
+      console.error('Error uploading image:', error)
+      setUploadingImage(false)
+    }
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Validate file size (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        alert('File size must be less than 2MB')
+        return
+      }
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file')
+        return
+      }
+      handleImageUpload(file)
+    }
+  }
 
   useEffect(() => {
     if (isOpen && userAddress) {
@@ -26,7 +62,7 @@ export default function UserMenu({ isOpen, onClose, userAddress }: UserMenuProps
 
   const loadProfile = async () => {
     try {
-      const response = await fetch(`/api/profile?walletAddress=${userAddress}`)
+      const response = await fetch(`/.netlify/functions/user-profiles?walletAddress=${userAddress}`)
       if (response.ok) {
         const data = await response.json()
         setProfile(data)
@@ -36,7 +72,8 @@ export default function UserMenu({ isOpen, onClose, userAddress }: UserMenuProps
             profession: data.profession || '',
             web3_experience: data.web3_experience || 'beginner',
             project_name: data.project_name || '',
-            bio: data.bio || ''
+            bio: data.bio || '',
+            avatar_url: data.avatar_url || ''
           })
         }
       }
@@ -48,7 +85,10 @@ export default function UserMenu({ isOpen, onClose, userAddress }: UserMenuProps
   const handleSave = async () => {
     setIsLoading(true)
     try {
-      const response = await fetch('/api/profile', {
+      console.log('Saving profile for address:', userAddress)
+      console.log('Profile data:', formData)
+
+      const response = await fetch('/.netlify/functions/user-profiles', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -57,17 +97,31 @@ export default function UserMenu({ isOpen, onClose, userAddress }: UserMenuProps
         body: JSON.stringify(formData)
       })
 
+      console.log('Response status:', response.status)
+
       if (response.ok) {
         const updatedProfile = await response.json()
+        console.log('Profile saved successfully:', updatedProfile)
         setProfile(updatedProfile)
         setIsEditing(false)
-        alert('Profile saved successfully!')
+        alert('✅ Profile saved successfully!')
       } else {
-        alert('Error saving profile')
+        const errorText = await response.text()
+        console.error('Error response:', errorText)
+        
+        let errorMessage = 'Unknown error'
+        try {
+          const errorJson = JSON.parse(errorText)
+          errorMessage = errorJson.error || errorMessage
+        } catch {
+          errorMessage = errorText
+        }
+        
+        alert(`❌ Error saving profile: ${errorMessage}`)
       }
     } catch (error) {
-      console.error('Error saving profile:', error)
-      alert('Error saving profile')
+      console.error('Network error saving profile:', error)
+      alert('❌ Network error saving profile. Please check your connection and try again.')
     } finally {
       setIsLoading(false)
     }
@@ -221,6 +275,54 @@ export default function UserMenu({ isOpen, onClose, userAddress }: UserMenuProps
             </div>
 
             <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-4">
+              {/* Profile Photo */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Profile Photo</label>
+                <div className="flex items-center space-x-4">
+                  <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center overflow-hidden">
+                    {formData.avatar_url ? (
+                      <img 
+                        src={formData.avatar_url} 
+                        alt="Profile" 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-gray-400 text-xl">
+                        {formData.name?.[0]?.toUpperCase() || '?'}
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                      id="profile-photo"
+                      disabled={uploadingImage}
+                    />
+                    <label
+                      htmlFor="profile-photo"
+                      className={`cursor-pointer px-3 py-2 text-sm bg-yellow-500 text-black rounded-lg hover:bg-yellow-600 transition-colors ${
+                        uploadingImage ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      {uploadingImage ? 'Uploading...' : 'Change Photo'}
+                    </label>
+                    {formData.avatar_url && (
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, avatar_url: '' }))}
+                        className="ml-2 px-3 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <p className="text-xs text-gray-400 mt-1">Max 2MB, JPG/PNG format</p>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">Name</label>
                 <input

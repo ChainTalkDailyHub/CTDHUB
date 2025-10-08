@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import Header from '../../components/Header'
 import Footer from '../../components/Footer'
 import { createClient } from '@supabase/supabase-js'
+import { useViewTracking } from '../../lib/useViewTracking'
 
 interface Video {
   id: string
@@ -11,8 +12,10 @@ interface Video {
   youtubeUrl: string
   thumbnail?: string
   author: string
+  authorName?: string
   courseId: string
   courseName: string
+  courseDescription?: string
   duration?: string
   publishedAt: number
 }
@@ -34,6 +37,9 @@ const supabase = createClient(
 export default function VideoPage() {
   const router = useRouter()
   const { id } = router.query
+  const { registerView } = useViewTracking()
+  const viewRegistered = useRef(false)
+  const watchStartTime = useRef<number>(0)
   
   const [video, setVideo] = useState<Video | null>(null)
   const [relatedVideos, setRelatedVideos] = useState<Video[]>([])
@@ -68,7 +74,7 @@ export default function VideoPage() {
     try {
       setIsLoading(true)
       
-      // Buscar todos os cursos para encontrar o vídeo específico
+      // First, try to find the video with the current ID
       const response = await fetch('/.netlify/functions/course-manager')
       if (response.ok) {
         const courses = await response.json()
@@ -83,8 +89,10 @@ export default function VideoPage() {
             foundVideo = {
               ...videoInCourse,
               author: course.author,
+              authorName: course.authorName || `Developer ${course.author.slice(0, 6)}...${course.author.slice(-4)}`,
               courseId: course.id,
-              courseName: course.title
+              courseName: course.title,
+              courseDescription: course.description
             }
             foundCourse = course
             break
@@ -112,7 +120,38 @@ export default function VideoPage() {
             .slice(0, 10) // Limitar a 10 vídeos relacionados
           
           setRelatedVideos(authorVideos)
+          
+          // Registrar view quando o vídeo for carregado
+          if (!viewRegistered.current) {
+            watchStartTime.current = Date.now()
+            registerView({
+              videoId: foundVideo.id,
+              courseId: foundCourse.id,
+              viewerAddress: isConnected ? userAddress : undefined
+            })
+            viewRegistered.current = true
+          }
         } else {
+          // Try to check if it's an old UUID that needs to be converted
+          const finderResponse = await fetch(`/.netlify/functions/video-finder?id=${videoId}`)
+          if (finderResponse.ok) {
+            const finderData = await finderResponse.json()
+            if (finderData.redirect) {
+              // Redirect to the correct ID
+              router.replace(`/video/${finderData.newId}`)
+              return
+            } else if (finderData.availableVideos && finderData.availableVideos.length > 0) {
+              // Show available videos instead of error
+              setRelatedVideos(finderData.availableVideos.map((v: any) => ({
+                id: v.id,
+                title: v.title,
+                author: '',
+                courseId: '',
+                courseName: 'Available Video',
+                youtubeUrl: ''
+              })))
+            }
+          }
           setNotFound(true)
         }
       } else {
@@ -232,17 +271,53 @@ export default function VideoPage() {
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
         <Header />
         <section className="pt-20 pb-8 px-4">
-          <div className="max-w-6xl mx-auto text-center py-20">
-            <h1 className="text-3xl font-bold text-white mb-4">Video Not Found</h1>
-            <p className="text-gray-400 mb-8">
-              The video you're looking for doesn't exist or has been removed.
-            </p>
-            <a
-              href="/courses"
-              className="inline-block bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 py-3 rounded-lg transition-colors"
-            >
-              Back to Courses
-            </a>
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-white text-2xl">❌</span>
+              </div>
+              <h1 className="text-3xl font-bold text-white mb-4">Video Not Found</h1>
+              <p className="text-gray-400 mb-2">
+                The video ID <code className="bg-gray-700 px-2 py-1 rounded text-yellow-400">{id}</code> doesn't exist.
+              </p>
+              <p className="text-gray-400 mb-8">
+                This might be an old link or the video may have been moved.
+              </p>
+              
+              {relatedVideos.length > 0 && (
+                <div className="mt-8">
+                  <h3 className="text-xl font-bold text-white mb-6">Available Videos:</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                    {relatedVideos.slice(0, 6).map((availableVideo) => (
+                      <div key={availableVideo.id} className="bg-gray-800 rounded-lg p-4 hover:bg-gray-700 transition-colors">
+                        <h4 className="text-white font-semibold mb-2 text-sm">{availableVideo.title}</h4>
+                        <button
+                          onClick={() => router.push(`/video/${availableVideo.id}`)}
+                          className="w-full bg-blue-500 hover:bg-blue-600 text-white text-sm py-2 px-4 rounded transition-colors"
+                        >
+                          Watch Video
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex gap-4 justify-center mt-8">
+                <button
+                  onClick={() => router.push('/courses')}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 py-3 rounded-lg transition-colors"
+                >
+                  Browse All Courses
+                </button>
+                <button
+                  onClick={() => router.back()}
+                  className="bg-gray-600 hover:bg-gray-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+                >
+                  Go Back
+                </button>
+              </div>
+            </div>
           </div>
         </section>
         <Footer />
@@ -283,34 +358,49 @@ export default function VideoPage() {
               <div className="bg-gray-900 rounded-2xl p-6 mb-6">
                 <h1 className="text-2xl font-bold text-white mb-4">{video.title}</h1>
                 
-                <div className="flex items-center justify-between mb-4">
+                {/* Creator Info */}
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center">
+                    <span className="text-black font-bold text-lg">
+                      {video.authorName ? video.authorName.charAt(0) : '👤'}
+                    </span>
+                  </div>
                   <div>
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center">
-                        <span className="text-black font-bold text-lg">
-                          {authorProfile?.name ? authorProfile.name.charAt(0) : '👤'}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="text-yellow-400 font-semibold text-lg">
-                          {authorProfile?.name || 'Developer'}
-                        </p>
-                        <p className="text-sm text-gray-400">
-                          {authorProfile?.project_name ? `Project: ${authorProfile.project_name}` : 'Blockchain Developer'}
-                        </p>
-                      </div>
-                    </div>
+                    <p className="text-yellow-400 font-semibold text-lg">
+                      Created by: {video.authorName || 'Developer'}
+                    </p>
                     <p className="text-sm text-gray-400">
-                      From: <span className="text-gray-300">{video.courseName}</span>
+                      {authorProfile?.project_name ? `Project: ${authorProfile.project_name}` : 'Blockchain Developer'}
                     </p>
                   </div>
                 </div>
 
+                {/* Module/Course Info */}
+                <div className="mb-6 p-4 bg-gray-800 rounded-lg border-l-4 border-yellow-500">
+                  <h3 className="text-lg font-semibold text-yellow-400 mb-2">📚 About the Module</h3>
+                  <p className="text-white font-medium mb-1">
+                    Module: <span className="text-gray-300">{video.courseName}</span>
+                  </p>
+                  {video.courseDescription && (
+                    <p className="text-gray-300 leading-relaxed">
+                      {video.courseDescription}
+                    </p>
+                  )}
+                </div>
+
+                {/* Video Description */}
                 {video.description && (
-                  <div className="border-t border-gray-700 pt-4">
+                  <div className="mb-6 p-4 bg-gray-800 rounded-lg border-l-4 border-blue-500">
+                    <h3 className="text-lg font-semibold text-blue-400 mb-2">🎥 About this Video</h3>
                     <p className="text-gray-300 leading-relaxed">{video.description}</p>
                   </div>
                 )}
+
+                {/* Additional Info */}
+                <div className="flex items-center justify-between text-sm text-gray-400 pt-4 border-t border-gray-700">
+                  <span>Course: {video.courseName}</span>
+                  <span>Instructor: {video.authorName || 'Developer'}</span>
+                </div>
               </div>
 
               {/* Comments Section */}
@@ -396,12 +486,12 @@ export default function VideoPage() {
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center">
                     <span className="text-black font-bold text-sm">
-                      {authorProfile?.name ? authorProfile.name.charAt(0) : '👤'}
+                      {video.authorName ? video.authorName.charAt(0) : '👤'}
                     </span>
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-white">
-                      More from {authorProfile?.name || 'Developer'}
+                      More from {video.authorName || 'Developer'}
                     </h3>
                     {authorProfile?.project_name && (
                       <p className="text-sm text-yellow-400">
