@@ -1,7 +1,7 @@
-# Build settings for static export
+# Build settings for Next.js server-side rendering
 [build]
-  publish = "out"
-  command = "npm run netlify:build"
+  publish = ".next"
+  command = "npm run build"
   functions = "netlify/functions"
 
 # Environment variables for build
@@ -34,8 +34,10 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# SPA fallback for Next.js - but exclude function paths
+# Next.js server-side rendering - no SPA fallback needed
+# Functions will be handled by Next.js server
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
+  from = "/.netlify/functions/*"
+  to = "/.netlify/functions/:splat"
   status = 200
+  force = true

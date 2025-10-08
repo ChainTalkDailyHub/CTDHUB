@@ -2,9 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  // Netlify deployment optimization
-  output: process.env.NETLIFY ? 'export' : undefined,
-  trailingSlash: process.env.NETLIFY ? true : false,
+  // Remove static export to enable dynamic routes
+  // output: process.env.NETLIFY ? 'export' : undefined,
+  trailingSlash: false,
   images: {
     remotePatterns: [
       {
@@ -21,8 +21,8 @@ const nextConfig = {
       },
     ],
     formats: ['image/webp', 'image/avif'],
-    // Netlify image optimization
-    unoptimized: process.env.NETLIFY ? true : false,
+    // Remove unoptimized for server-side rendering
+    // unoptimized: process.env.NETLIFY ? true : false,
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
