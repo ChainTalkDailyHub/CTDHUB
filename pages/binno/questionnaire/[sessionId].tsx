@@ -261,9 +261,9 @@ export default function SkillCompassQuestionnaire() {
 
       const data = await response.json()
       
-      // Redirect to professional report page
+      // Redirect to professional report page using static route
       if (data.report) {
-        router.push(`/report/${data.sessionId}`)
+        router.push(`/report?id=${data.sessionId}`)
       } else {
         // Fallback to showing analysis in current page
         setFinalReport(data.analysis || 'Analysis completed successfully')

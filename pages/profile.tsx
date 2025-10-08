@@ -172,7 +172,7 @@ export default function UserProfile() {
                     </div>
                     
                     <button
-                      onClick={() => router.push(`/report/${report.session_id}`)}
+                      onClick={() => router.push(`/report?id=${report.session_id}`)}
                       className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"
                     >
                       View Report
