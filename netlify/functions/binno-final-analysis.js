@@ -107,6 +107,9 @@ exports.handler = async (event, context) => {
     }
 
     console.log('💾 ATTEMPTING DATABASE SAVE...')
+    console.log('🔗 Supabase URL:', SUPABASE_URL)
+    console.log('🔑 Has Supabase key:', !!SUPABASE_ANON_KEY)
+    console.log('📊 Session ID for save:', sessionId)
     
     // Database save
     let saveSuccess = false
@@ -125,23 +128,30 @@ exports.handler = async (event, context) => {
       console.log('📝 Inserting to Supabase...', {
         user_address: insertData.user_address,
         session_id: insertData.session_id,
-        score: insertData.score
+        score: insertData.score,
+        has_report_data: !!insertData.report_data
       })
       
+      console.log('🔧 About to call supabase.from...')
       const { data, error } = await supabase
         .from('user_analysis_reports')
         .insert([insertData])
         .select()
         .single()
 
+      console.log('📬 Supabase insert completed')
+      console.log('📊 Insert result data:', !!data)
+      console.log('❌ Insert result error:', !!error)
+
       if (error) {
-        console.error('❌ Supabase error:', error)
+        console.error('❌ Supabase error details:', JSON.stringify(error, null, 2))
         saveError = error.message
       } else {
-        console.log('✅ SAVED TO DATABASE!', data.id)
+        console.log('✅ SAVED TO DATABASE!', data?.id)
         saveSuccess = true
         
         // Verify immediately
+        console.log('🔍 Verifying save...')
         const { data: verification, error: verifyError } = await supabase
           .from('user_analysis_reports')
           .select('id, score, created_at')
@@ -163,10 +173,15 @@ exports.handler = async (event, context) => {
     report.dbSaveStatus = {
       success: saveSuccess,
       error: saveError,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      debugInfo: {
+        supabaseUrl: SUPABASE_URL,
+        hasKey: !!SUPABASE_ANON_KEY,
+        sessionId: sessionId
+      }
     }
 
-    console.log('✅ Returning response...')
+    console.log('✅ Returning response with debug info...')
     return {
       statusCode: 200,
       headers,
@@ -174,7 +189,12 @@ exports.handler = async (event, context) => {
         report,
         totalAnswers: userAnswers.length,
         sessionId,
-        dbSaveSuccess: saveSuccess
+        dbSaveSuccess: saveSuccess,
+        debugInfo: {
+          saveAttempted: true,
+          saveSuccess: saveSuccess,
+          saveError: saveError
+        }
       })
     }
 
