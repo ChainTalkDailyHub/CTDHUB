@@ -7,7 +7,12 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-// Initialize OpenAI
+// Initialize OpenAI - MANDATORY for AI analysis
+if (!process.env.OPENAI_API_KEY) {
+  console.error('❌ CRITICAL: OpenAI API key not configured!')
+  console.error('❌ CTD Skill Compass requires AI analysis - cannot use fallback templates')
+}
+
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 }) : null
@@ -28,14 +33,18 @@ function calculateScore(userAnswers) {
   return Math.round((totalScore / (userAnswers.length * 10)) * 100)
 }
 
-// AI-powered analysis generation
+// AI-powered analysis generation - MANDATORY, NO FALLBACK
 async function generateAnalysisWithAI(userAnswers, score) {
-  console.log('🤖 Starting AI analysis generation...')
+  console.log('🤖 Starting MANDATORY AI analysis generation...')
   
+  // CRITICAL: AI is mandatory for CTD Skill Compass
   if (!openai) {
-    console.log('⚠️ OpenAI not configured, falling back to template analysis')
-    return generateFallbackAnalysis(userAnswers, score)
+    const errorMsg = 'CRITICAL ERROR: OpenAI API key not configured. CTD Skill Compass requires AI-powered analysis for accurate assessment. Please configure OPENAI_API_KEY environment variable.'
+    console.error('❌', errorMsg)
+    throw new Error(errorMsg)
   }
+
+  console.log('✅ OpenAI configured - proceeding with AI analysis')
 
   try {
     const questionsAndAnswers = userAnswers.map((answer, index) => 
@@ -44,43 +53,50 @@ async function generateAnalysisWithAI(userAnswers, score) {
       `
     ).join('\n\n')
 
-    const prompt = `Generate a comprehensive Web3 project readiness analysis based on ${userAnswers.length} detailed questionnaire responses.
+    const prompt = `You are an expert Web3/blockchain consultant conducting a comprehensive project readiness analysis.
 
-PROJECT OVERVIEW (from Question 1):
+CRITICAL INSTRUCTIONS:
+- Analyze ALL ${userAnswers.length} detailed questionnaire responses
+- Provide SPECIFIC insights based on the user's actual answers
+- Reference CONCRETE details from their responses to prove personalization
+- Give professional-grade assessment suitable for business stakeholders
+- Focus on actionable recommendations based on demonstrated knowledge
+
+PROJECT DETAILS FROM USER:
 ${userAnswers[0]?.user_response || 'Not provided'}
 
-COMPLETE USER RESPONSES:
+COMPLETE USER RESPONSES TO ANALYZE:
 ${questionsAndAnswers}
 
 ANALYSIS REQUIREMENTS:
-1. Provide overall project readiness score validation (current calculated score: ${score})
-2. Identify specific strengths demonstrated in responses
-3. Highlight areas needing improvement or further development
-4. Provide actionable recommendations for next steps
-5. Assess technical knowledge level demonstrated
-6. Evaluate business strategy understanding
+1. Overall project readiness score assessment (validate calculated score: ${score}%)
+2. Identify SPECIFIC strengths demonstrated in their responses
+3. Highlight PRECISE areas needing improvement with evidence
+4. Provide ACTIONABLE recommendations for next steps
+5. Assess technical knowledge level shown through answers
+6. Evaluate business strategy understanding from responses
 7. Comment on BNB Chain ecosystem fit and opportunities
-8. Reference specific details from their answers to show personalization
+8. REFERENCE specific details from answers to show true personalization
 
-Return a JSON object with this exact structure:
+Return a JSON object with this EXACT structure:
 {
-  "executive_summary": "2-3 sentence high-level assessment and recommendation",
-  "strengths": ["strength 1", "strength 2", "strength 3", "strength 4"],
-  "improvement_areas": ["area 1", "area 2", "area 3", "area 4"],
-  "recommendations": ["rec 1", "rec 2", "rec 3", "rec 4"],
-  "action_plan": ["step 1", "step 2", "step 3", "step 4", "step 5"],
-  "risk_assessment": "Detailed risk evaluation paragraph",
-  "next_steps": ["next 1", "next 2", "next 3", "next 4", "next 5"]
+  "executive_summary": "2-3 sentence high-level assessment referencing their specific project and responses",
+  "strengths": ["specific strength 1 with evidence from responses", "specific strength 2 with evidence", "specific strength 3 with evidence", "specific strength 4 with evidence"],
+  "improvement_areas": ["specific area 1 with gaps identified from answers", "specific area 2 with context", "specific area 3 with evidence", "specific area 4 with reasoning"],
+  "recommendations": ["actionable recommendation 1 based on their answers", "recommendation 2 with context", "recommendation 3 based on gaps", "recommendation 4 for growth"],
+  "action_plan": ["immediate step 1 for their specific project", "step 2 for short term", "step 3 for medium term", "step 4 for long term", "step 5 for sustainability"],
+  "risk_assessment": "Detailed paragraph identifying key risks specific to their project and responses, with mitigation strategies",
+  "next_steps": ["immediate next action based on assessment", "follow-up action for their project", "long-term action for growth", "networking/learning action", "validation/testing action"]
 }
 
-Focus on being specific and actionable based on their actual responses.`
+CRITICAL: Reference specific details from their responses throughout the analysis to prove this is personalized, not template-based.`
 
     const response = await openai.chat.completions.create({
       model: 'gpt-4',
       messages: [
         {
           role: 'system',
-          content: 'You are an expert Web3/blockchain consultant providing comprehensive project assessments. Generate detailed analysis reports based on user questionnaire responses. Always return valid JSON.'
+          content: 'You are an expert Web3/blockchain consultant providing comprehensive project assessments. Generate detailed, personalized analysis reports based on user questionnaire responses. Always return valid JSON with specific evidence from user responses. This is a professional assessment tool - provide enterprise-grade insights.'
         },
         {
           role: 'user',
@@ -88,16 +104,37 @@ Focus on being specific and actionable based on their actual responses.`
         }
       ],
       temperature: 0.7,
-      max_tokens: 2000
+      max_tokens: 2500
     })
 
     const aiResponse = response.choices[0]?.message?.content
     if (!aiResponse) {
-      throw new Error('No response from AI')
+      throw new Error('No response from AI - OpenAI returned empty response')
     }
 
     console.log('✅ AI analysis generated successfully')
-    const aiAnalysis = JSON.parse(aiResponse)
+    console.log('📄 AI Response length:', aiResponse.length, 'characters')
+    
+    let aiAnalysis
+    try {
+      aiAnalysis = JSON.parse(aiResponse)
+      console.log('✅ AI response parsed successfully as JSON')
+    } catch (parseError) {
+      console.error('❌ Failed to parse AI response as JSON:', parseError)
+      console.error('🔍 AI Response content:', aiResponse.substring(0, 500) + '...')
+      throw new Error(`AI returned invalid JSON: ${parseError.message}`)
+    }
+
+    // Validate that AI response has all required fields
+    const requiredFields = ['executive_summary', 'strengths', 'improvement_areas', 'recommendations', 'action_plan', 'risk_assessment', 'next_steps']
+    const missingFields = requiredFields.filter(field => !aiAnalysis[field])
+    
+    if (missingFields.length > 0) {
+      console.error('❌ AI response missing required fields:', missingFields)
+      throw new Error(`AI response incomplete - missing fields: ${missingFields.join(', ')}`)
+    }
+
+    console.log('✅ AI analysis validated - all required fields present')
 
     // Build the complete report structure
     const analysisData = {
@@ -110,74 +147,30 @@ Focus on being specific and actionable based on their actual responses.`
       metadata: {
         totalQuestions: userAnswers.length,
         completionTime: 'Assessment completed',
-        analysisVersion: 'Binno AI v2.0 - GPT-4 Powered',
-        generatedBy: 'AI'
+        analysisVersion: 'Binno AI v3.0 - GPT-4 Powered (Mandatory AI)',
+        generatedBy: 'AI',
+        aiModel: 'gpt-4',
+        validationPassed: true
       }
     }
     
     return analysisData
 
   } catch (error) {
-    console.error('❌ AI analysis failed:', error)
-    console.log('🔄 Falling back to template analysis')
-    return generateFallbackAnalysis(userAnswers, score)
+    console.error('❌ CRITICAL: AI analysis failed completely:', error)
+    console.error('� Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    })
+    
+    // NO FALLBACK - AI is mandatory for CTD Skill Compass
+    throw new Error(`MANDATORY AI ANALYSIS FAILED: ${error.message}. CTD Skill Compass requires AI-powered analysis. Please ensure OpenAI API key is configured and valid.`)
   }
 }
 
-// Fallback template analysis (original logic)
-function generateFallbackAnalysis(userAnswers, score) {
-  const analysisData = {
-    reportId: `report_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    userAddress: '',
-    sessionId: `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    timestamp: new Date().toISOString(),
-    overallScore: score,
-    analysis: {
-      executive_summary: `Based on your comprehensive ${userAnswers.length}-question assessment, you demonstrate strong engagement with Web3 and blockchain technologies. Your Binno AI assessment score of ${score}% reflects your current knowledge level and provides insights for your professional development journey.`,
-      strengths: [
-        "Active learning approach to Web3 technologies",
-        "Demonstrated interest in blockchain innovation",
-        "Commitment to professional development in DeFi",
-        "Understanding of decentralized technology concepts"
-      ],
-      improvement_areas: [
-        "Expand hands-on experience with smart contracts",
-        "Deepen understanding of DeFi protocols and mechanics", 
-        "Strengthen knowledge of blockchain security practices",
-        "Develop practical skills in Web3 development tools"
-      ],
-      recommendations: [
-        "Focus on practical projects using testnet environments",
-        "Join Web3 communities for networking and collaborative learning",
-        "Complete specialized courses in your areas of interest",
-        "Build a portfolio of blockchain projects to showcase skills"
-      ],
-      action_plan: [
-        "Set up development environment for smart contract testing",
-        "Complete foundational courses in blockchain development",
-        "Participate in Web3 hackathons and community events",
-        "Create and deploy your first DeFi application",
-        "Establish connections with other Web3 professionals"
-      ],
-      risk_assessment: `Based on your responses, you show a ${score >= 70 ? 'strong' : score >= 50 ? 'moderate' : 'developing'} foundation for success in Web3. Continue building technical skills while maintaining focus on practical application and industry networking.`,
-      next_steps: [
-        "Continue with CTD Skill Compass learning modules",
-        "Apply knowledge through hands-on blockchain projects",
-        "Connect with Web3 professionals and mentors",
-        "Stay updated with latest DeFi and blockchain trends",
-        "Consider advanced certifications in your chosen specialization"
-      ]
-    },
-    metadata: {
-      totalQuestions: userAnswers.length,
-      completionTime: 'Assessment completed',
-      analysisVersion: 'Binno AI v2.0 - Template Fallback',
-      generatedBy: 'Template'
-    }
-  }
-  
-  return analysisData
-}
+// NO FALLBACK FUNCTION - AI IS MANDATORY FOR CTD SKILL COMPASS
+// All analysis must be generated by OpenAI GPT-4 for accurate assessment
 
 exports.handler = async (event, context) => {
   const headers = {
@@ -197,6 +190,23 @@ exports.handler = async (event, context) => {
 
   try {
     console.log('🚀 Binno AI Final Analysis - Starting...')
+    console.log('🔑 OpenAI API Key configured:', !!process.env.OPENAI_API_KEY)
+    
+    // CRITICAL: Validate AI is available before processing
+    if (!openai) {
+      console.error('❌ CRITICAL ERROR: OpenAI not configured!')
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ 
+          error: 'AI analysis service unavailable',
+          details: 'CTD Skill Compass requires OpenAI API configuration for analysis. Please contact administrator.',
+          errorCode: 'AI_NOT_CONFIGURED'
+        })
+      }
+    }
+    
+    console.log('✅ AI service validated - proceeding with analysis')
     console.log('Event body:', event.body)
     
     let requestData
