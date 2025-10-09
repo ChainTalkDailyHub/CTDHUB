@@ -138,7 +138,11 @@ export default function SkillCompassQuestionnaire() {
       
       console.log('📤 Request data:', JSON.stringify(requestData, null, 2))
       
-      const response = await fetch('/.netlify/functions/binno-generate-question', {
+      // Use local API endpoint when running locally
+      const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+      const apiEndpoint = isLocalhost ? '/api/binno/generate-question' : '/.netlify/functions/binno-generate-question'
+      
+      const response = await fetch(apiEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -154,12 +158,40 @@ export default function SkillCompassQuestionnaire() {
         throw new Error(errorData.error || `AI Question Generation failed: ${response.status}`)
       }
 
-      const data = await response.json()
+      // Try to parse JSON with better error handling
+      let data
+      try {
+        const responseText = await response.text()
+        console.log('🔍 Raw response:', responseText.substring(0, 200) + '...')
+        data = JSON.parse(responseText)
+      } catch (parseError) {
+        console.error('❌ JSON Parse Error:', parseError)
+        console.error('🔍 Response was not valid JSON, using fallback')
+        throw new Error('Invalid JSON response from API')
+      }
       console.log('✅ Question generated successfully:', data.question.question_text.substring(0, 50) + '...')
       return data.question
     } catch (error) {
       console.error('💥 AI Question Generation Failed:', error)
-      throw error
+      
+      // Check if it's a JSON parsing error
+      if (error instanceof SyntaxError && error.message.includes('JSON')) {
+        console.error('🔍 JSON Parse Error - Response was not valid JSON')
+      }
+      
+      // Fallback question if API fails completely
+      const fallbackQuestion = {
+        id: `q${nextQuestionNumber}_fallback_${Date.now()}`,
+        question_text: `Question ${nextQuestionNumber}: Please describe your approach to ${nextQuestionNumber === 2 ? 'technical architecture and smart contract security' : nextQuestionNumber === 3 ? 'tokenomics and economic model' : nextQuestionNumber <= 5 ? 'market analysis and competitive positioning' : nextQuestionNumber <= 8 ? 'governance and community structure' : nextQuestionNumber <= 12 ? 'risk management and security audits' : 'future planning and scalability'} for your Web3 project.`,
+        context: `Fallback question ${nextQuestionNumber} for Web3 project assessment`,
+        stage: nextQuestionNumber <= 3 ? 'project_overview' : nextQuestionNumber <= 6 ? 'technical_assessment' : nextQuestionNumber <= 9 ? 'business_strategy' : nextQuestionNumber <= 12 ? 'implementation_planning' : 'final_evaluation',
+        difficulty_level: (nextQuestionNumber <= 4 ? 'beginner' : nextQuestionNumber <= 8 ? 'intermediate' : nextQuestionNumber <= 12 ? 'advanced' : 'expert') as 'beginner' | 'intermediate' | 'advanced' | 'expert',
+        bnb_relevance: 80,
+        critical_factors: ['project_planning', 'technical_understanding', 'business_strategy']
+      }
+      
+      console.log('🔄 Using fallback question due to API error')
+      return fallbackQuestion
     }
   }
 
@@ -264,7 +296,8 @@ export default function SkillCompassQuestionnaire() {
         setIsCompleted(true)
         
         // Save session ID for future reference
-        localStorage.setItem('ctdhub:last-assessment', sessionId)
+        const sessionIdStr = Array.isArray(sessionId) ? sessionId[0] : sessionId || 'unknown'
+        localStorage.setItem('ctdhub:last-assessment', sessionIdStr)
         localStorage.setItem('ctdhub:last-score', data.score.toString())
         
         console.log('Assessment completed and saved')
@@ -371,8 +404,12 @@ export default function SkillCompassQuestionnaire() {
           <div className="bg-ctd-panel rounded-3xl shadow-2xl border border-ctd-border p-8">
             {/* Header */}
             <div className="text-center mb-8">
-              <div className="w-20 h-20 bg-gradient-to-r from-ctd-yellow to-ctd-holo rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-3xl">🎯</span>
+              <div className="w-20 h-20 bg-gradient-to-r from-ctd-yellow to-ctd-holo rounded-full flex items-center justify-center mx-auto mb-4 overflow-hidden">
+                <img 
+                  src="/images/CTDHUB.png" 
+                  alt="CTDHUB Logo" 
+                  className="w-16 h-16 object-contain"
+                />
               </div>
               <h1 className="text-4xl font-bold text-ctd-text mb-4">
                 Assessment Complete!

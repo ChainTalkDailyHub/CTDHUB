@@ -140,12 +140,21 @@ Return ONLY the question text, no formatting, no JSON, just the question.`
       // Handle both JSON and plain text responses
       let questionData: any
       try {
+        // Try to parse as JSON first
         questionData = JSON.parse(aiResponse)
+        console.log('✅ Successfully parsed AI response as JSON')
       } catch (parseError) {
-        console.log('JSON parse error, treating as plain text:', parseError)
+        console.log('⚠️ JSON parse error, treating as plain text:', parseError)
+        console.log('📄 Raw AI response:', aiResponse.substring(0, 200) + '...')
+        
         // If JSON parsing fails, treat as plain text question
         questionData = {
-          question_text: aiResponse.trim()
+          question_text: aiResponse.trim(),
+          context: 'AI generated plain text response',
+          stage: this.determineStageFromAnswers(previousAnswers),
+          difficulty_level: this.getDifficultyLevel(questionNumber),
+          bnb_relevance: 70,
+          critical_factors: ['general_web3_knowledge']
         }
       }
 
@@ -245,11 +254,14 @@ Generate a question that reveals new insights about the user's Web3 project capa
             content: `You are an expert Web3/blockchain consultant analyzing a comprehensive project assessment. Generate a detailed skill analysis report.
 
             ANALYSIS REQUIREMENTS:
-            - Provide specific, actionable insights
-            - Rate skills on 0-100 scale based on demonstrated knowledge
-            - Focus on BNB Chain ecosystem alignment
-            - Give concrete next steps and recommendations
-            - Highlight both strengths and improvement areas
+            - Provide specific, actionable insights based on actual responses
+            - Rate skills on 0-100 scale based on demonstrated knowledge depth
+            - Focus on BNB Chain ecosystem alignment and opportunities
+            - Give concrete next steps and recommendations with specific resources
+            - Highlight both strengths and improvement areas with evidence
+            - Provide detailed study plans for identified gaps
+            - Include specific learning resources and courses
+            - Reference exact quotes from user responses as evidence
             
             Return a JSON object with this structure:
             {
@@ -261,11 +273,29 @@ Generate a question that reveals new insights about the user's Web3 project capa
                 "bnb_chain_alignment": 80,
                 "overall_score": 80
               },
-              "recommendations": ["Specific recommendation 1", "Specific recommendation 2"],
-              "strengths": ["Demonstrated strength 1", "Demonstrated strength 2"],
-              "improvement_areas": ["Area to improve 1", "Area to improve 2"],
-              "next_steps": ["Actionable step 1", "Actionable step 2"],
-              "ai_analysis_narrative": "Comprehensive analysis in paragraph form"
+              "recommendations": ["Specific recommendation with evidence from responses"],
+              "strengths": ["Demonstrated strength with specific example from answers"],
+              "improvement_areas": ["Specific area to improve with explanation why"],
+              "study_plan": [
+                {
+                  "area": "Smart Contract Security",
+                  "priority": "High",
+                  "resources": ["Solidity documentation", "OpenZeppelin contracts", "Security audit guides"],
+                  "timeframe": "2-3 weeks",
+                  "evidence": "User showed limited security awareness in Q3 response"
+                }
+              ],
+              "learning_resources": [
+                {
+                  "topic": "DeFi Protocols",
+                  "type": "Course",
+                  "name": "DeFi Fundamentals Course",
+                  "url": "https://example.com",
+                  "reason": "Based on gaps identified in tokenomics understanding"
+                }
+              ],
+              "next_steps": ["Immediate actionable step 1", "Immediate actionable step 2"],
+              "ai_analysis_narrative": "Comprehensive analysis referencing specific user responses and providing detailed improvement roadmap"
             }`
           },
           {
@@ -324,7 +354,17 @@ ANALYSIS FOCUS AREAS:
 4. Project Readiness: Planning depth, execution capability, resource awareness
 5. BNB Chain Alignment: Understanding of BNB Chain features, ecosystem integration potential
 
-Provide detailed analysis with specific evidence from their responses. Rate each area 0-100 based on demonstrated knowledge and thinking depth.`
+DETAILED ANALYSIS REQUIREMENTS:
+- Analyze each response individually for depth and accuracy
+- Identify specific knowledge gaps with evidence from responses
+- Provide targeted learning recommendations for each gap
+- Suggest specific courses, documentation, and resources
+- Create a prioritized study plan based on project needs
+- Reference exact quotes from user responses as evidence
+- Provide realistic timelines for skill development
+- Focus on practical, actionable improvements
+
+Provide detailed analysis with specific evidence from their responses. Rate each area 0-100 based on demonstrated knowledge and thinking depth. Include specific study recommendations with resources and timelines.`
   }
 
   // Generate professional analysis report

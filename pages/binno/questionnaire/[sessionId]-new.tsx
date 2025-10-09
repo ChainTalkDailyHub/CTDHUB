@@ -92,25 +92,63 @@ export default function SkillCompassQuestionnaire() {
     
     console.log('📤 Request data:', JSON.stringify(requestData, null, 2))
     
-    const response = await fetch('/.netlify/functions/binno-generate-question', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestData)
-    })
+    try {
+      // Use local API endpoint when running locally
+      const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+      const apiEndpoint = isLocalhost ? '/api/binno/generate-question' : '/.netlify/functions/binno-generate-question'
+      
+      const response = await fetch(apiEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData)
+      })
 
-    console.log('📥 Response status:', response.status)
+      console.log('📥 Response status:', response.status)
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        console.error('❌ Error response:', errorData)
+        throw new Error(errorData.error || `AI Question Generation failed: ${response.status}`)
+      }
+
+      // Try to parse JSON with better error handling
+      let data
+      try {
+        const responseText = await response.text()
+        console.log('🔍 Raw response:', responseText.substring(0, 200) + '...')
+        data = JSON.parse(responseText)
+      } catch (parseError) {
+        console.error('❌ JSON Parse Error:', parseError)
+        console.error('🔍 Response was not valid JSON, using fallback')
+        throw new Error('Invalid JSON response from API')
+      }
+      
+      console.log('✅ Question generated successfully:', data.question.question_text.substring(0, 50) + '...')
+      return data.question
+    } catch (error) {
+      console.error('💥 AI Question Generation Failed:', error)
+      
+      // Check if it's a JSON parsing error
+      if (error instanceof SyntaxError && error.message.includes('JSON')) {
+        console.error('🔍 JSON Parse Error - Response was not valid JSON')
+      }
     
-    if (!response.ok) {
-      const errorData = await response.json()
-      console.error('❌ Error response:', errorData)
-      throw new Error(errorData.error || `AI Question Generation failed: ${response.status}`)
+    // Fallback question if API fails completely
+    const fallbackQuestion = {
+      id: `q${nextQuestionNumber}_fallback_${Date.now()}`,
+      question_text: `Question ${nextQuestionNumber}: Please describe your approach to ${nextQuestionNumber === 2 ? 'technical architecture and smart contract security' : nextQuestionNumber === 3 ? 'tokenomics and economic model' : nextQuestionNumber <= 5 ? 'market analysis and competitive positioning' : nextQuestionNumber <= 8 ? 'governance and community structure' : nextQuestionNumber <= 12 ? 'risk management and security audits' : 'future planning and scalability'} for your Web3 project.`,
+      context: `Fallback question ${nextQuestionNumber} for Web3 project assessment`,
+      stage: nextQuestionNumber <= 3 ? 'project_overview' : nextQuestionNumber <= 6 ? 'technical_assessment' : nextQuestionNumber <= 9 ? 'business_strategy' : nextQuestionNumber <= 12 ? 'implementation_planning' : 'final_evaluation',
+      difficulty_level: (nextQuestionNumber <= 4 ? 'beginner' : nextQuestionNumber <= 8 ? 'intermediate' : nextQuestionNumber <= 12 ? 'advanced' : 'expert') as 'beginner' | 'intermediate' | 'advanced' | 'expert',
+      bnb_relevance: 80,
+      critical_factors: ['project_planning', 'technical_understanding', 'business_strategy']
     }
-
-    const data = await response.json()
-    console.log('✅ Question generated successfully:', data.question.question_text.substring(0, 50) + '...')
-    return data.question
+    
+    console.log('🔄 Using fallback question due to API error')
+    return fallbackQuestion
+  }
   }, [answers])
 
   // Gerar relatório final
@@ -249,7 +287,12 @@ export default function SkillCompassQuestionnaire() {
           <div className="bg-ctd-panel rounded-3xl shadow-2xl border border-ctd-border p-8">
             <div className="text-center mb-8">
               <h1 className="text-4xl font-bold text-ctd-text mb-4">
-                🎯 Your CTD Skill Compass Analysis
+                <img 
+                  src="/images/CTDHUB.png" 
+                  alt="CTDHUB Logo" 
+                  className="w-8 h-8 inline-block mr-3"
+                />
+                Your CTD Skill Compass Analysis
               </h1>
               <p className="text-ctd-mute text-lg">
                 Based on your {answers.length} detailed responses

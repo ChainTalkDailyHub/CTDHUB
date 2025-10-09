@@ -40,14 +40,34 @@ Context:
 Rules:
 - If answers are positive/good: acknowledge strengths and suggest improvements if any.
 - If answers show gaps: point out exactly what's wrong and what to study next.
-- Keep it concise but actionable.
+- Provide specific learning resources and study plans for identified gaps.
+- Include realistic timelines for skill development.
+- Reference specific quotes from user responses as evidence.
+- Keep it concise but actionable with detailed study recommendations.
 - Return JSON with keys exactly:
   {
     "executive_summary": string,
     "strengths": string[],
     "weaknesses": string[],
     "improvements": string[],
-    "study_plan": string[],
+    "study_plan": [
+      {
+        "area": string,
+        "priority": "High|Medium|Low",
+        "resources": string[],
+        "timeframe": string,
+        "evidence": string
+      }
+    ],
+    "learning_resources": [
+      {
+        "topic": string,
+        "type": "Course|Documentation|Tutorial|Community",
+        "name": string,
+        "url": string,
+        "reason": string
+      }
+    ],
     "risks": string[],
     "next_actions": string[]
   }
@@ -86,12 +106,27 @@ ${condensed}`;
 
 function sanitizeReport(r: any) {
   const safeArr = (x: any) => Array.isArray(x) ? x.filter(Boolean).map(String) : [];
+  const safeStr = (x: any) => typeof x === 'string' ? x : '';
+  
   return {
-    executive_summary: String(r?.executive_summary || ''),
+    executive_summary: safeStr(r?.executive_summary),
     strengths: safeArr(r?.strengths),
     weaknesses: safeArr(r?.weaknesses),
     improvements: safeArr(r?.improvements),
-    study_plan: safeArr(r?.study_plan),
+    study_plan: Array.isArray(r?.study_plan) ? r.study_plan.map((item: any) => ({
+      area: safeStr(item?.area),
+      priority: safeStr(item?.priority),
+      resources: safeArr(item?.resources),
+      timeframe: safeStr(item?.timeframe),
+      evidence: safeStr(item?.evidence)
+    })) : [],
+    learning_resources: Array.isArray(r?.learning_resources) ? r.learning_resources.map((item: any) => ({
+      topic: safeStr(item?.topic),
+      type: safeStr(item?.type),
+      name: safeStr(item?.name),
+      url: safeStr(item?.url),
+      reason: safeStr(item?.reason)
+    })) : [],
     risks: safeArr(r?.risks),
     next_actions: safeArr(r?.next_actions),
   };
@@ -114,8 +149,26 @@ function buildFallbackJSON(userAnswers: any[], score: number, language = 'en') {
       en ? 'Practice on testnets with small guided tasks' : 'Praticar em testnets com tarefas guiadas'
     ],
     study_plan: [
-      en ? 'Finish an ERC-20 & ERC-721 mini-series' : 'Concluir uma mini-série de ERC-20 e ERC-721',
-      en ? 'Study security checklists (reentrancy, auth, pause)' : 'Estudar checklists de segurança (reentrancy, auth, pause)'
+      {
+        area: en ? 'Smart Contract Development' : 'Desenvolvimento de Smart Contracts',
+        priority: 'High',
+        resources: [
+          en ? 'Solidity Documentation' : 'Documentação Solidity',
+          en ? 'OpenZeppelin Contracts' : 'Contratos OpenZeppelin',
+          en ? 'Remix IDE Tutorials' : 'Tutoriais Remix IDE'
+        ],
+        timeframe: en ? '2-3 weeks' : '2-3 semanas',
+        evidence: en ? 'Limited smart contract experience demonstrated' : 'Pouca experiência com smart contracts demonstrada'
+      }
+    ],
+    learning_resources: [
+      {
+        topic: en ? 'Web3 Development' : 'Desenvolvimento Web3',
+        type: 'Course',
+        name: en ? 'Web3 Development Fundamentals' : 'Fundamentos de Desenvolvimento Web3',
+        url: 'https://web3.university',
+        reason: en ? 'Based on gaps in blockchain knowledge' : 'Baseado em lacunas no conhecimento de blockchain'
+      }
     ],
     risks: [
       en ? 'Deploying without audits or code reviews' : 'Deploy sem auditorias ou code reviews'
