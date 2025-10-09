@@ -17,62 +17,159 @@ const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 }) : null
 
-// Enhanced scoring function with quality assessment
+// Enhanced scoring function with individual question-response analysis
 function calculateScore(userAnswers) {
   if (!userAnswers || userAnswers.length === 0) return 0
   
   let totalScore = 0
-  let qualityPenalties = 0
+  let totalQuestions = userAnswers.length
+  let detailedAnalysis = []
   
-  for (const answer of userAnswers) {
-    if (answer.user_response && answer.user_response.trim().length > 0) {
-      const response = answer.user_response.trim()
-      const responseLength = response.length
-      
-      // Base score from length
-      let answerScore = Math.min(10, responseLength / 20)
-      
-      // Quality checks - severe penalties for poor responses
-      const lowQualityPatterns = [
-        /^(.)\1{5,}/, // Repeated characters (aaaaaaa...)
-        /^[^a-zA-Z]*$/, // Only special characters
-        /^(test|asdf|qwerty|123|abc){2,}/, // Common test strings
-        /^(.{1,3})\1{3,}/, // Short repeated patterns
-        /^[a-z]{20,}$/, // Long random letter strings
-        /^\s*$/, // Only whitespace
-      ]
-      
-      // Check for low quality patterns
-      const hasLowQuality = lowQualityPatterns.some(pattern => pattern.test(response.toLowerCase()))
-      
-      if (hasLowQuality) {
-        answerScore = Math.max(0, answerScore * 0.1) // 90% penalty
-        qualityPenalties += 5
-      }
-      
-      // Additional checks for meaningful content
-      const words = response.split(/\s+/).filter(word => word.length > 2)
-      const uniqueWords = new Set(words.map(w => w.toLowerCase()))
-      
-      if (words.length < 3) {
-        answerScore *= 0.3 // 70% penalty for very short answers
-        qualityPenalties += 2
-      }
-      
-      if (uniqueWords.size < words.length * 0.5) {
-        answerScore *= 0.5 // 50% penalty for repetitive content
-        qualityPenalties += 1
-      }
-      
-      totalScore += answerScore
+  // Check for repeated responses (major red flag)
+  const responses = userAnswers.map(a => (a.user_response || '').trim())
+  const uniqueResponses = new Set(responses)
+  const hasRepeatedResponses = uniqueResponses.size < responses.length
+  const globalRepeatPenalty = hasRepeatedResponses ? 60 : 0 // Major penalty for copy-paste
+  
+  userAnswers.forEach((answer, index) => {
+    let questionScore = 70 // Base score
+    const response = (answer.user_response || '').toLowerCase().trim()
+    const question = answer.question || ''
+    
+    // Individual question-response relevance analysis
+    let relevanceScore = analyzeRelevance(question, response)
+    questionScore = Math.max(questionScore * (relevanceScore / 100), 10)
+    
+    // Quality penalties
+    if (response.length < 10) {
+      questionScore -= 50
+    } else if (response.length < 20) {
+      questionScore -= 30
+    }
+    
+    // Pattern detection for low-quality responses
+    const repeatedCharsPattern = /(.)\1{5,}/
+    const meaninglessPattern = /^[a-zA-Z]{0,3}([a-zA-Z])\1{10,}/
+    const randomPattern = /^[a-z]{20,}$/
+    
+    if (repeatedCharsPattern.test(response)) {
+      questionScore -= 70
+    }
+    
+    if (meaninglessPattern.test(response)) {
+      questionScore -= 60
+    }
+    
+    if (randomPattern.test(response)) {
+      questionScore -= 50
+    }
+    
+    // Apply global repeat penalty
+    questionScore -= globalRepeatPenalty
+    
+    // Content quality assessment
+    const hasProperStructure = response.includes(' ') && response.split(' ').length >= 3
+    const hasTechnicalTerms = /(blockchain|smart contract|defi|nft|token|crypto|web3|dapp|dao|bnb|ethereum)/i.test(response)
+    
+    if (!hasProperStructure) {
+      questionScore -= 40
+    }
+    
+    if (hasTechnicalTerms) {
+      questionScore += 10
+    }
+    
+    // Ensure bounds
+    questionScore = Math.max(5, Math.min(100, questionScore))
+    
+    // Store detailed analysis for each question
+    detailedAnalysis.push({
+      questionIndex: index + 1,
+      question: question,
+      response: answer.user_response,
+      score: questionScore,
+      relevanceScore: relevanceScore,
+      issues: getResponseIssues(response, question, hasRepeatedResponses)
+    })
+    
+    totalScore += questionScore
+  })
+  
+  // Store detailed analysis for use in AI prompt
+  global.detailedQuestionAnalysis = detailedAnalysis
+  
+  return Math.round(totalScore / totalQuestions)
+}
+
+// Analyze relevance between question and response
+function analyzeRelevance(question, response) {
+  if (!question || !response) return 20
+  
+  const questionLower = question.toLowerCase()
+  const responseLower = response.toLowerCase()
+  
+  // Check if response is generic project description (red flag)
+  const isGenericProject = /project|platform|token|network|bnb|web3|edtech/.test(responseLower)
+  const isAnsweringQuestion = checkQuestionKeywords(questionLower, responseLower)
+  
+  if (isGenericProject && !isAnsweringQuestion) {
+    return 15 // Very low relevance for copy-paste project descriptions
+  }
+  
+  if (isAnsweringQuestion) {
+    return 80 // Good relevance
+  }
+  
+  return 40 // Medium relevance
+}
+
+// Check if response contains keywords relevant to the question
+function checkQuestionKeywords(question, response) {
+  const keywordMapping = {
+    'experience': ['year', 'month', 'time', 'since', 'ago', 'experience', 'worked'],
+    'technical': ['code', 'programming', 'language', 'framework', 'tool'],
+    'challenge': ['difficult', 'problem', 'issue', 'challenge', 'obstacle'],
+    'team': ['team', 'member', 'people', 'colleague', 'developer'],
+    'project': ['project', 'built', 'created', 'developed', 'working'],
+    'blockchain': ['blockchain', 'smart contract', 'defi', 'token', 'crypto'],
+    'goal': ['goal', 'objective', 'plan', 'want', 'hope', 'aim']
+  }
+  
+  for (const [category, keywords] of Object.entries(keywordMapping)) {
+    if (question.includes(category)) {
+      return keywords.some(keyword => response.includes(keyword))
     }
   }
   
-  // Apply overall quality penalty
-  let finalScore = Math.round((totalScore / (userAnswers.length * 10)) * 100)
-  finalScore = Math.max(0, finalScore - qualityPenalties * 2) // Additional penalties
+  return false
+}
+
+// Get specific issues with a response
+function getResponseIssues(response, question, hasGlobalRepeats) {
+  const issues = []
   
-  return Math.min(100, finalScore)
+  if (hasGlobalRepeats) {
+    issues.push('Identical response used for multiple questions')
+  }
+  
+  if (response.length < 10) {
+    issues.push('Response too short to be meaningful')
+  }
+  
+  if (/(.)\1{5,}/.test(response)) {
+    issues.push('Contains repeated characters (spam-like)')
+  }
+  
+  if (!/\s/.test(response) || response.split(' ').length < 3) {
+    issues.push('Lacks proper sentence structure')
+  }
+  
+  const relevance = analyzeRelevance(question, response)
+  if (relevance < 30) {
+    issues.push('Response not relevant to the specific question asked')
+  }
+  
+  return issues
 }
 
 // AI-powered analysis generation - MANDATORY, NO FALLBACK
@@ -95,49 +192,62 @@ async function generateAnalysisWithAI(userAnswers, score) {
       `
     ).join('\n\n')
 
-    const prompt = `You are an expert Web3/blockchain consultant conducting a RIGOROUS professional assessment. You must be BRUTALLY HONEST about response quality.
+    const prompt = `You are an expert Web3/blockchain consultant conducting a RIGOROUS professional assessment. You must analyze EACH question-response pair individually.
 
 CRITICAL ANALYSIS INSTRUCTIONS:
-- Analyze EVERY response for actual substance and meaning
-- HEAVILY PENALIZE nonsensical, random, or low-effort responses
-- If responses are clearly inadequate (random characters, repeated letters, meaningless text), CALL IT OUT
-- Be REALISTIC about knowledge levels demonstrated
-- Don't be artificially positive - this is a professional assessment
-- Score harshly for poor responses but fairly recognize genuine effort
+- Analyze EVERY question-response pair for relevance and quality
+- HEAVILY PENALIZE copy-paste responses used for multiple questions  
+- If the same response is used for different questions, CALL IT OUT as lazy/inadequate
+- Be REALISTIC about knowledge levels demonstrated in each specific answer
+- Score harshly for irrelevant responses but fairly recognize genuine effort
+- Focus on question-specific relevance, not generic project descriptions
 
 PROJECT DETAILS FROM USER:
 ${userAnswers[0]?.user_response || 'Not provided'}
 
-COMPLETE USER RESPONSES TO ANALYZE:
-${questionsAndAnswers}
+DETAILED QUESTION-BY-QUESTION ANALYSIS:
+${global.detailedQuestionAnalysis ? 
+  global.detailedQuestionAnalysis.map(qa => 
+    `QUESTION ${qa.questionIndex}: ${qa.question}
+    RESPONSE: "${qa.response}"
+    INDIVIDUAL SCORE: ${qa.score}/100
+    RELEVANCE SCORE: ${qa.relevanceScore}/100
+    ISSUES DETECTED: ${qa.issues.length > 0 ? qa.issues.join('; ') : 'None'}
+    `).join('\n') : 'Analysis not available'}
 
-QUALITY ASSESSMENT:
-- Current calculated score: ${score}% (this accounts for response quality)
-- If score is very low (under 30%), responses are likely inadequate
-- If responses contain random characters or nonsense, DOCUMENT THIS
+OVERALL CALCULATED SCORE: ${score}% 
+${global.detailedQuestionAnalysis && global.detailedQuestionAnalysis.filter(qa => qa.issues.includes('Identical response used for multiple questions')).length > 0 ? 
+  '⚠️ WARNING: IDENTICAL RESPONSES DETECTED - This indicates copy-paste behavior and lack of individual question consideration' : ''}
 
 ANALYSIS REQUIREMENTS:
-1. HONEST assessment of response quality and substance
-2. Identify REAL strengths only if genuinely demonstrated
-3. Be SPECIFIC about inadequacies in responses
-4. Provide REALISTIC recommendations based on actual knowledge shown
-5. If responses are poor quality, focus on fundamental learning needs
-6. Don't inflate capabilities - be truthful about readiness level
-7. Score should reflect ACTUAL demonstrated competence
-8. Reference specific response quality issues if present
+1. HONEST assessment focusing on question-response relevance
+2. SPECIFICALLY call out copy-paste responses and their inappropriateness  
+3. Evaluate if responses actually answer what was asked
+4. Be REALISTIC about demonstrated knowledge per question
+5. Don't inflate scores for generic/irrelevant responses
+6. Reference specific question-response mismatches
+7. Provide question-specific improvement recommendations
 
-Return a JSON object with this EXACT structure (be honest in your assessments):
+Return a JSON object with this EXACT structure (be brutally honest):
 {
-  "executive_summary": "HONEST 2-3 sentence assessment of actual knowledge demonstrated and response quality",
-  "strengths": ["only list GENUINE strengths if demonstrated", "don't fabricate positives", "be realistic about what was shown", "max 4 items"],
-  "improvement_areas": ["specific areas needing work based on responses", "address response quality if poor", "fundamental knowledge gaps", "professional communication skills if needed"],
-  "recommendations": ["realistic next steps for current level", "address basic learning if responses inadequate", "specific to demonstrated knowledge gaps", "actionable and honest"],
-  "action_plan": ["immediate steps for their actual level", "don't assume advanced capabilities", "start with fundamentals if needed", "progressive learning path", "realistic timeline"],
-  "risk_assessment": "HONEST paragraph about readiness level, response quality concerns, and genuine risks for Web3 development",
-  "next_steps": ["practical first steps for current level", "don't overestimate capabilities", "focus on knowledge building if needed", "realistic progression", "quality over quantity"]
+  "executive_summary": "HONEST assessment of response quality, relevance, and any copy-paste issues detected",
+  "question_analysis": [
+    {
+      "question_number": 1,
+      "relevance_assessment": "How well the response addressed this specific question",
+      "quality_issues": ["specific issues with this response", "irrelevance problems", "copy-paste detection"],
+      "improvement_needed": "What should have been answered for this question"
+    }
+  ],
+  "strengths": ["only list GENUINE strengths if demonstrated", "question-specific competencies shown", "max 4 items"],
+  "improvement_areas": ["question-specific gaps", "copy-paste issues", "relevance problems", "lack of individual consideration"],
+  "recommendations": ["how to properly answer different question types", "avoid generic responses", "demonstrate specific knowledge"],
+  "action_plan": ["learn to read questions carefully", "provide question-specific answers", "avoid copy-paste responses"],
+  "risk_assessment": "HONEST paragraph about readiness based on question-answering ability and response quality",
+  "next_steps": ["improve question comprehension", "develop specific technical knowledge", "practice targeted responses"]
 }
 
-CRITICAL: If responses were low-quality, random, or nonsensical, DOCUMENT THIS HONESTLY. This is a professional assessment, not a participation trophy.`
+CRITICAL: If responses were copied across questions or irrelevant to specific questions asked, DOCUMENT THIS CLEARLY. Professional assessments require question-specific answers.`
 
     const response = await openai.chat.completions.create({
       model: 'gpt-4',
