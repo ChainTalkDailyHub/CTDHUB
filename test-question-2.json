@@ -1,0 +1,16 @@
+{
+  "questionNumber": 2,
+  "previousAnswers": [
+    {
+      "question_id": "q1",
+      "question_text": "Tell me about your Web3 project",
+      "user_response": "My project is a DeFi platform for yield farming",
+      "timestamp": 1234567890
+    }
+  ],
+  "sessionContext": {
+    "user_expertise_level": "intermediate",
+    "project_focus": "DeFi platform",
+    "previous_responses_summary": "DeFi platform for yield farming"
+  }
+}

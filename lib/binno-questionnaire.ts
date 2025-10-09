@@ -56,6 +56,7 @@ export interface SkillAssessmentReport {
 
 export class BinnoAI {
   private openai: OpenAI
+  private questionCache: Map<string, Question> = new Map()
 
   constructor(apiKey?: string) {
     const key = apiKey || process.env.OPENAI_API_KEY
@@ -78,6 +79,13 @@ export class BinnoAI {
       throw new Error('AI integration is mandatory for Skill Compass. OpenAI API key not configured.')
     }
 
+    // Check cache first for common question patterns
+    const cacheKey = this.generateCacheKey(questionNumber, previousAnswers.length)
+    if (this.questionCache.has(cacheKey)) {
+      console.log('🚀 Using cached question for faster response')
+      return this.questionCache.get(cacheKey)!
+    }
+
     try {
       // Para a primeira pergunta, sempre perguntar sobre o projeto (em inglês)
       if (questionNumber === 1) {
@@ -94,44 +102,30 @@ export class BinnoAI {
       }
 
       console.log('Generating AI question for question number:', questionNumber)
-      const prompt = this.buildQuestionGenerationPrompt(questionNumber, previousAnswers, sessionContext)
+      const prompt = `Generate question ${questionNumber} about ${this.getQuestionTopics(questionNumber)} for a Web3 project.`
       
       const response = await this.openai.chat.completions.create({
-        model: 'gpt-4',
+        model: 'gpt-3.5-turbo',
         messages: [
           {
             role: 'system',
-            content: `You are an expert Web3/blockchain advisor for the Skill Compass system. Generate intelligent, adaptive questions for a Web3 project development assessment.
-            
-            CRITICAL REQUIREMENTS:
-            - Generate questions IN ENGLISH ONLY
-            - Build upon previous user responses to create personalized questions
-            - Extract key information from the first answer about the project
-            - Focus on BNB Chain ecosystem when relevant
-            - Adapt difficulty based on user's demonstrated knowledge level
-            - Cover different aspects: technical implementation, business strategy, tokenomics, community building, partnerships, security, regulatory compliance
-            - Questions should reveal decision-making patterns and strategic thinking
-            - Total questionnaire is 15 questions - make each one valuable
-            - NEVER repeat questions or ask about information already provided
-            
-            Return a JSON object with this exact structure:
-            {
-              "id": "unique_question_id",
-              "question_text": "Your adaptive question here",
-              "context": "Why this question is important",
-              "stage": "current_assessment_stage",
-              "difficulty_level": "beginner|intermediate|advanced|expert",
-              "bnb_relevance": 85,
-              "critical_factors": ["factor1", "factor2", "factor3"]
-            }`
+            content: `You are a Web3 expert. Generate ONE question for question ${questionNumber} of a Web3 project assessment.
+
+CONTEXT: ${sessionContext.user_expertise_level} level user
+PROJECT: ${sessionContext.project_focus}
+PREVIOUS: ${sessionContext.previous_responses_summary}
+
+Generate a focused question about: ${this.getQuestionTopics(questionNumber)}
+
+Return ONLY the question text, no formatting, no JSON, just the question.`
           },
           {
             role: 'user',
             content: prompt
           }
         ],
-        temperature: 0.7,
-        max_tokens: 800
+        temperature: 0.5,
+        max_tokens: 300,
       })
 
       console.log('OpenAI response received')
@@ -143,13 +137,16 @@ export class BinnoAI {
 
       console.log('Parsing AI response:', aiResponse.substring(0, 100) + '...')
       
+      // Handle both JSON and plain text responses
       let questionData: any
       try {
         questionData = JSON.parse(aiResponse)
       } catch (parseError) {
-        console.log('JSON parse error:', parseError)
-        console.log('Raw AI response:', aiResponse)
-        throw new Error(`Failed to parse AI response: ${parseError}`)
+        console.log('JSON parse error, treating as plain text:', parseError)
+        // If JSON parsing fails, treat as plain text question
+        questionData = {
+          question_text: aiResponse.trim()
+        }
       }
 
       const finalQuestion = {
@@ -241,7 +238,7 @@ Generate a question that reveals new insights about the user's Web3 project capa
       const analysisPrompt = this.buildAnalysisPrompt(userAnswers)
       
       const response = await this.openai.chat.completions.create({
-        model: 'gpt-4',
+        model: 'gpt-3.5-turbo',
         messages: [
           {
             role: 'system',
@@ -344,7 +341,7 @@ Provide detailed analysis with specific evidence from their responses. Rate each
       const professionalPrompt = this.buildProfessionalAnalysisPrompt(userAnswers, sessionContext)
       
       const response = await this.openai.chat.completions.create({
-        model: 'gpt-4',
+        model: 'gpt-3.5-turbo',
         messages: [
           {
             role: 'system',
@@ -423,5 +420,53 @@ REQUIRED REPORT STRUCTURE (return as JSON):
 }
 
 Base all analysis on specific evidence from the user's responses. Provide actionable, professional-grade insights suitable for business stakeholders.`
+  }
+
+  // Cache management methods
+  private generateCacheKey(questionNumber: number, answerCount: number): string {
+    // Create cache key based on question number and context
+    const context = answerCount > 0 ? 'with_context' : 'initial'
+    return `q${questionNumber}_${context}`
+  }
+
+  private clearCache(): void {
+    this.questionCache.clear()
+  }
+
+  private getQuestionTopics(questionNumber: number): string {
+    const topics = [
+      'project overview and vision',
+      'technical architecture and smart contracts',
+      'tokenomics and economic model',
+      'security considerations and audits',
+      'governance and community structure',
+      'market analysis and competition',
+      'development roadmap and milestones',
+      'team expertise and experience',
+      'funding and financial planning',
+      'regulatory compliance and legal',
+      'partnerships and integrations',
+      'marketing and user acquisition',
+      'scalability and performance',
+      'risk management and mitigation',
+      'success metrics and KPIs'
+    ]
+    
+    return topics[questionNumber - 1] || 'general Web3 development'
+  }
+
+  private getQuestionStage(questionNumber: number): string {
+    if (questionNumber <= 3) return 'project_overview'
+    if (questionNumber <= 6) return 'technical_assessment'
+    if (questionNumber <= 9) return 'business_strategy'
+    if (questionNumber <= 12) return 'implementation_planning'
+    return 'final_evaluation'
+  }
+
+  private getDifficultyLevel(questionNumber: number): 'beginner' | 'intermediate' | 'advanced' | 'expert' {
+    if (questionNumber <= 4) return 'beginner'
+    if (questionNumber <= 8) return 'intermediate'
+    if (questionNumber <= 12) return 'advanced'
+    return 'expert'
   }
 }
