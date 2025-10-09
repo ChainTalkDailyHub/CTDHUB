@@ -236,49 +236,40 @@ export default function SkillCompassQuestionnaire() {
     setError('')
 
     try {
-      // Get current user wallet address if connected
-      const userAddress = localStorage.getItem('ctdhub:wallet')
-      
       const response = await fetch('/.netlify/functions/binno-final-analysis', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          sessionId: sessionId,
           userAnswers: finalAnswers,
-          userAddress: userAddress,
-          sessionContext: {
-            user_id: userId,
-            session_id: sessionId
-          }
+          language: currentLanguage
         })
       })
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || `AI Analysis failed: ${response.status}`)
+        throw new Error(errorData.error || `Analysis generation failed: ${response.status}`)
       }
 
       const data = await response.json()
       
-      // SOLUTION: Show report directly in current page instead of redirecting
-      // This avoids the 404 error on /report page
-      if (data.report) {
-        // Extract the analysis content from the report
-        const analysisContent = data.report.analysis?.executive_summary || 
-                               data.analysis || 
-                               'Your assessment has been completed successfully!'
-        setFinalReport(analysisContent)
+      if (data.success && data.analysis) {
+        console.log(`✅ Analysis generated successfully with score: ${data.score}%`)
+        console.log(`💾 Saved to database: ${data.saved ? 'Yes' : 'No'}`)
+        
+        // Display analysis inline in current page
+        setFinalReport(data.analysis)
         setIsCompleted(true)
         
         // Save session ID for future reference
-        localStorage.setItem('ctdhub:last-assessment', data.sessionId)
+        localStorage.setItem('ctdhub:last-assessment', sessionId)
+        localStorage.setItem('ctdhub:last-score', data.score.toString())
         
-        console.log('Report displayed inline, session saved:', data.sessionId)
+        console.log('Assessment completed and saved')
       } else {
-        // Fallback to showing analysis in current page
-        setFinalReport(data.analysis || 'Analysis completed successfully')
-        setIsCompleted(true)
+        throw new Error(data.error || 'Failed to generate analysis')
       }
 
     } catch (error) {
