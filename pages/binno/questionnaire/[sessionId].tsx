@@ -261,9 +261,20 @@ export default function SkillCompassQuestionnaire() {
 
       const data = await response.json()
       
-      // Redirect to professional report page using static route
+      // SOLUTION: Show report directly in current page instead of redirecting
+      // This avoids the 404 error on /report page
       if (data.report) {
-        router.push(`/report?id=${data.sessionId}`)
+        // Extract the analysis content from the report
+        const analysisContent = data.report.analysis?.executive_summary || 
+                               data.analysis || 
+                               'Your assessment has been completed successfully!'
+        setFinalReport(analysisContent)
+        setIsCompleted(true)
+        
+        // Save session ID for future reference
+        localStorage.setItem('ctdhub:last-assessment', data.sessionId)
+        
+        console.log('Report displayed inline, session saved:', data.sessionId)
       } else {
         // Fallback to showing analysis in current page
         setFinalReport(data.analysis || 'Analysis completed successfully')
@@ -367,32 +378,69 @@ export default function SkillCompassQuestionnaire() {
       <div className="min-h-screen bg-ctd-bg py-8">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-ctd-panel rounded-3xl shadow-2xl border border-ctd-border p-8">
+            {/* Header */}
             <div className="text-center mb-8">
+              <div className="w-20 h-20 bg-gradient-to-r from-ctd-yellow to-ctd-holo rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-3xl">🎯</span>
+              </div>
               <h1 className="text-4xl font-bold text-ctd-text mb-4">
-                {t.skillAnalysisTitle}
+                Assessment Complete!
               </h1>
               <p className="text-ctd-mute text-lg">
-                {formatString(t.basedOnAnswers, { count: answers.length.toString() })}
+                Based on your {answers.length} detailed responses
               </p>
+              <div className="mt-4 px-4 py-2 bg-ctd-yellow/20 rounded-lg inline-block">
+                <span className="text-ctd-yellow font-semibold">✅ Report Generated Successfully</span>
+              </div>
             </div>
 
-            <div className="prose prose-lg max-w-none text-ctd-text">
-              <div dangerouslySetInnerHTML={{ __html: finalReport.replace(/\n/g, '<br />') }} />
+            {/* Report Content */}
+            <div className="bg-ctd-bg rounded-2xl p-6 mb-8 border border-ctd-border">
+              <h2 className="text-2xl font-bold text-ctd-text mb-4 flex items-center">
+                <span className="mr-3">📋</span>
+                Your CTD Skill Compass Analysis
+              </h2>
+              <div className="prose prose-lg max-w-none text-ctd-text leading-relaxed">
+                <div dangerouslySetInnerHTML={{ __html: finalReport.replace(/\n/g, '<br />') }} />
+              </div>
             </div>
 
-            <div className="mt-8 flex justify-center space-x-4">
+            {/* Action Buttons */}
+            <div className="flex flex-wrap gap-4 justify-center">
               <button
-                onClick={() => router.push('/binno-ai')}
+                onClick={() => router.push('/binno/questionnaire')}
                 className="px-6 py-3 bg-ctd-yellow text-black rounded-lg hover:bg-ctd-yellow-dark transition-colors font-medium"
               >
-                {t.backToBinno}
+                🔄 Take Another Assessment
+              </button>
+              <button
+                onClick={() => router.push('/binno-ai')}
+                className="px-6 py-3 bg-ctd-panel border border-ctd-border text-ctd-text rounded-lg hover:bg-ctd-border/30 transition-colors font-medium"
+              >
+                💬 Chat with Binno AI
+              </button>
+              <button
+                onClick={() => router.push('/courses')}
+                className="px-6 py-3 bg-ctd-panel border border-ctd-border text-ctd-text rounded-lg hover:bg-ctd-border/30 transition-colors font-medium"
+              >
+                📚 Explore Courses
               </button>
               <button
                 onClick={() => window.print()}
-                className="px-6 py-3 bg-ctd-panel border border-ctd-border text-ctd-text rounded-lg hover:bg-ctd-border transition-colors font-medium"
+                className="px-6 py-3 bg-ctd-panel border border-ctd-border text-ctd-text rounded-lg hover:bg-ctd-border/30 transition-colors font-medium"
               >
-                {t.downloadReport}
+                🖨️ Print Report
               </button>
+            </div>
+
+            {/* Footer Info */}
+            <div className="mt-8 pt-6 border-t border-ctd-border text-center">
+              <p className="text-ctd-mute text-sm">
+                💾 Your assessment has been saved. Session ID: {sessionId}
+              </p>
+              <p className="text-ctd-mute text-xs mt-2">
+                ⏰ Completed on {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}
+              </p>
             </div>
           </div>
         </div>
@@ -513,9 +561,9 @@ export default function SkillCompassQuestionnaire() {
                       {t.processing}
                     </span>
                   ) : questionNumber >= 15 ? (
-                    t.completeAssessment
+                    t.completeAssessment  // ← "Complete Assessment"
                   ) : (
-                    t.nextQuestion
+                    t.nextQuestion        // ← "Next Question →"
                   )}
                 </button>
               )}
