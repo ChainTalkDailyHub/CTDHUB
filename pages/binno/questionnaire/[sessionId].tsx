@@ -408,7 +408,7 @@ export default function SkillCompassQuestionnaire() {
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-4 justify-center">
               <button
-                onClick={() => router.push('/binno/questionnaire')}
+                onClick={() => router.push('/questionnaire')}
                 className="px-6 py-3 bg-ctd-yellow text-black rounded-lg hover:bg-ctd-yellow-dark transition-colors font-medium"
               >
                 🔄 Take Another Assessment
