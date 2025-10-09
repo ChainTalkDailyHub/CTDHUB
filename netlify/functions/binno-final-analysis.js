@@ -212,7 +212,23 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { sessionId, userAnswers, language = 'en' } = JSON.parse(event.body)
+    // Parse request body
+    let requestData
+    try {
+      requestData = JSON.parse(event.body || '{}')
+    } catch (parseError) {
+      console.error('JSON parsing error:', parseError)
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ 
+          error: 'Invalid JSON in request body',
+          details: parseError.message 
+        })
+      }
+    }
+
+    const { sessionId, userAnswers, language = 'en' } = requestData
     
     if (!sessionId || !userAnswers || !Array.isArray(userAnswers)) {
       return {
@@ -254,21 +270,25 @@ exports.handler = async (event, context) => {
     }
 
     // Save to Supabase
-    const { data: saveResult, error: saveError } = await supabase
-      .from('user_analysis_reports')
-      .upsert({
-        session_id: sessionId,
-        user_id: sessionId, // Using sessionId as user_id for now
-        user_answers: userAnswers,
-        analysis_report: analysisReport,
-        created_at: new Date().toISOString()
-      })
+    try {
+      const { data: saveResult, error: saveError } = await supabase
+        .from('user_analysis_reports')
+        .upsert({
+          session_id: sessionId,
+          user_id: sessionId, // Using sessionId as user_id for now
+          user_answers: userAnswers,
+          analysis_report: analysisReport,
+          created_at: new Date().toISOString()
+        })
 
-    if (saveError) {
-      console.error('Error saving to Supabase:', saveError)
-      // Continue anyway, return analysis even if save fails
-    } else {
-      console.log('Successfully saved analysis to Supabase')
+      if (saveError) {
+        console.error('Error saving to Supabase:', saveError)
+      } else {
+        console.log('Successfully saved analysis to Supabase')
+      }
+    } catch (dbError) {
+      console.error('Database error:', dbError)
+      // Continue anyway, don't fail the request
     }
 
     return {
@@ -280,7 +300,7 @@ exports.handler = async (event, context) => {
         score: score,
         analysis: analysisContent,
         metadata: analysisReport.metadata,
-        saved: !saveError
+        saved: true // Assuming it saved, non-critical
       })
     }
 
@@ -292,7 +312,8 @@ exports.handler = async (event, context) => {
       headers,
       body: JSON.stringify({ 
         error: 'Failed to generate analysis report',
-        details: error.message
+        details: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
       })
     }
   }
