@@ -236,7 +236,7 @@ export default function SkillCompassQuestionnaire() {
     setError('')
 
     try {
-      const response = await fetch('/.netlify/functions/binno-final-analysis', {
+      const response = await fetch('/api/binno-final-analysis', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
