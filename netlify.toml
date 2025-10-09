@@ -1,8 +1,7 @@
-# Build settings for static export
+# Build settings for Next.js with Netlify
 [build]
-  publish = "out"
   command = "npm run netlify:build"
-  functions = "netlify/functions"
+  publish = "out"
 
 # Environment variables for build
 [build.environment]
@@ -11,7 +10,12 @@
 
 # Functions configuration
 [functions]
+  directory = "netlify/functions"
   node_bundler = "esbuild"
+
+# Enable Next.js plugin
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
 
 # API redirects
 [[redirects]]
