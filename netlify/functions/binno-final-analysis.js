@@ -17,20 +17,62 @@ const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 }) : null
 
-// Simple scoring function
+// Enhanced scoring function with quality assessment
 function calculateScore(userAnswers) {
   if (!userAnswers || userAnswers.length === 0) return 0
   
   let totalScore = 0
+  let qualityPenalties = 0
+  
   for (const answer of userAnswers) {
     if (answer.user_response && answer.user_response.trim().length > 0) {
-      const responseLength = answer.user_response.trim().length
-      const contentQuality = Math.min(10, responseLength / 20)
-      totalScore += contentQuality
+      const response = answer.user_response.trim()
+      const responseLength = response.length
+      
+      // Base score from length
+      let answerScore = Math.min(10, responseLength / 20)
+      
+      // Quality checks - severe penalties for poor responses
+      const lowQualityPatterns = [
+        /^(.)\1{5,}/, // Repeated characters (aaaaaaa...)
+        /^[^a-zA-Z]*$/, // Only special characters
+        /^(test|asdf|qwerty|123|abc){2,}/, // Common test strings
+        /^(.{1,3})\1{3,}/, // Short repeated patterns
+        /^[a-z]{20,}$/, // Long random letter strings
+        /^\s*$/, // Only whitespace
+      ]
+      
+      // Check for low quality patterns
+      const hasLowQuality = lowQualityPatterns.some(pattern => pattern.test(response.toLowerCase()))
+      
+      if (hasLowQuality) {
+        answerScore = Math.max(0, answerScore * 0.1) // 90% penalty
+        qualityPenalties += 5
+      }
+      
+      // Additional checks for meaningful content
+      const words = response.split(/\s+/).filter(word => word.length > 2)
+      const uniqueWords = new Set(words.map(w => w.toLowerCase()))
+      
+      if (words.length < 3) {
+        answerScore *= 0.3 // 70% penalty for very short answers
+        qualityPenalties += 2
+      }
+      
+      if (uniqueWords.size < words.length * 0.5) {
+        answerScore *= 0.5 // 50% penalty for repetitive content
+        qualityPenalties += 1
+      }
+      
+      totalScore += answerScore
     }
   }
   
-  return Math.round((totalScore / (userAnswers.length * 10)) * 100)
+  // Apply overall quality penalty
+  let finalScore = Math.round((totalScore / (userAnswers.length * 10)) * 100)
+  finalScore = Math.max(0, finalScore - qualityPenalties * 2) // Additional penalties
+  
+  return Math.min(100, finalScore)
 }
 
 // AI-powered analysis generation - MANDATORY, NO FALLBACK
@@ -53,14 +95,15 @@ async function generateAnalysisWithAI(userAnswers, score) {
       `
     ).join('\n\n')
 
-    const prompt = `You are an expert Web3/blockchain consultant conducting a comprehensive project readiness analysis.
+    const prompt = `You are an expert Web3/blockchain consultant conducting a RIGOROUS professional assessment. You must be BRUTALLY HONEST about response quality.
 
-CRITICAL INSTRUCTIONS:
-- Analyze ALL ${userAnswers.length} detailed questionnaire responses
-- Provide SPECIFIC insights based on the user's actual answers
-- Reference CONCRETE details from their responses to prove personalization
-- Give professional-grade assessment suitable for business stakeholders
-- Focus on actionable recommendations based on demonstrated knowledge
+CRITICAL ANALYSIS INSTRUCTIONS:
+- Analyze EVERY response for actual substance and meaning
+- HEAVILY PENALIZE nonsensical, random, or low-effort responses
+- If responses are clearly inadequate (random characters, repeated letters, meaningless text), CALL IT OUT
+- Be REALISTIC about knowledge levels demonstrated
+- Don't be artificially positive - this is a professional assessment
+- Score harshly for poor responses but fairly recognize genuine effort
 
 PROJECT DETAILS FROM USER:
 ${userAnswers[0]?.user_response || 'Not provided'}
@@ -68,28 +111,33 @@ ${userAnswers[0]?.user_response || 'Not provided'}
 COMPLETE USER RESPONSES TO ANALYZE:
 ${questionsAndAnswers}
 
-ANALYSIS REQUIREMENTS:
-1. Overall project readiness score assessment (validate calculated score: ${score}%)
-2. Identify SPECIFIC strengths demonstrated in their responses
-3. Highlight PRECISE areas needing improvement with evidence
-4. Provide ACTIONABLE recommendations for next steps
-5. Assess technical knowledge level shown through answers
-6. Evaluate business strategy understanding from responses
-7. Comment on BNB Chain ecosystem fit and opportunities
-8. REFERENCE specific details from answers to show true personalization
+QUALITY ASSESSMENT:
+- Current calculated score: ${score}% (this accounts for response quality)
+- If score is very low (under 30%), responses are likely inadequate
+- If responses contain random characters or nonsense, DOCUMENT THIS
 
-Return a JSON object with this EXACT structure:
+ANALYSIS REQUIREMENTS:
+1. HONEST assessment of response quality and substance
+2. Identify REAL strengths only if genuinely demonstrated
+3. Be SPECIFIC about inadequacies in responses
+4. Provide REALISTIC recommendations based on actual knowledge shown
+5. If responses are poor quality, focus on fundamental learning needs
+6. Don't inflate capabilities - be truthful about readiness level
+7. Score should reflect ACTUAL demonstrated competence
+8. Reference specific response quality issues if present
+
+Return a JSON object with this EXACT structure (be honest in your assessments):
 {
-  "executive_summary": "2-3 sentence high-level assessment referencing their specific project and responses",
-  "strengths": ["specific strength 1 with evidence from responses", "specific strength 2 with evidence", "specific strength 3 with evidence", "specific strength 4 with evidence"],
-  "improvement_areas": ["specific area 1 with gaps identified from answers", "specific area 2 with context", "specific area 3 with evidence", "specific area 4 with reasoning"],
-  "recommendations": ["actionable recommendation 1 based on their answers", "recommendation 2 with context", "recommendation 3 based on gaps", "recommendation 4 for growth"],
-  "action_plan": ["immediate step 1 for their specific project", "step 2 for short term", "step 3 for medium term", "step 4 for long term", "step 5 for sustainability"],
-  "risk_assessment": "Detailed paragraph identifying key risks specific to their project and responses, with mitigation strategies",
-  "next_steps": ["immediate next action based on assessment", "follow-up action for their project", "long-term action for growth", "networking/learning action", "validation/testing action"]
+  "executive_summary": "HONEST 2-3 sentence assessment of actual knowledge demonstrated and response quality",
+  "strengths": ["only list GENUINE strengths if demonstrated", "don't fabricate positives", "be realistic about what was shown", "max 4 items"],
+  "improvement_areas": ["specific areas needing work based on responses", "address response quality if poor", "fundamental knowledge gaps", "professional communication skills if needed"],
+  "recommendations": ["realistic next steps for current level", "address basic learning if responses inadequate", "specific to demonstrated knowledge gaps", "actionable and honest"],
+  "action_plan": ["immediate steps for their actual level", "don't assume advanced capabilities", "start with fundamentals if needed", "progressive learning path", "realistic timeline"],
+  "risk_assessment": "HONEST paragraph about readiness level, response quality concerns, and genuine risks for Web3 development",
+  "next_steps": ["practical first steps for current level", "don't overestimate capabilities", "focus on knowledge building if needed", "realistic progression", "quality over quantity"]
 }
 
-CRITICAL: Reference specific details from their responses throughout the analysis to prove this is personalized, not template-based.`
+CRITICAL: If responses were low-quality, random, or nonsensical, DOCUMENT THIS HONESTLY. This is a professional assessment, not a participation trophy.`
 
     const response = await openai.chat.completions.create({
       model: 'gpt-4',
