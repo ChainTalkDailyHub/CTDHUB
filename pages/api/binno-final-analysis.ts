@@ -11,6 +11,99 @@ const supabase = (supabaseUrl && supabaseServiceKey)
   ? createClient(supabaseUrl, supabaseServiceKey)
   : null;
 
+// Parse template-based response (more reliable than JSON)
+function parseTemplateResponse(response: string, score: number) {
+  console.log('🔧 Parsing template response...');
+  
+  const sections: any = {};
+  
+  // Extract sections using regex
+  const extractSection = (sectionName: string, multiline = false) => {
+    const pattern = multiline 
+      ? new RegExp(`${sectionName}:\\s*([\\s\\S]*?)(?=\\n[A-Z_]+:|$)`, 'i')
+      : new RegExp(`${sectionName}:\\s*(.+)`, 'i');
+    const match = response.match(pattern);
+    return match ? match[1].trim() : '';
+  };
+  
+  // Extract all sections
+  sections.executive_summary = extractSection('EXECUTIVE_SUMMARY', true);
+  sections.score = extractSection('SCORE');
+  sections.strengths = extractSection('STRENGTHS', true);
+  sections.weaknesses = extractSection('WEAKNESSES', true);
+  sections.improvements = extractSection('IMPROVEMENTS', true);
+  sections.study_plan = extractSection('STUDY_PLAN', true);
+  sections.copy_paste = extractSection('COPY_PASTE_DETECTED', true);
+  
+  // Convert to list format
+  const parseList = (text: string) => {
+    if (!text) return [];
+    return text.split(/\n|\-/).filter(item => item.trim()).map(item => item.trim().replace(/^[\-\*]\s*/, ''));
+  };
+  
+  // Build final structure
+  const analysis = {
+    executive_summary: sections.executive_summary || `Assessment completed with score ${score}%. ${score < 30 ? 'Significant issues with response quality detected.' : 'Analysis shows areas for improvement.'}`,
+    strengths: parseList(sections.strengths).slice(0, 4) || (score > 40 ? ['Basic project concept provided'] : ['Limited strengths demonstrated']),
+    weaknesses: parseList(sections.weaknesses) || [
+      'Provide question-specific responses',
+      'Avoid copy-paste behavior', 
+      'Demonstrate deeper technical knowledge'
+    ],
+    improvements: parseList(sections.improvements) || [
+      'Read each question carefully',
+      'Provide targeted, specific answers',
+      'Develop technical knowledge in Web3'
+    ],
+    study_plan: sections.study_plan ? parseStudyPlan(sections.study_plan) : [{
+      area: 'Web3 Fundamentals',
+      priority: 'High',
+      resources: ['Basic blockchain concepts'],
+      timeframe: '2-4 weeks',
+      evidence: 'Based on response analysis'
+    }],
+    learning_resources: [{
+      topic: 'Web3 Development',
+      type: 'Course',
+      name: 'Blockchain Basics',
+      url: 'https://example.com',
+      reason: 'Foundation needed'
+    }],
+    risks: [`With score ${score}%, significant preparation needed`],
+    next_actions: ['Improve question comprehension', 'Develop specific knowledge']
+  };
+  
+  console.log('✅ Template parsed into structured analysis');
+  return analysis;
+}
+
+// Parse study plan section
+function parseStudyPlan(planText: string) {
+  const plans = [];
+  const items = planText.split(/AREA:|;/).filter(item => item.trim());
+  
+  for (const item of items) {
+    if (item.trim()) {
+      const parts = item.split('|').map(p => p.trim());
+      plans.push({
+        area: parts[0] || 'General Web3',
+        priority: parts[1]?.replace('PRIORITY:', '').trim() || 'Medium',
+        resources: [parts[2]?.replace('RESOURCES:', '').trim() || 'Study materials'],
+        timeframe: parts[3]?.replace('TIMEFRAME:', '').trim() || '2-4 weeks',
+        evidence: parts[4]?.replace('EVIDENCE:', '').trim() || 'Based on assessment'
+      });
+    }
+  }
+  
+  return plans.length > 0 ? plans : [{
+    area: 'Web3 Fundamentals',
+    priority: 'High',
+    resources: ['Basic concepts'],
+    timeframe: '2-4 weeks',
+    evidence: 'Foundation needed'
+  }];
+}
+
 function calculateScore(userAnswers: any[]) {
   if (!userAnswers || !userAnswers.length) return 0;
   let total = 0;
@@ -44,33 +137,30 @@ Rules:
 - Include realistic timelines for skill development.
 - Reference specific quotes from user responses as evidence.
 - Keep it concise but actionable with detailed study recommendations.
-- Return JSON with keys exactly:
-  {
-    "executive_summary": string,
-    "strengths": string[],
-    "weaknesses": string[],
-    "improvements": string[],
-    "study_plan": [
-      {
-        "area": string,
-        "priority": "High|Medium|Low",
-        "resources": string[],
-        "timeframe": string,
-        "evidence": string
-      }
-    ],
-    "learning_resources": [
-      {
-        "topic": string,
-        "type": "Course|Documentation|Tutorial|Community",
-        "name": string,
-        "url": string,
-        "reason": string
-      }
-    ],
-    "risks": string[],
-    "next_actions": string[]
-  }
+Return your analysis in this EXACT template format (no JSON, no markdown):
+
+EXECUTIVE_SUMMARY:
+[Write 2-3 sentences about overall assessment and copy-paste detection]
+
+SCORE:
+[The calculated score: ${score}]
+
+STRENGTHS:
+[List 2-4 genuine strengths if any, or write "Limited strengths demonstrated"]
+
+WEAKNESSES:
+[List 3-5 specific weakness areas including copy-paste issues]
+
+IMPROVEMENTS:
+[List 3-5 actionable improvements]
+
+STUDY_PLAN:
+[Write: AREA: [area] | PRIORITY: [High/Medium/Low] | RESOURCES: [resources] | TIMEFRAME: [timeframe] | EVIDENCE: [evidence from responses]]
+
+COPY_PASTE_DETECTED:
+[Write YES or NO, then explain if copy-paste was found]
+
+Remember: Be brutally honest about copy-paste behavior and response quality.
 
 Answers:
 ${condensed}`;
@@ -95,8 +185,8 @@ ${condensed}`;
 
     if (!resp.ok) throw new Error(`OpenAI ${resp.status}`);
     const data = await resp.json();
-    const content = data?.choices?.[0]?.message?.content || '{}';
-    const parsed = JSON.parse(content);
+    const content = data?.choices?.[0]?.message?.content || '';
+    const parsed = parseTemplateResponse(content, score);
     return sanitizeReport(parsed);
   } catch (err) {
     console.error('OpenAI error:', err);
