@@ -610,8 +610,10 @@ exports.handler = async (event, context) => {
         report: reportData,
         sessionId: sessionId,
         analysis: reportData.analysis.executive_summary,
+        score: reportData.overallScore,  // Frontend espera este campo
         success: true,
         ok: true,
+        saved: true,  // Frontend verifica este campo
         redirectUrl: `/report?id=${sessionId}`
       })
     }
