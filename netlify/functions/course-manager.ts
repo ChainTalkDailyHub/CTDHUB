@@ -128,8 +128,60 @@ async function readCoursesFromSupabase() {
 }
 
 async function writeCourseToSupabase(course: any) {
-  // Implementation for writing courses
-  return true
+  try {
+    console.log('💾 Writing course to Supabase:', course.title)
+    
+    // Insert course into courses table
+    const { data: newCourse, error: courseError } = await supabase
+      .from('courses')
+      .insert([{
+        title: course.title,
+        description: course.description,
+        author: course.author.toLowerCase(),
+        created_at: new Date(course.createdAt).toISOString(),
+        updated_at: new Date(course.updatedAt).toISOString()
+      }])
+      .select()
+      .single()
+
+    if (courseError) {
+      console.error('❌ Error creating course:', courseError)
+      return false
+    }
+
+    console.log('✅ Course created with UUID:', newCourse.id)
+
+    // Insert videos
+    if (course.videos && course.videos.length > 0) {
+      const videosToInsert = course.videos.map((video: any) => ({
+        course_id: newCourse.id,
+        title: video.title,
+        description: video.description || '',
+        youtube_url: video.youtubeUrl,
+        thumbnail: video.thumbnail,
+        order_index: video.order
+      }))
+
+      const { error: videosError } = await supabase
+        .from('course_videos')
+        .insert(videosToInsert)
+
+      if (videosError) {
+        console.error('❌ Error inserting videos:', videosError)
+        // Rollback: delete the course
+        await supabase.from('courses').delete().eq('id', newCourse.id)
+        return false
+      }
+
+      console.log(`✅ Inserted ${course.videos.length} videos`)
+    }
+
+    console.log('✅ Course and videos saved successfully')
+    return true
+  } catch (error) {
+    console.error('❌ Error in writeCourseToSupabase:', error)
+    return false
+  }
 }
 
 async function getCourseByIdFromSupabase(courseId: string) {
@@ -194,8 +246,67 @@ async function getCourseByIdFromSupabase(courseId: string) {
 }
 
 async function addVideosToSupabaseCourse(courseId: string, videos: any[]) {
-  // Implementation for adding videos
-  return true
+  try {
+    console.log('💾 Adding videos to course in Supabase:', courseId)
+    
+    // Find the course by generated ID
+    const { data: courses, error: coursesError } = await supabase
+      .from('courses')
+      .select('*')
+
+    if (coursesError) {
+      console.error('❌ Error fetching courses:', coursesError)
+      return false
+    }
+
+    const matchingCourse = courses?.find(course => generateConsistentId(course.id) === courseId)
+    
+    if (!matchingCourse) {
+      console.error('❌ Course not found for ID:', courseId)
+      return false
+    }
+
+    // Get current max order_index
+    const { data: existingVideos } = await supabase
+      .from('course_videos')
+      .select('order_index')
+      .eq('course_id', matchingCourse.id)
+      .order('order_index', { ascending: false })
+      .limit(1)
+
+    const startOrder = (existingVideos?.[0]?.order_index || 0) + 1
+
+    // Insert new videos
+    const videosToInsert = videos.map((video: any, index: number) => ({
+      course_id: matchingCourse.id,
+      title: video.title,
+      description: video.description || '',
+      youtube_url: video.youtubeUrl,
+      thumbnail: video.thumbnail,
+      order_index: startOrder + index
+    }))
+
+    const { error: videosError } = await supabase
+      .from('course_videos')
+      .insert(videosToInsert)
+
+    if (videosError) {
+      console.error('❌ Error inserting videos:', videosError)
+      return false
+    }
+
+    // Update course updated_at timestamp
+    await supabase
+      .from('courses')
+      .update({ updated_at: new Date().toISOString() })
+      .eq('id', matchingCourse.id)
+
+    console.log(`✅ Added ${videos.length} videos to course`)
+    return true
+  } catch (error) {
+    console.error('❌ Error in addVideosToSupabaseCourse:', error)
+    return false
+  }
 }
 
 // Fallback in-memory storage for when Supabase is not available

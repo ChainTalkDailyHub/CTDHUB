@@ -53,9 +53,9 @@ export const translations: Record<Language, Translations> = {
     processing: 'Processing...',
     
     // Estados de carregamento
-    generatingQuestion: '🤖 AI is analyzing your response and generating the next personalized question...',
+    generatingQuestion: '🤖 BINNO AI is analyzing your response and generating the next personalized question...',
     generatingQuestionDesc: 'This ensures each question builds upon your previous answers',
-    generatingReport: 'Generating AI Analysis...',
+    generatingReport: 'Generating BINNO AI Analysis...',
     
     // Erros e validações
     shortAnswer: 'Please provide a more detailed answer (at least 10 characters)',
@@ -92,9 +92,9 @@ export const translations: Record<Language, Translations> = {
     processing: 'Processing...',
     
     // Estados de carregamento
-    generatingQuestion: '🤖 AI is analyzing your response and generating the next personalized question...',
+    generatingQuestion: '🤖 BINNO AI is analyzing your response and generating the next personalized question...',
     generatingQuestionDesc: 'This ensures each question builds upon your previous answers',
-    generatingReport: 'Generating AI Analysis...',
+    generatingReport: 'Generating BINNO AI Analysis...',
     
     // Erros e validações
     shortAnswer: 'Please provide a more detailed answer (at least 10 characters)',

@@ -222,22 +222,23 @@ export default function SkillCompassQuestionnaire() {
         }
 
         .logo-section img {
-            height: 60px;
+            height: 70px;
             width: auto;
             object-fit: contain;
             background: transparent;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
         }
 
         .logo-fallback {
-            height: 60px;
-            width: 180px;
+            height: 70px;
+            width: 200px;
             background: rgba(0,0,0,0.1);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 22px;
+            font-size: 24px;
             color: #000;
             letter-spacing: 2px;
             border: 3px solid #000;
@@ -361,6 +362,48 @@ export default function SkillCompassQuestionnaire() {
             border-left: 2px solid #444;
         }
         
+        /* Educational Assessment Section Styles */
+        .assessment-section {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            border: 1px solid #444;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            page-break-inside: avoid;
+        }
+        
+        .section-title {
+            color: #FFCC33;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(255, 204, 51, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-content {
+            color: #e2e8f0;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        
+        .section-content p {
+            margin-bottom: 12px;
+        }
+        
+        .section-content ul {
+            margin: 0;
+            padding-left: 25px;
+        }
+        
+        .section-content li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        
         .pdf-footer {
             position: absolute;
             bottom: 0;
@@ -446,14 +489,175 @@ export default function SkillCompassQuestionnaire() {
                 </div>
             </div>
             
-            <!-- Main Analysis -->
-            <div class="analysis-content">
-                ${report.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}
-            </div>
+            <!-- Educational Assessment Sections -->
+            ${(() => {
+              // Parse the template-formatted report into structured sections
+              const sections: {
+                executive: string
+                score: string
+                strengths: string[]
+                improvements: string[]
+                recommendations: string[]
+                actionPlan: string[]
+                riskAssessment: string
+                questionAnalysis: string[]
+              } = {
+                executive: '',
+                score: '',
+                strengths: [],
+                improvements: [],
+                recommendations: [],
+                actionPlan: [],
+                riskAssessment: '',
+                questionAnalysis: []
+              }
+              
+              // Extract sections using regex patterns
+              const executiveMatch = report.match(/EXECUTIVE_SUMMARY:\s*([\s\S]*?)(?=\n\n[A-Z_]+:|$)/i)
+              if (executiveMatch) sections.executive = executiveMatch[1].trim()
+              
+              const scoreMatch = report.match(/SCORE:\s*(\d+)/i)
+              if (scoreMatch) sections.score = scoreMatch[1]
+              
+              const strengthsMatch = report.match(/STRENGTHS:\s*([\s\S]*?)(?=\n\n[A-Z_]+:|$)/i)
+              if (strengthsMatch) {
+                sections.strengths = strengthsMatch[1].trim().split('\n').filter(l => l.trim()).map(l => l.replace(/^[-•*]\s*/, ''))
+              }
+              
+              const improvementsMatch = report.match(/IMPROVEMENT_AREAS:\s*([\s\S]*?)(?=\n\n[A-Z_]+:|$)/i)
+              if (improvementsMatch) {
+                sections.improvements = improvementsMatch[1].trim().split('\n').filter(l => l.trim()).map(l => l.replace(/^[-•*]\s*/, ''))
+              }
+              
+              const recommendationsMatch = report.match(/RECOMMENDATIONS:\s*([\s\S]*?)(?=\n\n[A-Z_]+:|$)/i)
+              if (recommendationsMatch) {
+                sections.recommendations = recommendationsMatch[1].trim().split('\n').filter(l => l.trim()).map(l => l.replace(/^[-•*]\s*/, ''))
+              }
+              
+              const actionMatch = report.match(/ACTION_PLAN:\s*([\s\S]*?)(?=\n\n[A-Z_]+:|$)/i)
+              if (actionMatch) {
+                sections.actionPlan = actionMatch[1].trim().split('\n').filter(l => l.trim()).map(l => l.replace(/^[-•*]\s*/, ''))
+              }
+              
+              const riskMatch = report.match(/RISK_ASSESSMENT:\s*([\s\S]*?)(?=\n\n[A-Z_]+:|$)/i)
+              if (riskMatch) sections.riskAssessment = riskMatch[1].trim()
+              
+              const questionMatch = report.match(/QUESTION_ANALYSIS:\s*([\s\S]*?)$/i)
+              if (questionMatch) {
+                sections.questionAnalysis = questionMatch[1].trim().split(/Q\d+:/i).filter(l => l.trim())
+              }
+              
+              return `
+                <!-- Executive Summary -->
+                <div class="assessment-section">
+                  <h2 class="section-title">📊 Executive Summary</h2>
+                  <div class="section-content">
+                    <p style="line-height: 1.8; color: #e2e8f0;">${sections.executive}</p>
+                    ${sections.score ? `<div style="text-align: center; margin-top: 20px; padding: 15px; background: rgba(255, 204, 51, 0.1); border-radius: 8px; border: 1px solid rgba(255, 204, 51, 0.3);">
+                      <div style="font-size: 36px; font-weight: 700; color: #FFCC33;">${sections.score}%</div>
+                      <div style="font-size: 12px; color: #94a3b8; margin-top: 5px;">OVERALL READINESS SCORE</div>
+                    </div>` : ''}
+                  </div>
+                </div>
+                
+                <!-- Strengths -->
+                ${sections.strengths.length > 0 ? `
+                <div class="assessment-section">
+                  <h2 class="section-title">✅ Key Strengths Identified</h2>
+                  <div class="section-content">
+                    <ul style="list-style: none; padding: 0;">
+                      ${sections.strengths.map(item => `
+                        <li style="margin-bottom: 12px; padding-left: 25px; position: relative; line-height: 1.6;">
+                          <span style="position: absolute; left: 0; color: #10b981; font-weight: bold;">✓</span>
+                          ${item}
+                        </li>
+                      `).join('')}
+                    </ul>
+                  </div>
+                </div>
+                ` : ''}
+                
+                <!-- Improvement Areas -->
+                ${sections.improvements.length > 0 ? `
+                <div class="assessment-section">
+                  <h2 class="section-title">📈 Areas for Development</h2>
+                  <div class="section-content">
+                    <ul style="list-style: none; padding: 0;">
+                      ${sections.improvements.map(item => `
+                        <li style="margin-bottom: 12px; padding-left: 25px; position: relative; line-height: 1.6;">
+                          <span style="position: absolute; left: 0; color: #f59e0b; font-weight: bold;">→</span>
+                          ${item}
+                        </li>
+                      `).join('')}
+                    </ul>
+                  </div>
+                </div>
+                ` : ''}
+                
+                <!-- Recommendations -->
+                ${sections.recommendations.length > 0 ? `
+                <div class="assessment-section">
+                  <h2 class="section-title">💡 Personalized Recommendations</h2>
+                  <div class="section-content">
+                    <ul style="list-style: none; padding: 0;">
+                      ${sections.recommendations.map((item, idx) => `
+                        <li style="margin-bottom: 12px; padding-left: 30px; position: relative; line-height: 1.6;">
+                          <span style="position: absolute; left: 0; color: #8be9fd; font-weight: bold; background: rgba(139, 233, 253, 0.1); border-radius: 4px; padding: 2px 6px; font-size: 11px;">${idx + 1}</span>
+                          ${item}
+                        </li>
+                      `).join('')}
+                    </ul>
+                  </div>
+                </div>
+                ` : ''}
+                
+                <!-- Action Plan -->
+                ${sections.actionPlan.length > 0 ? `
+                <div class="assessment-section">
+                  <h2 class="section-title">🎯 Immediate Action Plan</h2>
+                  <div class="section-content">
+                    <ol style="padding-left: 20px; margin: 0;">
+                      ${sections.actionPlan.map(item => `
+                        <li style="margin-bottom: 12px; line-height: 1.6; color: #e2e8f0;">
+                          ${item}
+                        </li>
+                      `).join('')}
+                    </ol>
+                  </div>
+                </div>
+                ` : ''}
+                
+                <!-- Risk Assessment -->
+                ${sections.riskAssessment ? `
+                <div class="assessment-section">
+                  <h2 class="section-title">⚠️ Risk Assessment & Project Readiness</h2>
+                  <div class="section-content">
+                    <p style="line-height: 1.8; color: #e2e8f0;">${sections.riskAssessment.replace(/\n\n/g, '</p><p style="line-height: 1.8; color: #e2e8f0; margin-top: 15px;">')}</p>
+                  </div>
+                </div>
+                ` : ''}
+                
+                <!-- Question-by-Question Analysis -->
+                ${sections.questionAnalysis.length > 0 ? `
+                <div class="assessment-section" style="page-break-before: always;">
+                  <h2 class="section-title">📝 Detailed Question Analysis</h2>
+                  <div class="section-content">
+                    ${sections.questionAnalysis.map((analysis, idx) => `
+                      <div style="margin-bottom: 20px; padding: 15px; background: rgba(0, 0, 0, 0.3); border-left: 3px solid #8be9fd; border-radius: 6px;">
+                        <div style="font-weight: 600; color: #8be9fd; margin-bottom: 8px;">Question ${idx + 1}</div>
+                        <div style="font-size: 13px; line-height: 1.7; color: #cbd5e1;">${analysis.trim()}</div>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+                ` : ''}
+              `
+            })()}
 
-            <!-- Questions and Answers Section -->
-            <div class="questions-section">
-                <h2 class="questions-title">📝 Complete Question & Answer Review</h2>
+            <!-- Questions and Answers Reference -->
+            <div class="questions-section" style="page-break-before: always;">
+                <h2 class="questions-title">📋 Complete Q&A Reference</h2>
+                <p style="color: #94a3b8; font-size: 13px; margin-bottom: 20px;">Your original responses for reference</p>
                 ${userAnswers.map((answer, index) => `
                     <div class="question-item">
                         <div class="question-text">
