@@ -123,12 +123,10 @@ export default function Quiz() {
                     <p className="text-ctd-mute">You've completed all 10 quiz modules. Now you can burn CTD tokens!</p>
                   </div>
                   
-                  {userAddress && typeof window !== 'undefined' && (
-                    <BurnBadge 
-                      isEnabled={allModulesCompleted}
-                      userAddress={userAddress}
-                    />
-                  )}
+                  <BurnBadge 
+                    isEnabled={allModulesCompleted}
+                    userAddress={userAddress}
+                  />
                 </div>
               ) : (
                 <div className="bg-ctd-panel/50 rounded-2xl p-6 border border-ctd-border">

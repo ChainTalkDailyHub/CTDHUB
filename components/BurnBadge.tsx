@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 
 interface BurnBadgeProps {
   isEnabled: boolean
-  userAddress: string
+  userAddress?: string // Opcional, apenas para identificação
 }
 
 export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
@@ -22,22 +22,42 @@ export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
     setIsClient(true)
   }, [])
 
+  // Verificar se já foi feito burn para este usuário
+  useEffect(() => {
+    if (!isClient || !userAddress) return
+    
+    const burnKey = `quiz_burn_completed_${userAddress}`
+    const savedBurn = localStorage.getItem(burnKey)
+    
+    if (savedBurn) {
+      try {
+        const burnData = JSON.parse(savedBurn)
+        setBurnResult(burnData)
+      } catch (error) {
+        console.warn('Error parsing saved burn data:', error)
+      }
+    }
+  }, [isClient, userAddress])
+
   const handleBurn = async () => {
-    if (!isEnabled || !userAddress || !isClient) {
-      console.warn('⚠️ Burn disabled:', { isEnabled, userAddress, isClient })
+    if (!isEnabled || !isClient) {
+      console.warn('⚠️ Burn disabled:', { isEnabled, isClient })
       return
     }
     
     setIsLoading(true)
     try {
-      console.log('🔥 Iniciando processo de burn para:', userAddress)
+      console.log('🔥 Iniciando burn automático de tokens CTD...')
       
-      const response = await fetch('/.netlify/functions/burn-on-completion', {
+      const response = await fetch('/.netlify/functions/admin-burn-tokens', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userAddress }),
+        body: JSON.stringify({ 
+          userAddress: userAddress || 'anonymous',
+          amount: '1000' // 1000 tokens por quiz completo
+        }),
       })
       
       if (!response.ok) {
@@ -49,8 +69,10 @@ export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
       
       setBurnResult(result)
       
-      if (result.success && result.txHash && typeof window !== 'undefined') {
-        localStorage.setItem(`burn_tx_${userAddress}`, result.txHash)
+      // Salvar resultado para evitar duplo burn
+      if (result.success && typeof window !== 'undefined' && userAddress) {
+        const burnKey = `quiz_burn_completed_${userAddress}`
+        localStorage.setItem(burnKey, JSON.stringify(result))
       }
     } catch (error) {
       console.error('❌ Erro no burn:', error)
@@ -89,18 +111,15 @@ export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
       
       return () => clearTimeout(timeoutId)
     }
-  }, [userAddress, isEnabled])
+  }
 
-  if (!userAddress) {
+  if (!isClient) {
     return (
       <div className="bg-ctd-panel border border-ctd-border rounded-2xl p-6 max-w-md mx-auto text-center">
-        <h3 className="text-xl font-semibold text-ctd-text mb-4">🔥 Burn Proof</h3>
-        <p className="text-ctd-mute mb-4">
-          Connect your wallet to unlock the burn mechanism
-        </p>
-        <button className="px-6 py-3 bg-ctd-border text-ctd-mute rounded-lg opacity-50 cursor-not-allowed">
-          Connect Wallet Required
-        </button>
+        <div className="animate-pulse">
+          <div className="h-4 bg-ctd-border rounded w-3/4 mx-auto mb-2"></div>
+          <div className="h-4 bg-ctd-border rounded w-1/2 mx-auto"></div>
+        </div>
       </div>
     )
   }
@@ -174,22 +193,35 @@ export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
         </div>
       ) : (
         <div>
-          <p className="text-ctd-mute mb-4">
-            {isEnabled 
-              ? "🔥 Execute o burn de tokens CTD reais para provar seu conhecimento!"
-              : "📚 Complete todos os 10 módulos do quiz para desbloquear o burn"
-            }
+          <div className="text-ctd-yellow mb-4">
+            <span className="text-4xl">🔥</span>
+          </div>
+          <h4 className="text-lg font-semibold text-ctd-text mb-2">
+            Ready to Burn CTD Tokens
+          </h4>
+          <p className="text-ctd-mute mb-4 text-sm">
+            🎯 <strong>Quiz Complete!</strong> Click below to automatically burn 1000 CTD tokens from the project treasury to the burn address.
+          </p>
+          <p className="text-ctd-mute text-xs mb-6">
+            🔥 Tokens will be sent to: <code className="bg-ctd-bg px-2 py-1 rounded text-ctd-yellow">0x...dead</code>
           </p>
           <button
             onClick={handleBurn}
             disabled={!isEnabled || isLoading}
-            className={`px-6 py-3 bg-ctd-yellow text-black rounded-lg font-medium transition-colors ${
+            className={`px-8 py-3 bg-ctd-yellow text-black rounded-lg font-medium transition-all transform hover:scale-105 ${
               !isEnabled || isLoading 
                 ? 'opacity-50 cursor-not-allowed' 
-                : 'hover:bg-ctd-yellow-dark'
+                : 'hover:bg-ctd-yellow-dark shadow-glow'
             }`}
           >
-            {isLoading ? '🔥 Processing...' : '🔥 Execute Burn'}
+            {isLoading ? (
+              <span className="flex items-center">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black mr-2"></div>
+                🔥 Burning Tokens...
+              </span>
+            ) : (
+              '🔥 Burn 1000 CTD Tokens'
+            )}
           </button>
         </div>
       )}
