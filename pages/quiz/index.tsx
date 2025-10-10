@@ -12,7 +12,13 @@ export default function Quiz() {
   useEffect(() => {
     // Load completed modules from localStorage
     const completed = localStorage.getItem('completed_modules')
-    const address = localStorage.getItem('wallet_address')
+    let address = localStorage.getItem('wallet_address')
+    
+    // Se não há endereço, gerar um para demonstração
+    if (!address) {
+      address = `0x${Math.random().toString(16).substr(2, 40)}`
+      localStorage.setItem('wallet_address', address)
+    }
     
     if (completed) {
       setCompletedModules(JSON.parse(completed))
@@ -88,13 +94,36 @@ export default function Quiz() {
               </div>
             </div>
             
-            {/* Burn Badge */}
-            {userAddress && (
-              <BurnBadge 
-                isEnabled={allModulesCompleted}
-                userAddress={userAddress}
-              />
-            )}
+            {/* Burn Section - Always visible */}
+            <div className="max-w-2xl mx-auto mb-12">
+              {allModulesCompleted ? (
+                <div className="bg-gradient-to-br from-ctd-yellow/10 via-ctd-panel to-ctd-holo/10 rounded-2xl p-8 border border-ctd-yellow/20">
+                  <div className="text-center mb-6">
+                    <div className="text-6xl mb-4">🎉</div>
+                    <h3 className="text-2xl font-bold text-ctd-text mb-2">Congratulations!</h3>
+                    <p className="text-ctd-mute">You've completed all 10 quiz modules. Now you can burn CTD tokens!</p>
+                  </div>
+                  
+                  {userAddress && (
+                    <BurnBadge 
+                      isEnabled={allModulesCompleted}
+                      userAddress={userAddress}
+                    />
+                  )}
+                </div>
+              ) : (
+                <div className="bg-ctd-panel/50 rounded-2xl p-6 border border-ctd-border">
+                  <div className="text-center">
+                    <div className="text-4xl mb-3">🔒</div>
+                    <h3 className="text-lg font-semibold text-ctd-text mb-2">Burn System Locked</h3>
+                    <p className="text-ctd-mute text-sm">Complete all 10 modules to unlock the burn mechanism</p>
+                    <p className="text-ctd-yellow text-sm mt-2">
+                      {10 - completedModules.length} modules remaining
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
