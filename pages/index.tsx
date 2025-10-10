@@ -27,31 +27,38 @@ export default function Home() {
                 <Link 
                   href="/courses" 
                   className="btn-primary"
-                  aria-label="Start learning blockchain development"
+                  aria-label="Browse Courses"
                   data-animate="pulse"
                 >
-                  Start Learning
+                  Courses
+                </Link>
+                <Link 
+                  href="/binno-ai" 
+                  className="btn-ghost"
+                  aria-label="AI Chat"
+                >
+                  AI Chat
                 </Link>
                 <Link 
                   href="/quiz" 
                   className="btn-ghost"
                   aria-label="Take the Quiz"
                 >
-                  Take the Quiz
+                  Quiz
                 </Link>
                 <Link 
-                  href="/binno-ai" 
+                  href="/questionnaire" 
                   className="btn-ghost"
-                  aria-label="Try Binno AI"
+                  aria-label="CTD Skill Compass"
                 >
-                  Try Binno AI
+                  CTD Skill Compass
                 </Link>
                 <Link 
                   href="/dev" 
                   className="btn-ghost"
-                  aria-label="Dev Area"
+                  aria-label="Creator Studio"
                 >
-                  Dev Area
+                  Creator Studio
                 </Link>
               </div>
             </div>
@@ -136,7 +143,7 @@ export default function Home() {
                   <div className="w-16 h-16 bg-ctd-yellow/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-ctd-yellow/30 transition-colors duration-200">
                     <span className="text-3xl" role="img" aria-label="Books">📚</span>
                   </div>
-                  <h3 id="feature-courses" className="text-2xl font-bold text-ctd-text mb-4">Interactive courses</h3>
+                  <h3 id="feature-courses" className="text-2xl font-bold text-ctd-text mb-4">Courses</h3>
                   <p className="text-ctd-mute leading-relaxed">
                     Learn by doing with guided, real-world projects.
                   </p>
@@ -152,7 +159,7 @@ export default function Home() {
                   <div className="w-16 h-16 bg-ctd-yellow/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-ctd-yellow/30 transition-colors duration-200">
                     <span className="text-3xl" role="img" aria-label="Brain">🧠</span>
                   </div>
-                  <h3 id="feature-quiz" className="text-2xl font-bold text-ctd-text mb-4">Smart quizzes</h3>
+                  <h3 id="feature-quiz" className="text-2xl font-bold text-ctd-text mb-4">Quiz</h3>
                   <p className="text-ctd-mute leading-relaxed">
                     10 progressive modules with instant feedback and retry.
                   </p>
@@ -168,7 +175,7 @@ export default function Home() {
                   <div className="w-16 h-16 bg-ctd-yellow/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-ctd-yellow/30 transition-colors duration-200">
                     <span className="text-3xl" role="img" aria-label="Robot">🤖</span>
                   </div>
-                  <h3 id="feature-ai" className="text-2xl font-bold text-ctd-text mb-4">Binno AI</h3>
+                  <h3 id="feature-ai" className="text-2xl font-bold text-ctd-text mb-4">AI Chat</h3>
                   <p className="text-ctd-mute leading-relaxed">
                     Ask anything. Get code hints, explanations, and next steps.
                   </p>
