@@ -56,6 +56,68 @@ export default function SkillCompassQuestionnaire() {
   // Proteção contra tradução de página
   const { detectTranslation, sanitizeTranslatedInput: sanitizeInput } = useTranslationProtection()
 
+  // Salvar estado da sessão no localStorage
+  const saveSessionState = useCallback(() => {
+    if (!sessionId || !mounted) return
+    
+    const sessionState = {
+      questionNumber,
+      answers,
+      currentQuestion,
+      currentAnswer,
+      isCompleted,
+      finalReport,
+      lastUpdated: Date.now()
+    }
+    
+    try {
+      localStorage.setItem(`questionnaire_session_${sessionId}`, JSON.stringify(sessionState))
+      console.log('💾 Session state saved', { questionNumber, answersCount: answers.length })
+    } catch (error) {
+      console.error('Error saving session state:', error)
+    }
+  }, [sessionId, mounted, questionNumber, answers, currentQuestion, currentAnswer, isCompleted, finalReport])
+
+  // Recuperar estado da sessão do localStorage
+  const loadSessionState = useCallback(() => {
+    if (!sessionId || !mounted) return false
+    
+    try {
+      const savedState = localStorage.getItem(`questionnaire_session_${sessionId}`)
+      if (!savedState) return false
+      
+      const sessionState = JSON.parse(savedState)
+      console.log('📂 Loading session state', sessionState)
+      
+      // Verificar se é um estado válido (não muito antigo)
+      const maxAge = 24 * 60 * 60 * 1000 // 24 horas
+      if (Date.now() - sessionState.lastUpdated > maxAge) {
+        console.log('⚠️ Session state too old, starting fresh')
+        localStorage.removeItem(`questionnaire_session_${sessionId}`)
+        return false
+      }
+      
+      // Restaurar estado
+      if (sessionState.questionNumber) setQuestionNumber(sessionState.questionNumber)
+      if (sessionState.answers) setAnswers(sessionState.answers)
+      if (sessionState.currentQuestion) setCurrentQuestion(sessionState.currentQuestion)
+      if (sessionState.currentAnswer) setCurrentAnswer(sessionState.currentAnswer)
+      if (sessionState.isCompleted) setIsCompleted(sessionState.isCompleted)
+      if (sessionState.finalReport) setFinalReport(sessionState.finalReport)
+      
+      console.log('✅ Session state restored', { 
+        questionNumber: sessionState.questionNumber, 
+        answersCount: sessionState.answers?.length || 0,
+        isCompleted: sessionState.isCompleted
+      })
+      
+      return true
+    } catch (error) {
+      console.error('Error loading session state:', error)
+      return false
+    }
+  }, [sessionId, mounted])
+
   // Garantir montagem segura do componente
   useEffect(() => {
     setMounted(true)
@@ -70,6 +132,26 @@ export default function SkillCompassQuestionnaire() {
       setUserId(newUserId)
     }
   }, [])
+
+  // Carregar estado da sessão quando componente montar
+  useEffect(() => {
+    if (mounted && sessionId) {
+      const stateLoaded = loadSessionState()
+      if (!stateLoaded) {
+        console.log('🆕 Starting fresh session')
+        // Se não há estado salvo, começar com a primeira pergunta
+        setCurrentQuestion(FIRST_QUESTION)
+        setQuestionNumber(1)
+      }
+    }
+  }, [mounted, sessionId, loadSessionState])
+
+  // Salvar estado sempre que mudar
+  useEffect(() => {
+    if (mounted) {
+      saveSessionState()
+    }
+  }, [mounted, saveSessionState])
 
   // Atualizar contador de caracteres de forma estável
   const updateCharacterCount = useCallback(() => {
@@ -181,6 +263,16 @@ export default function SkillCompassQuestionnaire() {
       const analysisData = await response.json()
       setFinalReport(analysisData.analysis.ai_analysis_narrative)
       setIsCompleted(true)
+      
+      // Limpar estado da sessão após completar
+      if (sessionId) {
+        try {
+          localStorage.removeItem(`questionnaire_session_${sessionId}`)
+          console.log('🗑️ Session state cleared after completion')
+        } catch (error) {
+          console.error('Error clearing session state:', error)
+        }
+      }
     } catch (error) {
       console.error('Error generating final report:', error)
       setError(error instanceof Error ? error.message : 'Failed to generate final report')
@@ -270,6 +362,30 @@ export default function SkillCompassQuestionnaire() {
     }
   }, [questionNumber, answers])
 
+  // Reiniciar sessão
+  const handleRestartSession = useCallback(() => {
+    if (!sessionId) return
+    
+    try {
+      // Limpar estado salvo
+      localStorage.removeItem(`questionnaire_session_${sessionId}`)
+      
+      // Resetar estado do componente
+      setQuestionNumber(1)
+      setAnswers([])
+      setCurrentQuestion(FIRST_QUESTION)
+      setCurrentAnswer('')
+      setIsCompleted(false)
+      setFinalReport('')
+      setError('')
+      
+      console.log('🔄 Session restarted')
+    } catch (error) {
+      console.error('Error restarting session:', error)
+      setError('Error restarting session')
+    }
+  }, [sessionId])
+
   // Tratar teclas
   const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !isSubmitting && !isGeneratingQuestion) {
@@ -344,6 +460,27 @@ export default function SkillCompassQuestionnaire() {
               <p className="text-ctd-mute text-sm mb-4">
                 🤖 Powered by Binno AI • Questions adapt based on your responses • CTDHUB
               </p>
+              
+              {/* Session Info */}
+              {answers.length > 0 && (
+                <div className="mb-4 p-3 bg-ctd-bg rounded-lg border border-ctd-border">
+                  <div className="flex items-center justify-center space-x-4 text-sm">
+                    <span className="text-ctd-text">
+                      💾 Progress saved automatically
+                    </span>
+                    <span className="text-ctd-mute">
+                      {answers.length} answer{answers.length !== 1 ? 's' : ''} completed
+                    </span>
+                    <button
+                      onClick={handleRestartSession}
+                      className="text-ctd-yellow hover:text-ctd-yellow-dark transition-colors text-xs underline"
+                      title="Start over from the beginning"
+                    >
+                      🔄 Restart
+                    </button>
+                  </div>
+                </div>
+              )}
               
               {/* Progress */}
               <div className="flex items-center justify-center space-x-4 mb-4">
