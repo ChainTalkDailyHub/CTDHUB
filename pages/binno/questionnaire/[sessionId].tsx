@@ -717,6 +717,10 @@ export default function SkillCompassQuestionnaire() {
   // Generate next question using AI
   const generateNextQuestion = async (nextQuestionNumber: number): Promise<Question> => {
     console.log('🔄 Generating question', nextQuestionNumber, 'with', answers.length, 'previous answers')
+    
+    // First, check if we can use a fallback question for debugging
+    const isDebugMode = process.env.NODE_ENV === 'development'
+    
     try {
       const requestData = {
         questionNumber: nextQuestionNumber,
@@ -734,18 +738,21 @@ export default function SkillCompassQuestionnaire() {
       const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost'
       const apiEndpoint = isLocalhost ? '/api/binno/generate-question' : '/.netlify/functions/binno-generate-question'
       
+      console.log('🌐 Using API endpoint:', apiEndpoint)
+      
       const response = await fetch(apiEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(requestData)
+        body: JSON.stringify(requestData),
+        signal: AbortSignal.timeout(25000) // 25 second timeout
       })
 
       console.log('📥 Response status:', response.status)
       
       if (!response.ok) {
-        const errorData = await response.json()
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
         console.error('❌ Error response:', errorData)
         throw new Error(errorData.error || `AI Question Generation failed: ${response.status}`)
       }
@@ -754,43 +761,79 @@ export default function SkillCompassQuestionnaire() {
       let data
       try {
         const responseText = await response.text()
-        console.log('🔍 Raw response:', responseText.substring(0, 200) + '...')
+        console.log('🔍 Raw response length:', responseText.length)
+        console.log('🔍 Raw response preview:', responseText.substring(0, 200) + '...')
         data = JSON.parse(responseText)
       } catch (parseError) {
         console.error('❌ JSON Parse Error:', parseError)
         console.error('🔍 Response was not valid JSON, using fallback')
-        throw new Error('Invalid JSON response from API')
+        throw new Error('Invalid JSON response from API - will use fallback question')
       }
+      
+      if (!data.question || !data.question.question_text) {
+        throw new Error('Invalid question structure received from API')
+      }
+      
       console.log('✅ Question generated successfully:', data.question.question_text.substring(0, 50) + '...')
       return data.question
+      
     } catch (error) {
       console.error('💥 AI Question Generation Failed:', error)
       
-      // Check if it's a JSON parsing error
-      if (error instanceof SyntaxError && error.message.includes('JSON')) {
+      // Enhanced error logging
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        console.error('🌐 Network error - check connection')
+      } else if (error instanceof SyntaxError && error.message.includes('JSON')) {
         console.error('🔍 JSON Parse Error - Response was not valid JSON')
+      } else if (error instanceof Error && error.name === 'AbortError') {
+        console.error('⏰ Request timeout - API took too long to respond')
       }
       
-      // Fallback question if API fails completely
-      const fallbackQuestion = {
+      // Generate enhanced fallback question based on question number
+      const fallbackQuestions = {
+        2: "Describe the technical architecture of your Web3 project. What smart contracts will you need? What programming languages and frameworks are you planning to use? Include details about scalability, security considerations, and integration with existing blockchain infrastructure.",
+        3: "Explain your project's tokenomics model in detail. How will tokens be distributed? What utility does your token provide to users? What mechanisms will you implement to maintain token value and prevent inflation? How does your economic model incentivize user participation?",
+        4: "What is your go-to-market strategy? Who is your target audience and how will you reach them? What partnerships are you considering? How will you handle user acquisition and retention? What marketing channels will be most effective for your project?",
+        5: "How will you handle governance and community building? What voting mechanisms will you implement? How will community members participate in decision-making? What incentives will you provide for active community participation?",
+        6: "What are the main risks and challenges you anticipate for your project? How will you mitigate technical risks, regulatory challenges, and market volatility? What contingency plans do you have in place?",
+        7: "Describe your team's background and expertise. What roles need to be filled? How will you attract and retain top talent? What advisors or mentors are you working with? What is your hiring strategy?",
+        8: "What is your development timeline and roadmap? What are the key milestones for the next 6-12 months? How will you prioritize features and improvements? What dependencies might affect your timeline?",
+        9: "How will you measure success and track key performance indicators? What metrics are most important for your project? How will you gather user feedback and iterate based on data?",
+        10: "What is your funding strategy? How much capital do you need and for what purposes? Are you considering traditional VCs, token sales, grants, or other funding mechanisms? What is your burn rate and runway?",
+        11: "How does your project contribute to the broader Web3 ecosystem? What partnerships with other protocols are you considering? How will you integrate with existing DeFi, GameFi, or other Web3 infrastructure?",
+        12: "What is your user onboarding strategy? How will you make your product accessible to both crypto-native and traditional users? What educational resources will you provide? How will you handle user support?",
+        13: "Describe your approach to security and auditing. What security measures are you implementing? Which audit firms are you considering? How will you handle potential vulnerabilities or exploits?",
+        14: "What is your long-term vision for the project? Where do you see it in 3-5 years? How will you maintain innovation and competitiveness? What new features or expansions are you considering?",
+        15: "Looking back at your responses, what do you think are the strongest and weakest aspects of your project plan? What would you prioritize if you had to focus on just three key areas? What advice would you give to other Web3 entrepreneurs?"
+      }
+      
+      const fallbackQuestion: Question = {
         id: `q${nextQuestionNumber}_fallback_${Date.now()}`,
-        question_text: `Question ${nextQuestionNumber}: Please describe your approach to ${nextQuestionNumber === 2 ? 'technical architecture and smart contract security' : nextQuestionNumber === 3 ? 'tokenomics and economic model' : nextQuestionNumber <= 5 ? 'market analysis and competitive positioning' : nextQuestionNumber <= 8 ? 'governance and community structure' : nextQuestionNumber <= 12 ? 'risk management and security audits' : 'future planning and scalability'} for your Web3 project.`,
-        context: `Fallback question ${nextQuestionNumber} for Web3 project assessment`,
+        question_text: fallbackQuestions[nextQuestionNumber as keyof typeof fallbackQuestions] || `Question ${nextQuestionNumber}: Please describe your approach to the next phase of your Web3 project development, including any technical, business, or strategic considerations that you think are important to address.`,
+        context: `Fallback question ${nextQuestionNumber} for Web3 project assessment (API unavailable)`,
         stage: nextQuestionNumber <= 3 ? 'project_overview' : nextQuestionNumber <= 6 ? 'technical_assessment' : nextQuestionNumber <= 9 ? 'business_strategy' : nextQuestionNumber <= 12 ? 'implementation_planning' : 'final_evaluation',
         difficulty_level: (nextQuestionNumber <= 4 ? 'beginner' : nextQuestionNumber <= 8 ? 'intermediate' : nextQuestionNumber <= 12 ? 'advanced' : 'expert') as 'beginner' | 'intermediate' | 'advanced' | 'expert',
         bnb_relevance: 80,
         critical_factors: ['project_planning', 'technical_understanding', 'business_strategy']
       }
       
-      console.log('🔄 Using fallback question due to API error')
+      console.log('🔄 Using enhanced fallback question due to API error')
+      console.log('📝 Fallback question:', fallbackQuestion.question_text.substring(0, 100) + '...')
+      
       return fallbackQuestion
     }
   }
 
   // Submit answer and get next question
   const handleSubmitAnswer = async () => {
-    if (!currentAnswer.trim() || currentAnswer.length < 10) {
-      setError(t.shortAnswer)
+    // Validation with better error messages
+    if (!currentAnswer.trim()) {
+      setError('Por favor, forneça uma resposta antes de continuar.')
+      return
+    }
+
+    if (currentAnswer.length < 10) {
+      setError(`Resposta muito curta. Por favor, forneça pelo menos 10 caracteres. (Atual: ${currentAnswer.length})`)
       return
     }
 
@@ -798,6 +841,9 @@ export default function SkillCompassQuestionnaire() {
     setError('')
 
     try {
+      console.log(`📝 Submitting answer for question ${questionNumber}`)
+      console.log(`📊 Answer length: ${currentAnswer.length} characters`)
+      
       // Clear any previous errors
       setError('')
       
@@ -814,16 +860,18 @@ export default function SkillCompassQuestionnaire() {
 
       // Check if questionnaire is complete (15 questions)
       if (questionNumber >= 15) {
+        console.log('🎯 Questionnaire complete, generating final report...')
         try {
           await generateFinalReport(updatedAnswers)
         } catch (reportError) {
           console.error('Error generating final report:', reportError)
-          setError('Failed to generate final report. Please try again.')
+          setError('Falha ao gerar relatório final. Por favor, tente novamente.')
         }
         return
       }
 
       // Generate next question
+      console.log(`🔄 Generating question ${questionNumber + 1}...`)
       setIsGeneratingQuestion(true)
       const nextQuestionNumber = questionNumber + 1
       
@@ -838,16 +886,19 @@ export default function SkillCompassQuestionnaire() {
         setTimeout(() => {
           textareaRef.current?.focus()
         }, 100)
+        
+        console.log(`✅ Successfully generated question ${nextQuestionNumber}`)
       } catch (questionError) {
         console.error('Error generating next question:', questionError)
-        setError(`Failed to generate question ${nextQuestionNumber}. Please try again.`)
+        setError(`Falha ao gerar questão ${nextQuestionNumber}. Erro: ${questionError instanceof Error ? questionError.message : 'Erro desconhecido'}. Por favor, recarregue a página e tente novamente.`)
         // Revert state if question generation fails
         setAnswers(answers) // Keep previous state
       }
 
     } catch (error) {
       console.error('Error submitting answer:', error)
-      setError(error instanceof Error ? error.message : 'Failed to submit answer. Please try again.')
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
+      setError(`Falha ao processar sua resposta: ${errorMessage}. Verifique sua conexão e tente novamente.`)
     } finally {
       setIsSubmitting(false)
       setIsGeneratingQuestion(false)
