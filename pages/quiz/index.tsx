@@ -3,28 +3,19 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import QuizModuleCard from '@/components/QuizModuleCard'
 import BurnBadge from '@/components/BurnBadge'
+import WalletButton from '@/components/WalletButton'
 import { quizModules } from '@/lib/quizData'
 
 export default function Quiz() {
   const [completedModules, setCompletedModules] = useState<number[]>([])
   const [userAddress, setUserAddress] = useState<string>('')
+  const [isWalletConnected, setIsWalletConnected] = useState(false)
   
   useEffect(() => {
     // Load completed modules from localStorage
     if (typeof window === 'undefined') return // SSR guard
     
     const completed = localStorage.getItem('completed_modules')
-    let address = localStorage.getItem('wallet_address')
-    
-    // Se não há endereço, gerar um para demonstração
-    if (!address) {
-      address = `0x${Math.random().toString(16).substr(2, 40)}`
-      try {
-        localStorage.setItem('wallet_address', address)
-      } catch (error) {
-        console.warn('Cannot save wallet address to localStorage:', error)
-      }
-    }
     
     if (completed) {
       try {
@@ -35,26 +26,47 @@ export default function Quiz() {
       }
     }
     
-    if (address) {
-      setUserAddress(address)
-      
-      // Sincronizar progresso com o servidor
-      fetch(`/.netlify/functions/quiz-progress?userAddress=${encodeURIComponent(address)}`)
-        .then(res => {
-          if (!res.ok) throw new Error(`HTTP ${res.status}`)
-          return res.json()
-        })
-        .then(data => {
-          if (data.completedModules && Array.isArray(data.completedModules) && data.completedModules.length > 0) {
-            setCompletedModules(data.completedModules)
-            try {
-              localStorage.setItem('completed_modules', JSON.stringify(data.completedModules))
-            } catch (error) {
-              console.warn('Cannot save progress to localStorage:', error)
+    // Check for connected wallet
+    const checkWallet = () => {
+      const walletAddress = localStorage.getItem('ctdhub:wallet')
+      if (walletAddress) {
+        setUserAddress(walletAddress)
+        setIsWalletConnected(true)
+        
+        // Sincronizar progresso com o servidor
+        fetch(`/.netlify/functions/quiz-progress?userAddress=${encodeURIComponent(walletAddress)}`)
+          .then(res => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`)
+            return res.json()
+          })
+          .then(data => {
+            if (data.completedModules && Array.isArray(data.completedModules) && data.completedModules.length > 0) {
+              setCompletedModules(data.completedModules)
+              try {
+                localStorage.setItem('completed_modules', JSON.stringify(data.completedModules))
+              } catch (error) {
+                console.warn('Cannot save progress to localStorage:', error)
+              }
             }
-          }
-        })
-        .catch(err => console.warn('Failed to sync progress:', err))
+          })
+          .catch(err => console.warn('Failed to sync progress:', err))
+      } else {
+        setIsWalletConnected(false)
+        setUserAddress('')
+      }
+    }
+    
+    checkWallet()
+    
+    // Listen for wallet connection changes
+    const handleStorageChange = () => {
+      checkWallet()
+    }
+    
+    window.addEventListener('storage', handleStorageChange)
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
     }
   }, [])
   
@@ -120,13 +132,34 @@ export default function Quiz() {
                   <div className="text-center mb-6">
                     <div className="text-6xl mb-4">🎉</div>
                     <h3 className="text-2xl font-bold text-ctd-text mb-2">Congratulations!</h3>
-                    <p className="text-ctd-mute">You've completed all 10 quiz modules. Now you can burn CTD tokens!</p>
+                    <p className="text-ctd-mute">You've completed all 10 quiz modules.</p>
                   </div>
                   
-                  <BurnBadge 
-                    isEnabled={allModulesCompleted}
-                    userAddress={userAddress}
-                  />
+                  {/* Wallet Connection Required */}
+                  {!isWalletConnected ? (
+                    <div className="text-center">
+                      <div className="bg-ctd-bg/50 rounded-lg p-6 border border-ctd-border/50 mb-4">
+                        <div className="text-4xl mb-3">🔗</div>
+                        <h4 className="text-lg font-semibold text-ctd-text mb-2">Connect Wallet to Burn Tokens</h4>
+                        <p className="text-ctd-mute text-sm mb-4">
+                          Connect your wallet to burn 1000 CTD tokens and complete your achievement
+                        </p>
+                        <WalletButton className="inline-block" />
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="bg-ctd-bg/50 rounded-lg p-4 border border-ctd-border/50 mb-4 text-center">
+                        <p className="text-ctd-text text-sm">
+                          🏦 <strong>Connected:</strong> {userAddress.slice(0, 6)}...{userAddress.slice(-4)}
+                        </p>
+                      </div>
+                      <BurnBadge 
+                        isEnabled={allModulesCompleted}
+                        userAddress={userAddress}
+                      />
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="bg-ctd-panel/50 rounded-2xl p-6 border border-ctd-border">

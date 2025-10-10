@@ -11,8 +11,8 @@ const ERC20_ABI = [
 // Endereço de queima padrão
 const BURN_ADDRESS = '0x000000000000000000000000000000000000dead'
 
-// Store para evitar duplo burn por usuário
-const burnedUsers = new Set<string>()
+// Store para evitar duplo burn por endereço de carteira (persistente durante a sessão da função)
+const burnedUsers = new Map<string, { txHash: string, timestamp: number }>()
 
 export const handler: Handler = async (event, context) => {
   console.log('🔥 Admin Burn Function - Start')
@@ -47,24 +47,28 @@ export const handler: Handler = async (event, context) => {
     const body = JSON.parse(event.body || '{}')
     const { userAddress, amount = '1000' } = body
 
-    if (!userAddress) {
+    if (!userAddress || !userAddress.startsWith('0x') || userAddress.length !== 42) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: 'User address is required' })
+        body: JSON.stringify({ error: 'Valid wallet address is required (0x format)' })
       }
     }
 
-    // Verificar se já foi feito burn para este usuário
+    // Verificar se já foi feito burn para este endereço de carteira
     const userKey = userAddress.toLowerCase()
-    if (burnedUsers.has(userKey)) {
+    const existingBurn = burnedUsers.get(userKey)
+    
+    if (existingBurn) {
       return {
         statusCode: 200,
         headers,
         body: JSON.stringify({
           success: false,
-          error: 'Burn already completed for this user',
-          alreadyBurned: true
+          error: 'Burn already completed for this wallet address',
+          alreadyBurned: true,
+          txHash: existingBurn.txHash,
+          timestamp: existingBurn.timestamp
         })
       }
     }
@@ -126,7 +130,10 @@ export const handler: Handler = async (event, context) => {
     console.log('⛽ Gas used:', receipt.gasUsed.toString())
 
     // Marcar usuário como já tendo feito burn
-    burnedUsers.add(userKey)
+    burnedUsers.set(userKey, {
+      txHash: receipt.hash,
+      timestamp: Date.now()
+    })
 
     const result = {
       success: true,

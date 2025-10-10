@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 
 interface BurnBadgeProps {
   isEnabled: boolean
-  userAddress?: string // Opcional, apenas para identificação
+  userAddress: string // Obrigatório para identificar usuário único
 }
 
 export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
@@ -40,14 +40,23 @@ export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
   }, [isClient, userAddress])
 
   const handleBurn = async () => {
-    if (!isEnabled || !isClient) {
-      console.warn('⚠️ Burn disabled:', { isEnabled, isClient })
+    if (!isEnabled || !isClient || !userAddress) {
+      console.warn('⚠️ Burn disabled:', { isEnabled, isClient, userAddress })
+      return
+    }
+    
+    // Validar endereço da carteira
+    if (!userAddress.startsWith('0x') || userAddress.length !== 42) {
+      setBurnResult({
+        success: false,
+        error: 'Invalid wallet address format'
+      })
       return
     }
     
     setIsLoading(true)
     try {
-      console.log('🔥 Iniciando burn automático de tokens CTD...')
+      console.log('🔥 Iniciando burn automático para carteira:', userAddress)
       
       const response = await fetch('/.netlify/functions/admin-burn-tokens', {
         method: 'POST',
@@ -55,7 +64,7 @@ export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          userAddress: userAddress || 'anonymous',
+          userAddress: userAddress,
           amount: '1000' // 1000 tokens por quiz completo
         }),
       })
@@ -70,7 +79,7 @@ export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
       setBurnResult(result)
       
       // Salvar resultado para evitar duplo burn
-      if (result.success && typeof window !== 'undefined' && userAddress) {
+      if (result.success && typeof window !== 'undefined') {
         const burnKey = `quiz_burn_completed_${userAddress}`
         localStorage.setItem(burnKey, JSON.stringify(result))
       }
@@ -111,7 +120,7 @@ export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
       
       return () => clearTimeout(timeoutId)
     }
-  }
+  }, [isEnabled, userAddress])
 
   if (!isClient) {
     return (
