@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { createClient } from '@supabase/supabase-js'
 import { Language, useTranslations, formatString } from '../../../lib/i18n/translations'
 import LanguageSelector from '../../../components/LanguageSelector'
+import { apiRequest, getApiInfo } from '../../../lib/apiBase'
 
 // Supabase client with environment validation
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -268,24 +269,16 @@ export default function SkillCompassQuestionnaire() {
     setError('')
 
     try {
-      const response = await fetch('/api/binno-final-analysis', {
+      console.log('🚀 Starting final analysis with API info:', getApiInfo())
+      
+      const data = await apiRequest('binno-final-analysis', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           sessionId: sessionId,
           userAnswers: finalAnswers,
           language: currentLanguage
         })
       })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || `Analysis generation failed: ${response.status}`)
-      }
-
-      const data = await response.json()
       
       if (data.success && data.analysis) {
         console.log(`✅ Analysis generated successfully with score: ${data.score}%`)
