@@ -1,3 +1,11 @@
+  // Protege rota: só acessa se wallet conectada
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const walletAddress = localStorage.getItem('ctdhub:wallet')
+    if (!walletAddress) {
+      router.replace('/')
+    }
+  }, [])
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Header from '../../components/Header'

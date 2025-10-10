@@ -77,22 +77,26 @@ export default function Header() {
               <span className="relative z-10">Courses</span>
               <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
             </Link>
-            <Link href="/quiz" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
-              <span className="relative z-10">Quiz</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
-            </Link>
             <Link href="/binno-ai" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
               <span className="relative z-10">AI Chat</span>
               <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
             </Link>
-            <Link href="/questionnaire" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
-              <span className="relative z-10">CTD Skill Compass</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
-            </Link>
-            <Link href="/dev" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
-              <span className="relative z-10">Creator Studio</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
-            </Link>
+            {isConnected && (
+              <>
+                <Link href="/quiz" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
+                  <span className="relative z-10">Quiz</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
+                </Link>
+                <Link href="/questionnaire" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
+                  <span className="relative z-10">CTD Skill Compass</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
+                </Link>
+                <Link href="/dev" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
+                  <span className="relative z-10">Creator Studio</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
+                </Link>
+              </>
+            )}
           </nav>
 
           <div className="flex items-center space-x-4">
@@ -163,33 +167,37 @@ export default function Header() {
                 📚 Courses
               </Link>
               <Link
-                href="/quiz"
-                className="block px-4 py-3 text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 rounded-lg transition-colors"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                🧠 Quiz
-              </Link>
-              <Link
                 href="/binno-ai"
                 className="block px-4 py-3 text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 rounded-lg transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                🤖 AI Chat
+                � AI Chat
               </Link>
-              <Link
-                href="/questionnaire"
-                className="block px-4 py-3 text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 rounded-lg transition-colors"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                🧭 CTD Skill Compass
-              </Link>
-              <Link
-                href="/dev"
-                className="block px-4 py-3 text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 rounded-lg transition-colors"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                ⚙️ Creator Studio
-              </Link>
+              {isConnected && (
+                <>
+                  <Link
+                    href="/quiz"
+                    className="block px-4 py-3 text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 rounded-lg transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    � Quiz
+                  </Link>
+                  <Link
+                    href="/questionnaire"
+                    className="block px-4 py-3 text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 rounded-lg transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    🧭 CTD Skill Compass
+                  </Link>
+                  <Link
+                    href="/dev"
+                    className="block px-4 py-3 text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 rounded-lg transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    ⚙️ Creator Studio
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}

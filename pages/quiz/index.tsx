@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import QuizModuleCard from '@/components/QuizModuleCard'
@@ -7,9 +8,18 @@ import WalletButton from '@/components/WalletButton'
 import { quizModules } from '@/lib/quizData'
 
 export default function Quiz() {
+  const router = useRouter()
   const [completedModules, setCompletedModules] = useState<number[]>([])
   const [userAddress, setUserAddress] = useState<string>('')
   const [isWalletConnected, setIsWalletConnected] = useState(false)
+  // Protege rota: só acessa se wallet conectada
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const walletAddress = localStorage.getItem('ctdhub:wallet')
+    if (!walletAddress) {
+      router.replace('/')
+    }
+  }, [])
   
   useEffect(() => {
     // Load completed modules from localStorage

@@ -40,7 +40,9 @@ export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
   }, [isClient, userAddress])
 
   const handleBurn = async () => {
+    // Só permite burn se quiz estiver completo
     if (!isEnabled || !isClient || !userAddress) {
+      setBurnResult({ success: false, error: 'Você precisa completar o quiz para queimar os tokens.' })
       console.warn('⚠️ Burn disabled:', { isEnabled, isClient, userAddress })
       return
     }
@@ -58,6 +60,7 @@ export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
     try {
       console.log('🔥 Iniciando burn automático para carteira:', userAddress)
       
+      // Sempre envia 1000 tokens
       const response = await fetch('/.netlify/functions/burn-on-completion', {
         method: 'POST',
         headers: {
@@ -65,7 +68,7 @@ export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
         },
         body: JSON.stringify({ 
           userAddress: userAddress,
-          amount: '1000' // 1000 tokens por quiz completo
+          amount: '1000'
         }),
       })
       

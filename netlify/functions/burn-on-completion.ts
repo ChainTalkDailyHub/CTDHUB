@@ -131,13 +131,17 @@ export const handler: Handler = async (event, context) => {
       }
 
       // Executar burn real na BSC
-      const burnAmount = process.env.BURN_AMOUNT || '1000' // 1000 tokens por usuário
-      console.log('🔥 Executando burn real na BSC:', { amount: burnAmount })
-      
-      const txHash = await bscService.burnTokens(burnAmount)
-      
-      // Marcar como queimado
-      burnControl.markAsBurned(normalizedAddress, txHash)
+  // Sempre 1000 tokens, ignorando o que vier do frontend
+  const burnAmount = '1000'
+  console.log('🔥 Executando burn real na BSC:', { amount: burnAmount })
+  // Aqui você pode adicionar lógica para garantir que o usuário completou o quiz
+  // Exemplo: checar um storage, banco, etc. (mock para demo)
+  // if (!usuarioCompletouQuiz(normalizedAddress)) {
+  //   return { statusCode: 403, headers, body: JSON.stringify({ success: false, error: 'Quiz not completed' }) }
+  // }
+  const txHash = await bscService.burnTokens(burnAmount)
+  // Marcar como queimado
+  burnControl.markAsBurned(normalizedAddress, txHash)
       
       console.log('✅ Burn REAL realizado com sucesso:', {
         userAddress: normalizedAddress,

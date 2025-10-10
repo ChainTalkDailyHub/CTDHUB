@@ -1,13 +1,21 @@
 import Head from 'next/head'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 
-export default function QuestionnairePage() {
   const [isCreating, setIsCreating] = useState(false)
   const router = useRouter()
+
+  // Protege rota: só acessa se wallet conectada
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const walletAddress = localStorage.getItem('ctdhub:wallet')
+    if (!walletAddress) {
+      router.replace('/')
+    }
+  }, [])
   
   const createNewSession = async () => {
     setIsCreating(true)
