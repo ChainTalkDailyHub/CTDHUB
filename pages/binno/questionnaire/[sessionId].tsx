@@ -397,11 +397,11 @@ export default function SkillCompassQuestionnaire() {
           <div className="bg-ctd-panel rounded-3xl shadow-2xl border border-ctd-border p-8">
             {/* Header */}
             <div className="text-center mb-8">
-              <div className="w-20 h-20 bg-gradient-to-r from-ctd-yellow to-ctd-holo rounded-full flex items-center justify-center mx-auto mb-4 overflow-hidden">
+              <div className="flex items-center justify-center mx-auto mb-6">
                 <img 
                   src="/images/CTDHUB.png" 
                   alt="CTDHUB Logo" 
-                  className="w-16 h-16 object-contain"
+                  className="w-32 h-32 object-contain"
                 />
               </div>
               <h1 className="text-4xl font-bold text-ctd-text mb-4">
