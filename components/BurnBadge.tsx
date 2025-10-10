@@ -6,6 +6,7 @@ interface BurnBadgeProps {
 }
 
 export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
+  const [isClient, setIsClient] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [burnResult, setBurnResult] = useState<{
     success: boolean
@@ -16,8 +17,16 @@ export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
     alreadyBurned?: boolean
   } | null>(null)
 
+  // Garantir que componente só renderiza no cliente após hidratação
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   const handleBurn = async () => {
-    if (!isEnabled || !userAddress) return
+    if (!isEnabled || !userAddress || !isClient) {
+      console.warn('⚠️ Burn disabled:', { isEnabled, userAddress, isClient })
+      return
+    }
     
     setIsLoading(true)
     try {
@@ -31,19 +40,23 @@ export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
         body: JSON.stringify({ userAddress }),
       })
       
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+      
       const result = await response.json()
       console.log('🔥 Resultado do burn:', result)
       
       setBurnResult(result)
       
-      if (result.success && result.txHash) {
+      if (result.success && result.txHash && typeof window !== 'undefined') {
         localStorage.setItem(`burn_tx_${userAddress}`, result.txHash)
       }
     } catch (error) {
       console.error('❌ Erro no burn:', error)
       setBurnResult({
         success: false,
-        error: 'Failed to process burn transaction'
+        error: error instanceof Error ? error.message : 'Failed to process burn transaction'
       })
     } finally {
       setIsLoading(false)

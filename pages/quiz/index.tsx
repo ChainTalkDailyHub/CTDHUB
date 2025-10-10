@@ -11,28 +11,47 @@ export default function Quiz() {
   
   useEffect(() => {
     // Load completed modules from localStorage
+    if (typeof window === 'undefined') return // SSR guard
+    
     const completed = localStorage.getItem('completed_modules')
     let address = localStorage.getItem('wallet_address')
     
     // Se não há endereço, gerar um para demonstração
     if (!address) {
       address = `0x${Math.random().toString(16).substr(2, 40)}`
-      localStorage.setItem('wallet_address', address)
+      try {
+        localStorage.setItem('wallet_address', address)
+      } catch (error) {
+        console.warn('Cannot save wallet address to localStorage:', error)
+      }
     }
     
     if (completed) {
-      setCompletedModules(JSON.parse(completed))
+      try {
+        setCompletedModules(JSON.parse(completed))
+      } catch (error) {
+        console.warn('Error parsing completed modules:', error)
+        setCompletedModules([])
+      }
     }
+    
     if (address) {
       setUserAddress(address)
       
       // Sincronizar progresso com o servidor
-      fetch(`/.netlify/functions/quiz-progress?userAddress=${address}`)
-        .then(res => res.json())
+      fetch(`/.netlify/functions/quiz-progress?userAddress=${encodeURIComponent(address)}`)
+        .then(res => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`)
+          return res.json()
+        })
         .then(data => {
-          if (data.completedModules && data.completedModules.length > 0) {
+          if (data.completedModules && Array.isArray(data.completedModules) && data.completedModules.length > 0) {
             setCompletedModules(data.completedModules)
-            localStorage.setItem('completed_modules', JSON.stringify(data.completedModules))
+            try {
+              localStorage.setItem('completed_modules', JSON.stringify(data.completedModules))
+            } catch (error) {
+              console.warn('Cannot save progress to localStorage:', error)
+            }
           }
         })
         .catch(err => console.warn('Failed to sync progress:', err))
@@ -104,7 +123,7 @@ export default function Quiz() {
                     <p className="text-ctd-mute">You've completed all 10 quiz modules. Now you can burn CTD tokens!</p>
                   </div>
                   
-                  {userAddress && (
+                  {userAddress && typeof window !== 'undefined' && (
                     <BurnBadge 
                       isEnabled={allModulesCompleted}
                       userAddress={userAddress}
