@@ -73,9 +73,12 @@ export default function Quiz() {
   // Listener para atualizações do localStorage
   useEffect(() => {
     const handleStorageChange = () => {
+      console.log('🔄 Storage change detected')
       const completed = localStorage.getItem('completed_modules')
       if (completed) {
-        setCompletedModules(JSON.parse(completed))
+        const modules = JSON.parse(completed)
+        console.log('📊 Completed modules:', modules)
+        setCompletedModules(modules)
       }
     }
     
@@ -95,6 +98,16 @@ export default function Quiz() {
   }
   
   const allModulesCompleted = completedModules.length === 10
+  
+  // Debug log
+  useEffect(() => {
+    console.log('🎯 Quiz state:', {
+      completedModules: completedModules.length,
+      allModulesCompleted,
+      isWalletConnected,
+      userAddress
+    })
+  }, [completedModules, allModulesCompleted, isWalletConnected, userAddress])
   
   return (
     <div className="min-h-screen bg-ctd-bg">
@@ -148,7 +161,7 @@ export default function Quiz() {
                       </div>
                     </div>
                   ) : (
-                    <div>
+                    <div data-testid="burn-section">
                       <div className="bg-ctd-bg/50 rounded-lg p-4 border border-ctd-border/50 mb-4 text-center">
                         <p className="text-ctd-text text-sm">
                           🏦 <strong>Connected:</strong> {userAddress.slice(0, 6)}...{userAddress.slice(-4)}
