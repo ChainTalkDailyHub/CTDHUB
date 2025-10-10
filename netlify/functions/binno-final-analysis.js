@@ -607,14 +607,14 @@ exports.handler = async (event, context) => {
       statusCode: 200,
       headers: corsHeaders,
       body: JSON.stringify({
-        report: reportData,
-        sessionId: sessionId,
-        analysis: reportData.analysis.executive_summary,
-        score: reportData.overallScore,  // Frontend espera este campo
         success: true,
         ok: true,
+        analysis: reportData.analysis.executive_summary,
+        score: reportData.overallScore,  // Frontend espera este campo
         saved: true,  // Frontend verifica este campo
-        redirectUrl: `/report?id=${sessionId}`
+        sessionId: sessionId,
+        redirectUrl: `/report?id=${sessionId}`,
+        report: reportData
       })
     }
 
