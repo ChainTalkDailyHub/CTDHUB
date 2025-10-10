@@ -43,23 +43,8 @@ export default function Quiz() {
         setUserAddress(walletAddress)
         setIsWalletConnected(true)
         
-        // Sincronizar progresso com o servidor
-        fetch(`/.netlify/functions/quiz-progress?userAddress=${encodeURIComponent(walletAddress)}`)
-          .then(res => {
-            if (!res.ok) throw new Error(`HTTP ${res.status}`)
-            return res.json()
-          })
-          .then(data => {
-            if (data.completedModules && Array.isArray(data.completedModules) && data.completedModules.length > 0) {
-              setCompletedModules(data.completedModules)
-              try {
-                localStorage.setItem('completed_modules', JSON.stringify(data.completedModules))
-              } catch (error) {
-                console.warn('Cannot save progress to localStorage:', error)
-              }
-            }
-          })
-          .catch(err => console.warn('Failed to sync progress:', err))
+        // Progresso armazenado localmente (mais rápido, sem requisições)
+        // Removido fetch para quiz-progress para melhorar performance
       } else {
         setIsWalletConnected(false)
         setUserAddress('')
