@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 
+export default function QuestionnairePage() {
   const [isCreating, setIsCreating] = useState(false)
   const router = useRouter()
 
@@ -15,15 +16,13 @@ import Footer from '../components/Footer'
     if (!walletAddress) {
       router.replace('/')
     }
-  }, [])
-  
+  }, [router])
+
   const createNewSession = async () => {
     setIsCreating(true)
-    
     try {
       // Generate a unique session ID
       const sessionId = `binno_questionnaire_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-      
       // Save basic context for the session
       const basicContext = {
         user_id: sessionId,
@@ -31,9 +30,7 @@ import Footer from '../components/Footer'
         interests: ['DeFi', 'Smart Contracts', 'Web3'],
         goal: 'Learn and improve blockchain development skills'
       }
-      
       localStorage.setItem(`questionnaire_context_${sessionId}`, JSON.stringify(basicContext))
-      
       // Redirect to questionnaire using Next.js router
       await router.push(`/binno/questionnaire/${sessionId}`)
     } catch (error) {

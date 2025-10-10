@@ -1,11 +1,4 @@
-  // Protege rota: só acessa se wallet conectada
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const walletAddress = localStorage.getItem('ctdhub:wallet')
-    if (!walletAddress) {
-      router.replace('/')
-    }
-  }, [])
+
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Header from '../../components/Header'
@@ -17,6 +10,14 @@ import { short } from '../../lib/storage'
 
 export default function DevArea() {
   const router = useRouter()
+  // Protege rota: só acessa se wallet conectada
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const walletAddress = localStorage.getItem('ctdhub:wallet')
+    if (!walletAddress) {
+      router.replace('/')
+    }
+  }, [router])
   const [isConnected, setIsConnected] = useState(false)
   const [address, setAddress] = useState('')
   const [myCourses, setMyCourses] = useState<Course[]>([])
