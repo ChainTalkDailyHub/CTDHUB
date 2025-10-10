@@ -119,11 +119,448 @@ export default function SkillCompassQuestionnaire() {
     setCharacterCount(currentAnswer.length)
   }, [currentAnswer])
 
-  // Export PDF function
-  const exportToPDF = () => {
-    if (!finalReport) return
+  // Export PDF function with detailed analysis
+  const exportToPDF = async () => {
+    if (!finalReport || answers.length === 0) return
+
+    try {
+      console.log('🔄 Generating detailed PDF analysis...')
+      
+      // Call individual analysis function
+      const response = await fetch('/.netlify/functions/binno-individual-analysis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          answers: answers,
+          projectType: null, // Will be auto-detected
+          userLevel: 'intermediate'
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to generate detailed analysis')
+      }
+
+      const detailedAnalysis = await response.json()
+      
+      // Generate PDF HTML
+      const pdfHTML = generatePDFHTML(detailedAnalysis, finalReport)
+      
+      // Create new window and print
+      const printWindow = window.open('', '_blank')
+      if (printWindow) {
+        printWindow.document.write(pdfHTML)
+        printWindow.document.close()
+        
+        // Wait for load and print
+        printWindow.onload = () => {
+          setTimeout(() => {
+            printWindow.print()
+          }, 500)
+        }
+      }
+    } catch (error) {
+      console.error('Error generating PDF:', error)
+      alert('Erro ao gerar PDF detalhado. Tentando versão simplificada...')
+      
+      // Fallback to simple PDF
+      generateSimplePDF()
+    }
+  }
+
+  // Function to generate PDF HTML
+  const generatePDFHTML = (detailedAnalysis: any, originalReport: string) => {
+    const currentDate = new Date()
+    const dateStr = currentDate.toLocaleDateString('pt-BR')
+    const timeStr = currentDate.toLocaleTimeString('pt-BR')
     
-    // Create a structured report content
+    return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTD Skill Compass - Relatório Detalhado</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #1a1a1a;
+            padding: 20px;
+            min-height: 100vh;
+            color: #ffffff;
+        }
+
+        .pdf-container {
+            width: 210mm;
+            min-height: 297mm;
+            background: #000000;
+            margin: 0 auto;
+            box-shadow: 0 0 20px rgba(255, 204, 51, 0.3);
+            border: 1px solid #333;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .pdf-header {
+            background: linear-gradient(135deg, #FFCC33 0%, #FFA500 100%);
+            height: 80px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 40px;
+            box-shadow: 0 2px 10px rgba(255, 204, 51, 0.5);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-section img {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+            background: transparent;
+        }
+
+        .logo-fallback {
+            height: 50px;
+            width: 150px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            color: #000;
+            letter-spacing: 1px;
+            border: 2px solid #000;
+        }
+
+        /* Content */
+        .pdf-content {
+            padding: 30px;
+            color: #ffffff;
+        }
+
+        .main-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #FFCC33;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 204, 51, 0.5);
+        }
+
+        .session-info {
+            background: rgba(255, 204, 51, 0.1);
+            border: 1px solid rgba(255, 204, 51, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .session-info h3 {
+            color: #FFCC33;
+            font-size: 16px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .session-info p {
+            color: #ffffff;
+            font-size: 14px;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .question-analysis {
+            background: rgba(139, 233, 253, 0.05);
+            border-left: 4px solid #8BE9FD;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 0 8px 8px 0;
+            break-inside: avoid;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .question-number {
+            background: #FFCC33;
+            color: #000;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .question-score {
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .score-excellent { background: #22c55e; }
+        .score-good { background: #f59e0b; }
+        .score-needs-improvement { background: #ef4444; }
+
+        .question-text {
+            color: #8BE9FD;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .user-response {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            line-height: 1.6;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .ai-feedback {
+            background: rgba(34, 197, 94, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.6;
+            border-left: 3px solid #22c55e;
+        }
+
+        .feedback-section {
+            margin-bottom: 12px;
+        }
+
+        .feedback-section strong {
+            color: #FFCC33;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .study-suggestions {
+            background: rgba(255, 204, 51, 0.1);
+            border: 1px solid rgba(255, 204, 51, 0.3);
+            border-radius: 8px;
+            padding: 25px;
+            margin-top: 40px;
+        }
+
+        .study-suggestions h2 {
+            color: #FFCC33;
+            font-size: 18px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .study-content {
+            font-size: 12px;
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+
+        .overall-summary {
+            background: rgba(139, 233, 253, 0.1);
+            border: 1px solid rgba(139, 233, 253, 0.3);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .overall-summary h2 {
+            color: #8BE9FD;
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .performance-metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #FFCC33;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 10px;
+            color: #ccc;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Footer */
+        .pdf-footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 40px;
+            background: linear-gradient(180deg, transparent 0%, #141414 50%, #000000 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            font-size: 10px;
+            color: #94A3B8;
+        }
+
+        .footer-left {
+            font-weight: 500;
+        }
+
+        .footer-right {
+            text-align: right;
+        }
+
+        .footer-right .website {
+            color: #8BE9FD;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        @media print {
+            body { background: white; }
+            .pdf-container { box-shadow: none; border: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="pdf-container">
+        <!-- Header -->
+        <div class="pdf-header">
+            <div class="logo-section">
+                <img src="/images/CTDHUB.png" alt="CTD HUB Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="logo-fallback" style="display:none;">CTD HUB</div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="pdf-content">
+            <h1 class="main-title">CTD Skill Compass - Relatório Detalhado</h1>
+
+            <!-- Session Info -->
+            <div class="session-info">
+                <h3>📊 Informações da Sessão</h3>
+                <p><strong>Sessão ID:</strong> ${sessionId}</p>
+                <p><strong>Questões Respondidas:</strong> ${answers.length}</p>
+                <p><strong>Tipo de Projeto:</strong> ${detailedAnalysis.projectType}</p>
+                <p><strong>Data de Conclusão:</strong> ${dateStr} às ${timeStr}</p>
+                <p><strong>Performance Geral:</strong> ${detailedAnalysis.overallInsights?.performance}</p>
+            </div>
+
+            <!-- Overall Summary -->
+            <div class="overall-summary">
+                <h2>🎯 Resumo Geral</h2>
+                <div class="performance-metrics">
+                    <div class="metric">
+                        <div class="metric-value">${detailedAnalysis.overallInsights?.averageScore || 0}</div>
+                        <div class="metric-label">Score Médio</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">${detailedAnalysis.overallInsights?.strongAreasCount || 0}</div>
+                        <div class="metric-label">Áreas Fortes</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">${detailedAnalysis.overallInsights?.weakAreasCount || 0}</div>
+                        <div class="metric-label">Áreas p/ Melhorar</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">${answers.length}</div>
+                        <div class="metric-label">Total Questões</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Individual Question Analysis -->
+            ${detailedAnalysis.individualAnalyses?.map((analysis: any, index: number) => {
+              const scoreClass = analysis.score >= 80 ? 'score-excellent' : analysis.score >= 60 ? 'score-good' : 'score-needs-improvement'
+              return `
+                <div class="question-analysis">
+                    <div class="question-header">
+                        <div class="question-number">Questão ${analysis.questionNumber}</div>
+                        <div class="question-score ${scoreClass}">${analysis.score}/100</div>
+                    </div>
+                    
+                    <div class="question-text">
+                        ${analysis.question}
+                    </div>
+                    
+                    <div class="user-response">
+                        <strong style="color: #8BE9FD; margin-bottom: 8px; display: block;">📝 Sua Resposta:</strong>
+                        ${analysis.userResponse}
+                    </div>
+                    
+                    <div class="ai-feedback">
+                        <div class="feedback-section">
+                            <strong>🤖 Análise AI:</strong>
+                            ${analysis.feedback}
+                        </div>
+                    </div>
+                </div>
+              `
+            }).join('') || ''}
+
+            <!-- Study Suggestions -->
+            ${detailedAnalysis.studySuggestions ? `
+                <div class="study-suggestions">
+                    <h2>📚 Sugestões de Estudo Personalizadas</h2>
+                    <div class="study-content">${detailedAnalysis.studySuggestions}</div>
+                </div>
+            ` : ''}
+        </div>
+
+        <!-- Footer -->
+        <div class="pdf-footer">
+            <div class="footer-left">
+                Gerado por CTD HUB BinnoAI - Plataforma de Análise Web3 Avançada
+            </div>
+            <div class="footer-right">
+                <div class="website">ctdhub.io</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>`
+  }
+
+  // Fallback simple PDF generation
+  const generateSimplePDF = () => {
     const reportContent = `
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -156,33 +593,47 @@ export default function SkillCompassQuestionnaire() {
         
         .pdf-header {
             background: linear-gradient(135deg, #FFCC33 0%, #FFA500 100%);
-            height: 35mm;
+            height: 80px;
             width: 100%;
-            position: relative;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 0 20mm;
+            justify-content: center;
+            padding: 0 40px;
             box-shadow: 0 2px 10px rgba(255, 204, 51, 0.5);
         }
-        
-        .logo-section p {
-            font-size: 14px;
-            color: #333;
-            margin: 0;
-            font-weight: 500;
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
-        
-        .date-section {
-            text-align: right;
-            font-size: 10px;
-            color: #333;
+
+        .logo-section img {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+            background: transparent;
+        }
+
+        .logo-fallback {
+            height: 50px;
+            width: 150px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            color: #000;
+            letter-spacing: 1px;
+            border: 2px solid #000;
         }
         
         .pdf-content {
-            padding: 20mm;
+            padding: 30px;
             color: #ffffff;
-            min-height: calc(297mm - 55mm);
+            min-height: calc(297mm - 120px);
         }
         
         .main-title {
@@ -206,12 +657,12 @@ export default function SkillCompassQuestionnaire() {
             position: absolute;
             bottom: 0;
             width: 100%;
-            height: 20mm;
+            height: 40px;
             background: linear-gradient(180deg, transparent 0%, #141414 50%, #000000 100%);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20mm;
+            padding: 0 30px;
             font-size: 9px;
             color: #94A3B8;
         }
@@ -221,11 +672,8 @@ export default function SkillCompassQuestionnaire() {
     <div class="pdf-container">
         <div class="pdf-header">
             <div class="logo-section">
-                <p>CTD Skill Compass Analysis Report</p>
-            </div>
-            <div class="date-section">
-                <div>Generated on: ${new Date().toLocaleDateString()}</div>
-                <div>${new Date().toLocaleTimeString()}</div>
+                <img src="/images/CTDHUB.png" alt="CTD HUB Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="logo-fallback" style="display:none;">CTD HUB</div>
             </div>
         </div>
         
@@ -239,7 +687,7 @@ export default function SkillCompassQuestionnaire() {
         
         <div class="pdf-footer">
             <div class="footer-left">
-                Generated by CTD Skill Compass - AI-Powered Web3 Assessment
+                Generated by CTD HUB BinnoAI - AI-Powered Web3 Assessment
             </div>
             <div class="footer-right">
                 <div>ctdhub.io</div>
@@ -255,7 +703,7 @@ export default function SkillCompassQuestionnaire() {
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `CTD_Skill_Compass_Report_${sessionId}.html`
+    link.download = `CTD_Skill_Compass_Simple_Report_${sessionId}.html`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
