@@ -254,7 +254,7 @@ CRITICAL: If responses were copied across questions or irrelevant to specific qu
       messages: [
         {
           role: 'system',
-          content: 'You are an expert Web3/blockchain consultant providing comprehensive project assessments. Generate detailed, personalized analysis reports based on user questionnaire responses. Always return valid JSON with specific evidence from user responses. This is a professional assessment tool - provide enterprise-grade insights.'
+          content: 'You are an expert Web3/blockchain consultant providing comprehensive project assessments. You MUST respond with VALID JSON ONLY. Do not include any text before or after the JSON object. Generate detailed, personalized analysis reports based on user questionnaire responses. Always return valid JSON with specific evidence from user responses. This is a professional assessment tool - provide enterprise-grade insights.'
         },
         {
           role: 'user',
@@ -262,7 +262,8 @@ CRITICAL: If responses were copied across questions or irrelevant to specific qu
         }
       ],
       temperature: 0.7,
-      max_tokens: 2500
+      max_tokens: 2500,
+      response_format: { type: "json_object" }
     })
 
     const aiResponse = response.choices[0]?.message?.content
@@ -272,10 +273,20 @@ CRITICAL: If responses were copied across questions or irrelevant to specific qu
 
     console.log('✅ AI analysis generated successfully')
     console.log('📄 AI Response length:', aiResponse.length, 'characters')
+    console.log('🔍 First 200 characters of AI response:', aiResponse.substring(0, 200))
+    console.log('🔍 Last 200 characters of AI response:', aiResponse.substring(Math.max(0, aiResponse.length - 200)))
     
     let aiAnalysis
     try {
-      aiAnalysis = JSON.parse(aiResponse)
+      // Clean the response - remove any potential markdown formatting or extra text
+      const cleanedResponse = aiResponse.trim()
+        .replace(/^```json\s*/, '') // Remove starting ```json
+        .replace(/\s*```$/, '')     // Remove ending ```
+        .replace(/^```\s*/, '')     // Remove starting ```
+        .trim()
+      
+      console.log('🧹 Attempting to parse cleaned response')
+      aiAnalysis = JSON.parse(cleanedResponse)
       console.log('✅ AI response parsed successfully as JSON')
     } catch (parseError) {
       console.error('❌ Failed to parse AI response as JSON:', parseError)
