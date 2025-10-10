@@ -124,29 +124,10 @@ export default function SkillCompassQuestionnaire() {
     if (!finalReport || answers.length === 0) return
 
     try {
-      console.log('🔄 Generating detailed PDF analysis...')
+      console.log('🔄 Generating detailed PDF...')
       
-      // Call individual analysis function
-      const response = await fetch('/.netlify/functions/binno-individual-analysis', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          answers: answers,
-          projectType: null, // Will be auto-detected
-          userLevel: 'intermediate'
-        })
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to generate detailed analysis')
-      }
-
-      const detailedAnalysis = await response.json()
-      
-      // Generate PDF HTML
-      const pdfHTML = generatePDFHTML(detailedAnalysis, finalReport)
+      // Generate improved PDF HTML directly
+      const pdfHTML = generateEnhancedPDFHTML(finalReport, answers)
       
       // Create new window and print
       const printWindow = window.open('', '_blank')
@@ -158,19 +139,350 @@ export default function SkillCompassQuestionnaire() {
         printWindow.onload = () => {
           setTimeout(() => {
             printWindow.print()
+            // Close print window after printing
+            setTimeout(() => {
+              printWindow.close()
+            }, 1000)
           }, 500)
         }
       }
     } catch (error) {
       console.error('Error generating PDF:', error)
-      alert('Erro ao gerar PDF detalhado. Tentando versão simplificada...')
+      alert('Error generating detailed PDF. Trying simplified version...')
       
       // Fallback to simple PDF
       generateSimplePDF()
     }
   }
 
-  // Function to generate PDF HTML
+  // Enhanced PDF generation function
+  const generateEnhancedPDFHTML = (report: string, userAnswers: any[]) => {
+    const currentDate = new Date()
+    const dateStr = currentDate.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+    const timeStr = currentDate.toLocaleTimeString('en-US')
+    
+    // Extract project name from first answer
+    const projectName = userAnswers[0]?.user_response?.split('.')[0]?.trim() || 'Web3 Project'
+    
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTD Skill Compass - Analysis Report</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #1a1a1a;
+            padding: 20px;
+            min-height: 100vh;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        .pdf-container {
+            width: 210mm;
+            min-height: 297mm;
+            background: #000000;
+            margin: 0 auto;
+            box-shadow: 0 0 30px rgba(255, 204, 51, 0.4);
+            border: 1px solid #333;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .pdf-header {
+            background: linear-gradient(135deg, #FFCC33 0%, #FFA500 100%);
+            height: 100px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            box-shadow: 0 4px 20px rgba(255, 204, 51, 0.3);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-section img {
+            height: 60px;
+            width: auto;
+            object-fit: contain;
+            background: transparent;
+        }
+
+        .logo-fallback {
+            height: 60px;
+            width: 180px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 22px;
+            color: #000;
+            letter-spacing: 2px;
+            border: 3px solid #000;
+        }
+
+        .header-info {
+            text-align: right;
+            color: #000;
+        }
+
+        .header-info h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .header-info p {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .pdf-content {
+            padding: 40px;
+            color: #ffffff;
+            min-height: calc(297mm - 200px);
+        }
+        
+        .main-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #FFCC33;
+            margin-bottom: 30px;
+            text-align: center;
+            text-shadow: 0 0 15px rgba(255, 204, 51, 0.5);
+            border-bottom: 2px solid #FFCC33;
+            padding-bottom: 15px;
+        }
+
+        .assessment-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            border: 1px solid #444;
+            border-radius: 12px;
+            padding: 25px;
+            border-left: 4px solid #FFCC33;
+        }
+
+        .info-card h3 {
+            color: #FFCC33;
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .info-card p {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .info-card strong {
+            color: #8BE9FD;
+        }
+        
+        .analysis-content {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            border: 1px solid #444;
+            border-left: 4px solid #8BE9FD;
+            padding: 30px;
+            margin: 25px 0;
+            border-radius: 12px;
+            line-height: 1.8;
+            font-size: 15px;
+        }
+
+        .analysis-content h4 {
+            color: #8BE9FD;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .questions-section {
+            margin-top: 40px;
+            page-break-inside: avoid;
+        }
+
+        .questions-title {
+            font-size: 22px;
+            color: #FFCC33;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+        }
+
+        .question-item {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+
+        .question-text {
+            color: #8BE9FD;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .answer-text {
+            color: #ffffff;
+            font-size: 13px;
+            line-height: 1.6;
+            padding-left: 15px;
+            border-left: 2px solid #444;
+        }
+        
+        .pdf-footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 60px;
+            background: linear-gradient(180deg, transparent 0%, #141414 50%, #000000 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            font-size: 12px;
+            color: #94A3B8;
+        }
+
+        .footer-left {
+            font-weight: 500;
+        }
+
+        .footer-right {
+            text-align: right;
+        }
+
+        .footer-right .date {
+            font-weight: 600;
+            color: #FFCC33;
+        }
+
+        .footer-right .website {
+            color: #8BE9FD;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        @media print {
+            body { 
+                background: white; 
+                margin: 0;
+                padding: 0;
+            }
+            .pdf-container { 
+                box-shadow: none; 
+                border: none; 
+                margin: 0;
+                width: 100%;
+                min-height: 100vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="pdf-container">
+        <!-- Header -->
+        <div class="pdf-header">
+            <div class="logo-section">
+                <img src="/images/CTDHUB.png" alt="CTD HUB Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="logo-fallback" style="display:none;">CTD HUB</div>
+            </div>
+            <div class="header-info">
+                <h1>Skill Compass Analysis</h1>
+                <p>BINNO AI Assessment Report</p>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="pdf-content">
+            <h1 class="main-title">CTD Skill Compass Analysis</h1>
+
+            <!-- Assessment Info -->
+            <div class="assessment-info">
+                <div class="info-card">
+                    <h3>📊 Assessment Details</h3>
+                    <p><strong>Project:</strong> ${projectName}</p>
+                    <p><strong>Questions Answered:</strong> ${userAnswers.length}</p>
+                    <p><strong>Assessment Date:</strong> ${dateStr}</p>
+                    <p><strong>Completion Time:</strong> ${timeStr}</p>
+                </div>
+                <div class="info-card">
+                    <h3>🤖 Analysis Engine</h3>
+                    <p><strong>AI System:</strong> BINNO AI</p>
+                    <p><strong>Model:</strong> GPT-4 Enhanced</p>
+                    <p><strong>Analysis Type:</strong> Comprehensive</p>
+                    <p><strong>Report Version:</strong> 2.0</p>
+                </div>
+            </div>
+            
+            <!-- Main Analysis -->
+            <div class="analysis-content">
+                ${report.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}
+            </div>
+
+            <!-- Questions and Answers Section -->
+            <div class="questions-section">
+                <h2 class="questions-title">📝 Complete Question & Answer Review</h2>
+                ${userAnswers.map((answer, index) => `
+                    <div class="question-item">
+                        <div class="question-text">
+                            Q${index + 1}: ${answer.question_text}
+                        </div>
+                        <div class="answer-text">
+                            ${answer.user_response.length > 300 ? 
+                              answer.user_response.substring(0, 300) + '...' : 
+                              answer.user_response}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="pdf-footer">
+            <div class="footer-left">
+                Generated by CTD HUB BINNO AI - Comprehensive Web3 Assessment Platform
+            </div>
+            <div class="footer-right">
+                <div class="date">${dateStr}</div>
+                <div class="website">ctdhub.io</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>`
+  }
   const generatePDFHTML = (detailedAnalysis: any, originalReport: string) => {
     const currentDate = new Date()
     const dateStr = currentDate.toLocaleDateString('pt-BR')
@@ -1053,13 +1365,13 @@ export default function SkillCompassQuestionnaire() {
               {/* Congratulations Message */}
               <div className="bg-gradient-to-r from-ctd-yellow/10 to-ctd-holo/10 border border-ctd-yellow/30 rounded-xl p-6 mb-6">
                 <div className="text-center">
-                  <h2 className="text-2xl font-bold text-ctd-yellow mb-2">🎉 Parabéns!</h2>
+                  <h2 className="text-2xl font-bold text-ctd-yellow mb-2">🎉 Congratulations!</h2>
                   <p className="text-ctd-text text-lg mb-2">
-                    Você completou o <strong>CTD Skill Compass</strong>!
+                    You have completed the <strong>CTD Skill Compass</strong>!
                   </p>
                   <p className="text-ctd-mute text-sm">
-                    Poucos chegam até aqui. Você demonstrou dedicação em avaliar suas habilidades Web3. 
-                    Este é um passo importante na sua jornada de crescimento profissional.
+                    Few make it this far. You have demonstrated dedication in evaluating your Web3 skills. 
+                    This is an important step in your professional growth journey.
                   </p>
                 </div>
               </div>
@@ -1082,7 +1394,7 @@ export default function SkillCompassQuestionnaire() {
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-ctd-text">Your CTD Skill Compass Analysis</h2>
-                    <p className="text-ctd-mute">AI-Powered Web3 Assessment Results</p>
+                    <p className="text-ctd-mute">BINNO AI-Powered Web3 Assessment Results</p>
                   </div>
                 </div>
                 
@@ -1092,7 +1404,7 @@ export default function SkillCompassQuestionnaire() {
                     <div className="text-ctd-mute text-sm">Questions Answered</div>
                   </div>
                   <div className="bg-ctd-bg/50 rounded-lg p-4 text-center border border-ctd-border/50">
-                    <div className="text-ctd-holo font-bold text-lg">AI-Generated</div>
+                    <div className="text-ctd-holo font-bold text-lg">BINNO AI</div>
                     <div className="text-ctd-mute text-sm">Personalized Analysis</div>
                   </div>
                   <div className="bg-ctd-bg/50 rounded-lg p-4 text-center border border-ctd-border/50">
@@ -1107,10 +1419,10 @@ export default function SkillCompassQuestionnaire() {
                 <div className="bg-gradient-to-r from-ctd-yellow/10 to-ctd-holo/10 p-4 border-b border-ctd-border">
                   <h3 className="text-xl font-bold text-ctd-text flex items-center">
                     <span className="mr-2">🤖</span>
-                    AI-Generated Assessment Report
+                    BINNO AI Assessment Report
                   </h3>
                   <p className="text-ctd-mute text-sm mt-1">
-                    Comprehensive analysis powered by GPT-4, tailored to your responses
+                    Comprehensive analysis powered by BINNO AI, tailored to your responses
                   </p>
                 </div>
                 

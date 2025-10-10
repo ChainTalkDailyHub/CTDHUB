@@ -48,8 +48,8 @@ function parseTemplateResponse(response, score, userAnswers) {
   sections.recommendations = extractSection('RECOMMENDATIONS', true) 
   sections.action_plan = extractSection('ACTION_PLAN', true)
   sections.risk_assessment = extractSection('RISK_ASSESSMENT', true)
-  sections.copy_paste = extractSection('COPY_PASTE_DETECTED', true)
   sections.question_analysis = extractSection('QUESTION_ANALYSIS', true)
+  sections.learning_path = extractSection('LEARNING_PATH', true)
   
   // Convert to list format
   const parseList = (text) => {
@@ -60,24 +60,30 @@ function parseTemplateResponse(response, score, userAnswers) {
   // Build final structure with guaranteed fields
   const analysis = {
     executive_summary: sections.executive_summary || `Assessment completed with score ${score}%. ${score < 30 ? 'Significant issues with response quality detected.' : 'Analysis shows areas for improvement.'}`,
-    strengths: parseList(sections.strengths).slice(0, 4).length > 0 ? parseList(sections.strengths).slice(0, 4) : (score > 40 ? ['Basic project concept provided'] : ['Limited strengths demonstrated']),
+    strengths: parseList(sections.strengths).slice(0, 6).length > 0 ? parseList(sections.strengths).slice(0, 6) : (score > 40 ? ['Basic project concept provided'] : ['Limited strengths demonstrated']),
     improvement_areas: parseList(sections.improvement_areas).length > 0 ? parseList(sections.improvement_areas) : [
       'Provide question-specific responses',
       'Avoid copy-paste behavior', 
       'Demonstrate deeper technical knowledge',
-      'Focus on relevance to each question'
+      'Focus on relevance to each question',
+      'Expand on technical implementation details',
+      'Show understanding of market dynamics'
     ],
     recommendations: parseList(sections.recommendations).length > 0 ? parseList(sections.recommendations) : [
       'Read each question carefully',
       'Provide targeted, specific answers',
       'Develop technical knowledge in Web3',
-      'Practice explaining concepts clearly'
+      'Practice explaining concepts clearly',
+      'Study successful Web3 projects',
+      'Build hands-on experience with blockchain tools'
     ],
     action_plan: parseList(sections.action_plan).length > 0 ? parseList(sections.action_plan) : [
       'Review fundamental Web3 concepts',
       'Practice answering technical questions',
       'Build hands-on experience',
-      'Focus on question-specific responses'
+      'Focus on question-specific responses',
+      'Complete online blockchain courses',
+      'Join Web3 communities and forums'
     ],
     risk_assessment: sections.risk_assessment || `With a score of ${score}%, ${score < 30 ? 'significant preparation is needed before undertaking Web3 development projects.' : 'moderate readiness is shown but additional learning would be beneficial.'}`,
     next_steps: parseList(sections.action_plan).length > 0 ? parseList(sections.action_plan) : [
@@ -86,7 +92,7 @@ function parseTemplateResponse(response, score, userAnswers) {
       'Practice targeted responses',
       'Engage in practical projects'
     ],
-    // Add question analysis if provided
+    learning_path: sections.learning_path || `Recommended learning sequence: 1) Master blockchain fundamentals, 2) Learn smart contract development, 3) Understand tokenomics and DeFi, 4) Practice with real projects.`,
     question_analysis: sections.question_analysis ? parseQuestionAnalysis(sections.question_analysis, userAnswers) : generateQuestionAnalysis(userAnswers, score)
   }
   
@@ -298,15 +304,16 @@ async function generateAnalysisWithAI(userAnswers, score) {
       `
     ).join('\n\n')
 
-    const prompt = `You are an expert Web3/blockchain consultant conducting a RIGOROUS professional assessment. You must analyze EACH question-response pair individually.
+    const prompt = `You are BINNO AI, an expert Web3/blockchain consultant conducting a COMPREHENSIVE professional assessment. You must provide DETAILED, ACTIONABLE feedback.
 
 CRITICAL ANALYSIS INSTRUCTIONS:
-- Analyze EVERY question-response pair for relevance and quality
-- HEAVILY PENALIZE copy-paste responses used for multiple questions  
-- If the same response is used for different questions, CALL IT OUT as lazy/inadequate
-- Be REALISTIC about knowledge levels demonstrated in each specific answer
-- Score harshly for irrelevant responses but fairly recognize genuine effort
-- Focus on question-specific relevance, not generic project descriptions
+- Analyze EVERY question-response pair individually with specific feedback
+- Provide detailed explanations for each question's score and relevance
+- Give specific examples from their responses (quote their exact words)
+- Identify exactly WHERE they demonstrated knowledge vs WHERE they need improvement
+- Provide SPECIFIC next steps for each knowledge gap identified
+- Reference their actual project details in recommendations
+- Be thorough but constructive - help them understand their current level
 
 PROJECT DETAILS FROM USER:
 ${userAnswers[0]?.user_response || 'Not provided'}
@@ -315,55 +322,56 @@ DETAILED QUESTION-BY-QUESTION ANALYSIS:
 ${global.detailedQuestionAnalysis ? 
   global.detailedQuestionAnalysis.map(qa => 
     `QUESTION ${qa.questionIndex}: ${qa.question}
-    RESPONSE: "${qa.response}"
+    USER'S RESPONSE: "${qa.response}"
     INDIVIDUAL SCORE: ${qa.score}/100
     RELEVANCE SCORE: ${qa.relevanceScore}/100
     ISSUES DETECTED: ${qa.issues.length > 0 ? qa.issues.join('; ') : 'None'}
-    `).join('\n') : 'Analysis not available'}
+    `).join('\n\n') : 'Analysis not available'}
 
 OVERALL CALCULATED SCORE: ${score}% 
 ${global.detailedQuestionAnalysis && global.detailedQuestionAnalysis.filter(qa => qa.issues.includes('Identical response used for multiple questions')).length > 0 ? 
   '⚠️ WARNING: IDENTICAL RESPONSES DETECTED - This indicates copy-paste behavior and lack of individual question consideration' : ''}
 
 ANALYSIS REQUIREMENTS:
-1. HONEST assessment focusing on question-response relevance
-2. SPECIFICALLY call out copy-paste responses and their inappropriateness  
-3. Evaluate if responses actually answer what was asked
-4. Be REALISTIC about demonstrated knowledge per question
-5. Don't inflate scores for generic/irrelevant responses
-6. Reference specific question-response mismatches
-7. Provide question-specific improvement recommendations
+1. DETAILED assessment with specific examples from their responses
+2. For each strength, quote exactly what they said that was good
+3. For each weakness, explain specifically what was missing or incorrect
+4. Provide CONCRETE next steps (specific courses, resources, practice areas)
+5. Reference their actual project in recommendations
+6. Include learning timeline estimates (beginner/intermediate/advanced paths)
+7. Give praise where deserved but be honest about gaps
+8. Provide question-by-question breakdown with specific feedback
 
 Return your analysis in this EXACT format (no JSON, no markdown, just follow this template):
 
 EXECUTIVE_SUMMARY:
-[Write 2-3 sentences about overall assessment and copy-paste detection]
+[Write 3-4 detailed sentences about overall performance, their project viability, and key observations. Quote specific examples from their responses.]
 
 SCORE:
 [The calculated score: ${score}]
 
 STRENGTHS:
-[List 2-4 genuine strengths if any, or write "Limited strengths demonstrated"]
+[List 4-6 specific strengths with exact quotes from their responses showing these strengths. Example: "Demonstrated solid understanding of smart contracts when you mentioned 'X specific detail'"]
 
 IMPROVEMENT_AREAS:
-[List 3-5 specific improvement areas including copy-paste issues]
+[List 5-8 specific improvement areas with explanations of what was missing and why it matters. Example: "Tokenomics explanation lacked details about utility mechanisms - you mentioned tokens but didn't explain HOW they create value"]
 
 RECOMMENDATIONS:
-[List 3-5 actionable recommendations]
+[List 6-8 actionable recommendations with specific resources, timeframes, and next steps. Example: "Study DeFi protocols like Uniswap and Compound for 2-3 weeks to understand liquidity mechanics"]
 
 ACTION_PLAN:
-[List 3-5 immediate action steps]
+[List 6-8 immediate action steps with priorities and timeframes. Example: "Week 1-2: Complete Ethereum development course, Week 3-4: Build simple smart contract"]
 
 RISK_ASSESSMENT:
-[Write detailed paragraph about readiness and risks]
-
-COPY_PASTE_DETECTED:
-[Write YES or NO, then explain if copy-paste was found]
+[Write 2-3 detailed paragraphs about project readiness, technical gaps, market risks, and overall viability based on their responses]
 
 QUESTION_ANALYSIS:
-[For each question, write: Q1: [analysis], Q2: [analysis], etc.]
+[For each question (Q1, Q2, Q3...), provide detailed feedback: "Q1: Your response about [quote their words] showed understanding of X but missed Y. Score: X/100. To improve: [specific advice]"]
 
-Remember: Be brutally honest about copy-paste behavior and response quality.`
+LEARNING_PATH:
+[Recommend specific learning sequence: Beginner level (topics), Intermediate level (topics), Advanced level (topics) with estimated timeframes]
+
+Remember: Be thorough, specific, and constructive. Quote their actual responses to show you read them carefully.`
 
     const response = await openai.chat.completions.create({
       model: 'gpt-4-1106-preview',

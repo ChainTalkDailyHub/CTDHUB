@@ -110,7 +110,7 @@ export default function QuestionnairePage() {
                 <div className="text-center">
                   <div className="w-12 h-12 bg-gradient-to-r from-ctd-yellow to-ctd-holo rounded-full flex items-center justify-center text-black font-bold text-lg mx-auto mb-3">1</div>
                   <h4 className="font-semibold text-ctd-text mb-2">Answer Questions</h4>
-                  <p className="text-ctd-mute text-sm">Respond to AI-generated questions that adapt to your level</p>
+                  <p className="text-ctd-mute text-sm">Respond to BINNO AI questions that adapt to your level</p>
                 </div>
                 <div className="text-center">
                   <div className="w-12 h-12 bg-gradient-to-r from-ctd-holo to-ctd-yellow rounded-full flex items-center justify-center text-black font-bold text-lg mx-auto mb-3">2</div>
