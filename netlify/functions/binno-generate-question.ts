@@ -85,30 +85,8 @@ export const handler: Handler = async (event, context) => {
     } catch (aiError) {
       console.error('❌ AI question generation failed:', aiError)
       
-      // Fallback question if AI fails
-      const fallbackQuestion = {
-        id: `q${questionNumber}_fallback_${Date.now()}`,
-        question_text: `Question ${questionNumber}: Please describe your approach to ${questionNumber === 2 ? 'technical architecture and smart contract security' : questionNumber === 3 ? 'tokenomics and economic model' : 'project implementation and risk management'} for your Web3 project.`,
-        context: `Fallback question ${questionNumber} for Web3 project assessment`,
-        stage: questionNumber <= 3 ? 'project_overview' : questionNumber <= 6 ? 'technical_assessment' : 'business_strategy',
-        difficulty_level: questionNumber <= 4 ? 'beginner' : questionNumber <= 8 ? 'intermediate' : 'advanced',
-        bnb_relevance: 80,
-        critical_factors: ['project_planning', 'technical_understanding', 'business_strategy']
-      }
-      
-      console.log('🔄 Using fallback question due to AI error')
-      
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({
-          question: fallbackQuestion,
-          questionNumber,
-          totalQuestions: 15,
-          isLastQuestion: questionNumber >= 15,
-          warning: 'AI generation failed, using fallback question'
-        })
-      }
+      // No fallback - AI generation is mandatory
+      throw new Error(`AI question generation failed: ${aiError instanceof Error ? aiError.message : 'Unknown error'}`)
     }
 
   } catch (error) {

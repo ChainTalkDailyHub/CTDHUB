@@ -69,7 +69,7 @@ exports.handler = async (event, context) => {
           userResponse: answer.user_response,
           analysis: generateFallbackAnalysis(answer, finalProjectType),
           score: 70, // Neutral score
-          feedback: "Resposta adequada. Continue desenvolvendo este aspecto do seu projeto."
+          feedback: "Adequate response. Continue developing this aspect of your project."
         });
       }
     }
@@ -103,41 +103,41 @@ exports.handler = async (event, context) => {
 };
 
 async function analyzeIndividualResponse(answer, questionNumber, projectType, userLevel) {
-  const prompt = `Como expert em Web3 e ${projectType}, analise esta resposta individual do usuário:
+  const prompt = `As a Web3 and ${projectType} expert, analyze this individual user response:
 
-PERGUNTA ${questionNumber}: ${answer.question_text}
+QUESTION ${questionNumber}: ${answer.question_text}
 
-RESPOSTA DO USUÁRIO: ${answer.user_response}
+USER RESPONSE: ${answer.user_response}
 
-CONTEXTO:
-- Tipo de projeto: ${projectType}
-- Nível do usuário: ${userLevel || 'intermediate'}
-- Questão número: ${questionNumber}
+CONTEXT:
+- Project type: ${projectType}
+- User level: ${userLevel || 'intermediate'}
+- Question number: ${questionNumber}
 
-ANALISE E FORNEÇA:
+ANALYZE AND PROVIDE IN ENGLISH ONLY:
 
-1. QUALIDADE DA RESPOSTA (0-100):
-Avalie a profundidade, conhecimento técnico demonstrado e relevância.
+1. RESPONSE QUALITY (0-100):
+Evaluate depth, demonstrated technical knowledge, and relevance.
 
-2. PONTOS FORTES:
-- Identifique aspectos específicos bem demonstrados
-- Cite trechos da resposta que mostram conhecimento
-- Explique por que estes pontos são valiosos
+2. STRENGTHS:
+- Identify specific well-demonstrated aspects
+- Quote excerpts from the response that show knowledge
+- Explain why these points are valuable
 
-3. ÁREAS DE MELHORIA:
-- Identifique lacunas específicas ou conceitos não mencionados
-- Sugira conhecimentos que poderiam ser adicionados
-- Explique a importância destes aspectos
+3. AREAS FOR IMPROVEMENT:
+- Identify specific gaps or concepts not mentioned
+- Suggest knowledge that could be added
+- Explain the importance of these aspects
 
-4. FEEDBACK PERSONALIZADO:
+4. PERSONALIZED FEEDBACK:
 ${answer.user_response.length > 100 ? 
-  "Dê um feedback detalhado, reconhecendo o esforço e orientando melhorias específicas." :
-  "A resposta foi breve. Oriente sobre como expandir e aprofundar o conhecimento."}
+  "Provide detailed feedback, acknowledging the effort and guiding specific improvements." :
+  "The response was brief. Guide on how to expand and deepen the knowledge."}
 
-5. SUGESTÃO DE AÇÃO:
-Uma ação concreta que o usuário pode tomar para melhorar neste aspecto.
+5. ACTION SUGGESTION:
+One concrete action the user can take to improve in this aspect.
 
-Seja encorajador mas honesto. Forneça feedback que realmente ajude o usuário a crescer.`;
+Be encouraging but honest. Provide feedback that truly helps the user grow.`;
 
   const response = await openai.chat.completions.create({
     model: 'gpt-4-1106-preview',
@@ -150,44 +150,44 @@ Seja encorajador mas honesto. Forneça feedback que realmente ajude o usuário a
 }
 
 async function generateStudySuggestions(projectType, analyses) {
-  // Identificar áreas que mais precisam de melhoria
+  // Identify areas that need most improvement
   const weakAreas = analyses
     .filter(a => a.score < 70)
     .map(a => a.questionNumber);
 
-  const prompt = `Baseado em uma análise de projeto ${projectType}, gere sugestões de estudo personalizadas:
+  const prompt = `Based on a ${projectType} project analysis, generate personalized study suggestions:
 
-ÁREAS QUE PRECISAM DE ATENÇÃO: Questões ${weakAreas.join(', ')}
-TIPO DE PROJETO: ${projectType}
+AREAS NEEDING ATTENTION: Questions ${weakAreas.join(', ')}
+PROJECT TYPE: ${projectType}
 
-Gere 5-7 sugestões de estudo específicas para este tipo de projeto, incluindo:
+Generate 5-7 specific study suggestions for this project type, including:
 
-1. RECURSOS TÉCNICOS:
-- Documentações oficiais relevantes
-- Tutoriais específicos para ${projectType}
-- Ferramentas essenciais
+1. TECHNICAL RESOURCES:
+- Relevant official documentation
+- Specific tutorials for ${projectType}
+- Essential tools
 
-2. CURSOS E CERTIFICAÇÕES:
-- Cursos online recomendados
-- Certificações que agregam valor
-- Bootcamps especializados
+2. COURSES AND CERTIFICATIONS:
+- Recommended online courses
+- Value-adding certifications
+- Specialized bootcamps
 
-3. PRÁTICA HANDS-ON:
-- Projetos para construir
-- Challenges e hackathons
-- Repositórios para estudar
+3. HANDS-ON PRACTICE:
+- Projects to build
+- Challenges and hackathons
+- Repositories to study
 
-4. COMUNIDADE E NETWORKING:
-- Comunidades específicas de ${projectType}
-- Eventos e conferências
-- Fóruns de discussão
+4. COMMUNITY AND NETWORKING:
+- Specific ${projectType} communities
+- Events and conferences
+- Discussion forums
 
 5. READING LIST:
-- Livros essenciais
-- Whitepapers importantes
-- Blogs e newsletters
+- Essential books
+- Important whitepapers
+- Blogs and newsletters
 
-Seja específico para ${projectType} e prático na aplicação.`;
+Be specific to ${projectType} and practical in application. RESPOND IN ENGLISH ONLY.`;
 
   try {
     const response = await openai.chat.completions.create({
@@ -221,37 +221,37 @@ function detectProjectType(firstAnswer) {
 }
 
 function extractScore(analysis) {
-  // Extrair score da análise (0-100)
-  const scoreMatch = analysis.match(/(?:QUALIDADE|SCORE|PONTUAÇÃO).*?(\d{1,3})/i);
+  // Extract score from analysis (0-100)
+  const scoreMatch = analysis.match(/(?:QUALITY|SCORE|RATING).*?(\d{1,3})/i);
   if (scoreMatch) {
     return Math.min(100, Math.max(0, parseInt(scoreMatch[1])));
   }
-  return 75; // Score padrão
+  return 75; // Default score
 }
 
 function extractFeedback(analysis) {
-  // Extrair feedback personalizado
-  const feedbackMatch = analysis.match(/(?:FEEDBACK PERSONALIZADO|FEEDBACK):(.*?)(?:\n\d+\.|$)/is);
+  // Extract personalized feedback
+  const feedbackMatch = analysis.match(/(?:PERSONALIZED FEEDBACK|FEEDBACK):(.*?)(?:\n\d+\.|$)/is);
   if (feedbackMatch) {
     return feedbackMatch[1].trim();
   }
-  return "Continue desenvolvendo seus conhecimentos nesta área.";
+  return "Continue developing your knowledge in this area.";
 }
 
 function generateFallbackAnalysis(answer, projectType) {
-  return `QUALIDADE DA RESPOSTA: 70
+  return `RESPONSE QUALITY: 70
 
-PONTOS FORTES:
-Demonstra interesse e engajamento com o tema de ${projectType}. A resposta mostra compreensão básica dos conceitos.
+STRENGTHS:
+Shows interest and engagement with ${projectType} topics. The response demonstrates basic understanding of the concepts.
 
-ÁREAS DE MELHORIA:
-Recomendo aprofundar conhecimentos técnicos específicos de ${projectType} e explorar cases de sucesso na área.
+AREAS FOR IMPROVEMENT:
+Recommend deepening specific technical knowledge of ${projectType} and exploring success cases in the area.
 
-FEEDBACK PERSONALIZADO:
-Sua resposta demonstra potencial. Para evoluir, sugiro estudar mais sobre as nuances técnicas e práticas de ${projectType}.
+PERSONALIZED FEEDBACK:
+Your response shows potential. To evolve, I suggest studying more about the technical nuances and practices of ${projectType}.
 
-SUGESTÃO DE AÇÃO:
-Dedique 30 minutos diários para ler documentação oficial e acompanhar projetos de referência em ${projectType}.`;
+ACTION SUGGESTION:
+Dedicate 30 minutes daily to reading official documentation and following reference projects in ${projectType}.`;
 }
 
 function generateFallbackStudySuggestions(projectType) {
