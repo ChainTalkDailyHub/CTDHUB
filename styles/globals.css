@@ -335,3 +335,82 @@ a {
   border-color: #facc15 !important;
   box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.2) !important;
 }
+
+/* AI Analysis Content Styling */
+.ai-analysis-content {
+  line-height: 1.8;
+  font-size: 1rem;
+}
+
+.ai-analysis-content h1,
+.ai-analysis-content h2,
+.ai-analysis-content h3,
+.ai-analysis-content h4 {
+  color: #FFCC33;
+  font-weight: 600;
+  margin: 1.5rem 0 1rem 0;
+  border-left: 3px solid #FFCC33;
+  padding-left: 1rem;
+}
+
+.ai-analysis-content p {
+  margin-bottom: 1rem;
+  color: #F2F2F2;
+}
+
+.ai-analysis-content ul,
+.ai-analysis-content ol {
+  margin: 1rem 0 1rem 1.5rem;
+  color: #F2F2F2;
+}
+
+.ai-analysis-content li {
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+
+.ai-analysis-content li::marker {
+  color: #8BE9FD;
+}
+
+.ai-analysis-content strong {
+  color: #FFCC33;
+  font-weight: 600;
+}
+
+.ai-analysis-content em {
+  color: #8BE9FD;
+  font-style: italic;
+}
+
+/* Highlight boxes for important content */
+.ai-analysis-content .highlight {
+  background: linear-gradient(135deg, rgba(255, 204, 51, 0.1), rgba(139, 233, 253, 0.05));
+  border: 1px solid rgba(255, 204, 51, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+/* Score and metrics styling */
+.score-highlight {
+  background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
+  border: 2px solid #FFCC33;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.score-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #FFCC33;
+  margin-bottom: 0.25rem;
+}
+
+.score-label {
+  font-size: 0.875rem;
+  color: #8BE9FD;
+  font-weight: 500;
+}
