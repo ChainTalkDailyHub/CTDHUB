@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/router'
+import { useTranslationProtection, sanitizeTranslatedInput } from '../../../lib/translationProtection'
 
 interface Question {
   id: string
@@ -51,6 +52,9 @@ export default function SkillCompassQuestionnaire() {
   const [finalReport, setFinalReport] = useState<string>('')
   const [error, setError] = useState<string>('')
   const [userId, setUserId] = useState<string>('')
+
+  // Proteção contra tradução de página
+  const { detectTranslation, sanitizeTranslatedInput: sanitizeInput } = useTranslationProtection()
 
   // Garantir montagem segura do componente
   useEffect(() => {
@@ -193,10 +197,13 @@ export default function SkillCompassQuestionnaire() {
     setError('')
 
     try {
+      // Sanitizar entrada contra tradução de página
+      const sanitizedResponse = sanitizeInput(currentAnswer.trim())
+      
       const newAnswer: UserAnswer = {
         question_id: currentQuestion.id,
         question_text: currentQuestion.question_text,
-        user_response: currentAnswer.trim(),
+        user_response: sanitizedResponse,
         timestamp: Date.now()
       }
 
