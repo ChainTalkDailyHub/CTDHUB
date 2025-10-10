@@ -17,7 +17,105 @@ const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 }) : null
 
-// Enhanced scoring function with individual question-response analysis
+// Parse template-based response (more reliable than JSON)
+function parseTemplateResponse(response, score, userAnswers) {
+  console.log('🔧 Parsing template response...')
+  
+  const sections = {}
+  
+  // Extract sections using regex
+  const extractSection = (sectionName, multiline = false) => {
+    const pattern = multiline 
+      ? new RegExp(`${sectionName}:\\s*([\\s\\S]*?)(?=\\n[A-Z_]+:|$)`, 'i')
+      : new RegExp(`${sectionName}:\\s*(.+)`, 'i')
+    const match = response.match(pattern)
+    return match ? match[1].trim() : ''
+  }
+  
+  // Extract all sections
+  sections.executive_summary = extractSection('EXECUTIVE_SUMMARY', true)
+  sections.score = extractSection('SCORE')
+  sections.strengths = extractSection('STRENGTHS', true)
+  sections.improvement_areas = extractSection('IMPROVEMENT_AREAS', true)
+  sections.recommendations = extractSection('RECOMMENDATIONS', true) 
+  sections.action_plan = extractSection('ACTION_PLAN', true)
+  sections.risk_assessment = extractSection('RISK_ASSESSMENT', true)
+  sections.copy_paste = extractSection('COPY_PASTE_DETECTED', true)
+  sections.question_analysis = extractSection('QUESTION_ANALYSIS', true)
+  
+  // Convert to list format
+  const parseList = (text) => {
+    if (!text) return []
+    return text.split(/\n|\-/).filter(item => item.trim()).map(item => item.trim().replace(/^[\-\*]\s*/, ''))
+  }
+  
+  // Build final structure
+  const analysis = {
+    executive_summary: sections.executive_summary || `Assessment completed with score ${score}%. ${score < 30 ? 'Significant issues with response quality detected.' : 'Analysis shows areas for improvement.'}`,
+    strengths: parseList(sections.strengths).slice(0, 4) || (score > 40 ? ['Basic project concept provided'] : ['Limited strengths demonstrated']),
+    improvement_areas: parseList(sections.improvement_areas) || [
+      'Provide question-specific responses',
+      'Avoid copy-paste behavior', 
+      'Demonstrate deeper technical knowledge',
+      'Focus on relevance to each question'
+    ],
+    recommendations: parseList(sections.recommendations) || [
+      'Read each question carefully',
+      'Provide targeted, specific answers',
+      'Develop technical knowledge in Web3',
+      'Practice explaining concepts clearly'
+    ],
+    action_plan: parseList(sections.action_plan) || [
+      'Review fundamental Web3 concepts',
+      'Practice answering technical questions',
+      'Build hands-on experience',
+      'Focus on question-specific responses'
+    ],
+    risk_assessment: sections.risk_assessment || `With a score of ${score}%, ${score < 30 ? 'significant preparation is needed before undertaking Web3 development projects.' : 'moderate readiness is shown but additional learning would be beneficial.'}`,
+    next_steps: parseList(sections.action_plan) || [
+      'Improve question comprehension',
+      'Develop specific technical knowledge', 
+      'Practice targeted responses',
+      'Engage in practical projects'
+    ],
+    // Add question analysis if provided
+    question_analysis: sections.question_analysis ? parseQuestionAnalysis(sections.question_analysis, userAnswers) : generateQuestionAnalysis(userAnswers, score)
+  }
+  
+  console.log('✅ Template parsed into structured analysis')
+  return analysis
+}
+
+// Parse question-by-question analysis
+function parseQuestionAnalysis(analysisText, userAnswers) {
+  const questions = []
+  const regex = /Q(\d+):\s*([^Q]*)/g
+  let match
+  
+  while ((match = regex.exec(analysisText)) !== null) {
+    const questionNum = parseInt(match[1])
+    const analysis = match[2].trim()
+    
+    questions.push({
+      question_number: questionNum,
+      relevance_assessment: analysis,
+      quality_issues: analysis.toLowerCase().includes('copy') ? ['Copy-paste behavior detected'] : ['Response could be more specific'],
+      improvement_needed: 'Provide question-specific answer with relevant details'
+    })
+  }
+  
+  return questions.length > 0 ? questions : generateQuestionAnalysis(userAnswers, 0)
+}
+
+// Generate question analysis if not provided
+function generateQuestionAnalysis(userAnswers, score) {
+  return userAnswers.map((answer, index) => ({
+    question_number: index + 1,
+    relevance_assessment: score < 30 ? 'Response appears generic and not specifically addressing this question' : 'Response shows some relevance to the question',
+    quality_issues: score < 30 ? ['Identical response used', 'Lacks question-specific detail'] : ['Could be more specific'],
+    improvement_needed: 'Provide detailed, question-specific answer that directly addresses what was asked'
+  }))
+}
 function calculateScore(userAnswers) {
   if (!userAnswers || userAnswers.length === 0) return 0
   
@@ -228,26 +326,36 @@ ANALYSIS REQUIREMENTS:
 6. Reference specific question-response mismatches
 7. Provide question-specific improvement recommendations
 
-Return a JSON object with this EXACT structure (be brutally honest):
-{
-  "executive_summary": "HONEST assessment of response quality, relevance, and any copy-paste issues detected",
-  "question_analysis": [
-    {
-      "question_number": 1,
-      "relevance_assessment": "How well the response addressed this specific question",
-      "quality_issues": ["specific issues with this response", "irrelevance problems", "copy-paste detection"],
-      "improvement_needed": "What should have been answered for this question"
-    }
-  ],
-  "strengths": ["only list GENUINE strengths if demonstrated", "question-specific competencies shown", "max 4 items"],
-  "improvement_areas": ["question-specific gaps", "copy-paste issues", "relevance problems", "lack of individual consideration"],
-  "recommendations": ["how to properly answer different question types", "avoid generic responses", "demonstrate specific knowledge"],
-  "action_plan": ["learn to read questions carefully", "provide question-specific answers", "avoid copy-paste responses"],
-  "risk_assessment": "HONEST paragraph about readiness based on question-answering ability and response quality",
-  "next_steps": ["improve question comprehension", "develop specific technical knowledge", "practice targeted responses"]
-}
+Return your analysis in this EXACT format (no JSON, no markdown, just follow this template):
 
-CRITICAL: If responses were copied across questions or irrelevant to specific questions asked, DOCUMENT THIS CLEARLY. Professional assessments require question-specific answers.`
+EXECUTIVE_SUMMARY:
+[Write 2-3 sentences about overall assessment and copy-paste detection]
+
+SCORE:
+[The calculated score: ${score}]
+
+STRENGTHS:
+[List 2-4 genuine strengths if any, or write "Limited strengths demonstrated"]
+
+IMPROVEMENT_AREAS:
+[List 3-5 specific improvement areas including copy-paste issues]
+
+RECOMMENDATIONS:
+[List 3-5 actionable recommendations]
+
+ACTION_PLAN:
+[List 3-5 immediate action steps]
+
+RISK_ASSESSMENT:
+[Write detailed paragraph about readiness and risks]
+
+COPY_PASTE_DETECTED:
+[Write YES or NO, then explain if copy-paste was found]
+
+QUESTION_ANALYSIS:
+[For each question, write: Q1: [analysis], Q2: [analysis], etc.]
+
+Remember: Be brutally honest about copy-paste behavior and response quality.`
 
     const response = await openai.chat.completions.create({
       model: 'gpt-4-1106-preview',
@@ -277,31 +385,9 @@ CRITICAL: If responses were copied across questions or irrelevant to specific qu
     
     let aiAnalysis
     try {
-      // Multiple cleaning approaches for robust JSON parsing
-      let cleanedResponse = aiResponse.trim()
-      
-      // Remove markdown code blocks
-      cleanedResponse = cleanedResponse.replace(/^```json\s*/i, '').replace(/\s*```$/, '')
-      cleanedResponse = cleanedResponse.replace(/^```\s*/, '').replace(/\s*```$/, '')
-      
-      // Remove any leading/trailing text that might not be JSON
-      const jsonStart = cleanedResponse.indexOf('{')
-      const jsonEnd = cleanedResponse.lastIndexOf('}')
-      
-      if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
-        cleanedResponse = cleanedResponse.substring(jsonStart, jsonEnd + 1)
-      }
-      
-      console.log('🧹 Attempting to parse cleaned response (length:', cleanedResponse.length, ')')
-      console.log('🔍 Cleaned response preview:', cleanedResponse.substring(0, 100) + '...')
-      
-      aiAnalysis = JSON.parse(cleanedResponse)
-      console.log('✅ AI response parsed successfully as JSON')
-      
-      // Verify it's an object with expected structure
-      if (typeof aiAnalysis !== 'object' || aiAnalysis === null) {
-        throw new Error('Parsed result is not a valid object')
-      }
+      console.log('🔍 Parsing template-based response...')
+      aiAnalysis = parseTemplateResponse(aiResponse, score, userAnswers)
+      console.log('✅ Template response parsed successfully')
       
     } catch (parseError) {
       console.error('❌ Failed to parse AI response as JSON:', parseError)
