@@ -131,7 +131,7 @@ export const handler: Handler = async (event, context) => {
       }
 
       // Executar burn real na BSC
-      const burnAmount = process.env.BURN_AMOUNT || '1000' // Default 1000 tokens
+      const burnAmount = process.env.BURN_AMOUNT || '1000' // 1000 tokens por usuário
       console.log('🔥 Executando burn real na BSC:', { amount: burnAmount })
       
       const txHash = await bscService.burnTokens(burnAmount)

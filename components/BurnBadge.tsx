@@ -61,7 +61,7 @@ export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
     if (isEnabled && userAddress) {
       // Pequeno delay para não fazer muitas requisições
       const timeoutId = setTimeout(() => {
-        fetch('/api/quiz/progress', {
+        fetch(`/.netlify/functions/quiz-progress?userAddress=${userAddress}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
         })

@@ -21,7 +21,7 @@ export default function Quiz() {
       setUserAddress(address)
       
       // Sincronizar progresso com o servidor
-      fetch(`/api/quiz/progress?userAddress=${address}`)
+      fetch(`/.netlify/functions/quiz-progress?userAddress=${address}`)
         .then(res => res.json())
         .then(data => {
           if (data.completedModules && data.completedModules.length > 0) {

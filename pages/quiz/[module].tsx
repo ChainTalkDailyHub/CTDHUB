@@ -103,7 +103,7 @@ export default function QuizModule() {
       // Save to server
       const userAddress = localStorage.getItem('wallet_address')
       if (userAddress) {
-        fetch('/api/quiz/progress', {
+        fetch('/.netlify/functions/quiz-progress', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userAddress, moduleId })
