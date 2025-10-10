@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { createClient } from '@supabase/supabase-js'
 import { Language, useTranslations, formatString } from '../../../lib/i18n/translations'
 import LanguageSelector from '../../../components/LanguageSelector'
+import SimpleBurnBadge from '../../../components/SimpleBurnBadge'
 import { apiRequest, getApiInfo } from '../../../lib/apiBase'
 
 // Supabase client with environment validation
@@ -1434,6 +1435,31 @@ export default function SkillCompassQuestionnaire() {
                     />
                   </div>
                 </div>
+              </div>
+
+              {/* Token Burn System */}
+              <div className="bg-gradient-to-br from-ctd-yellow/10 via-ctd-panel to-ctd-holo/10 rounded-2xl p-6 border border-ctd-yellow/20">
+                <div className="flex items-center mb-4">
+                  <div className="bg-ctd-yellow/20 p-3 rounded-lg mr-4">
+                    <span className="text-2xl">🔥</span>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-ctd-text">Burn CTD Tokens</h3>
+                    <p className="text-ctd-mute">Complete your assessment by burning 1000 CTD tokens</p>
+                  </div>
+                </div>
+                
+                <div className="bg-ctd-bg/50 rounded-lg p-4 border border-ctd-border/50 mb-4">
+                  <p className="text-ctd-text text-sm">
+                    🎯 <strong>Assessment Complete!</strong> You've successfully completed the BINNO AI Skill Compass. 
+                    Now burn 1000 CTD tokens to permanently record your achievement on the BSC blockchain.
+                  </p>
+                  <p className="text-ctd-mute text-xs mt-2">
+                    ⚡ This action burns tokens from your wallet and cannot be undone. Each wallet can only burn once per assessment.
+                  </p>
+                </div>
+                
+                <SimpleBurnBadge sessionId={sessionId as string} isEnabled={true} />
               </div>
 
               {/* Next Steps Section */}
