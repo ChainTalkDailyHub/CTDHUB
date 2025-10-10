@@ -58,7 +58,7 @@ export default function BurnBadge({ isEnabled, userAddress }: BurnBadgeProps) {
     try {
       console.log('🔥 Iniciando burn automático para carteira:', userAddress)
       
-      const response = await fetch('/.netlify/functions/admin-burn-tokens', {
+      const response = await fetch('/.netlify/functions/burn-on-completion', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
