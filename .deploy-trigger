@@ -1,0 +1,3 @@
+// Deploy timestamp: 2025-10-10 14:26
+// Forcing redeploy to ensure admin-burn-tokens function is available
+console.log('Deploy triggered at:', new Date().toISOString())
