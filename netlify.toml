@@ -9,6 +9,11 @@
   NODE_VERSION = "18"
   NPM_FLAGS = "--production=false"
 
+# Function-specific settings
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
 # Headers for security
 [[headers]]
   for = "/*"
@@ -17,6 +22,16 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    X-CTD-Deploy = "optimized-v2"
+
+# Headers for API Functions (CORS)
+[[headers]]
+  for = "/.netlify/functions/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    Cache-Control = "no-cache, no-store, must-revalidate"
 
 # Cache static assets
 [[headers]]

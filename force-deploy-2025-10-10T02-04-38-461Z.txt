@@ -1,0 +1,2 @@
+Deploy forçado em: 2025-10-10T02:04:38.465Z
+Formato de resposta corrigido para frontend
