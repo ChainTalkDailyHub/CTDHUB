@@ -57,30 +57,30 @@ function parseTemplateResponse(response, score, userAnswers) {
     return text.split(/\n|\-/).filter(item => item.trim()).map(item => item.trim().replace(/^[\-\*]\s*/, ''))
   }
   
-  // Build final structure
+  // Build final structure with guaranteed fields
   const analysis = {
     executive_summary: sections.executive_summary || `Assessment completed with score ${score}%. ${score < 30 ? 'Significant issues with response quality detected.' : 'Analysis shows areas for improvement.'}`,
-    strengths: parseList(sections.strengths).slice(0, 4) || (score > 40 ? ['Basic project concept provided'] : ['Limited strengths demonstrated']),
-    improvement_areas: parseList(sections.improvement_areas) || [
+    strengths: parseList(sections.strengths).slice(0, 4).length > 0 ? parseList(sections.strengths).slice(0, 4) : (score > 40 ? ['Basic project concept provided'] : ['Limited strengths demonstrated']),
+    improvement_areas: parseList(sections.improvement_areas).length > 0 ? parseList(sections.improvement_areas) : [
       'Provide question-specific responses',
       'Avoid copy-paste behavior', 
       'Demonstrate deeper technical knowledge',
       'Focus on relevance to each question'
     ],
-    recommendations: parseList(sections.recommendations) || [
+    recommendations: parseList(sections.recommendations).length > 0 ? parseList(sections.recommendations) : [
       'Read each question carefully',
       'Provide targeted, specific answers',
       'Develop technical knowledge in Web3',
       'Practice explaining concepts clearly'
     ],
-    action_plan: parseList(sections.action_plan) || [
+    action_plan: parseList(sections.action_plan).length > 0 ? parseList(sections.action_plan) : [
       'Review fundamental Web3 concepts',
       'Practice answering technical questions',
       'Build hands-on experience',
       'Focus on question-specific responses'
     ],
     risk_assessment: sections.risk_assessment || `With a score of ${score}%, ${score < 30 ? 'significant preparation is needed before undertaking Web3 development projects.' : 'moderate readiness is shown but additional learning would be beneficial.'}`,
-    next_steps: parseList(sections.action_plan) || [
+    next_steps: parseList(sections.action_plan).length > 0 ? parseList(sections.action_plan) : [
       'Improve question comprehension',
       'Develop specific technical knowledge', 
       'Practice targeted responses',
