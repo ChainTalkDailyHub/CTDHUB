@@ -1,9 +1,9 @@
-const { Configuration, OpenAIApi } = require('openai');
+const { OpenAI } = require('openai');
 
 // Configuração do OpenAI
-const openai = new OpenAIApi(new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || '',
-}));
+});
 
 const headers = {
   'Access-Control-Allow-Origin': '*',
@@ -139,14 +139,14 @@ Uma ação concreta que o usuário pode tomar para melhorar neste aspecto.
 
 Seja encorajador mas honesto. Forneça feedback que realmente ajude o usuário a crescer.`;
 
-  const response = await openai.createChatCompletion({
+  const response = await openai.chat.completions.create({
     model: 'gpt-4-1106-preview',
     messages: [{ role: 'user', content: prompt }],
     max_tokens: 800,
     temperature: 0.7
   });
 
-  return response.data.choices[0].message.content;
+  return response.choices[0].message.content;
 }
 
 async function generateStudySuggestions(projectType, analyses) {
@@ -190,14 +190,14 @@ Gere 5-7 sugestões de estudo específicas para este tipo de projeto, incluindo:
 Seja específico para ${projectType} e prático na aplicação.`;
 
   try {
-    const response = await openai.createChatCompletion({
+    const response = await openai.chat.completions.create({
       model: 'gpt-4-1106-preview',
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 1000,
       temperature: 0.8
     });
 
-    return response.data.choices[0].message.content;
+    return response.choices[0].message.content;
   } catch (error) {
     console.error('Error generating study suggestions:', error);
     return generateFallbackStudySuggestions(projectType);
