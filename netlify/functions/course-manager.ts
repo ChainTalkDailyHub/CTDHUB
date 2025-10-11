@@ -51,7 +51,11 @@ function generateConsistentId(uuid: string): string {
 // Supabase functions
 async function getUserNameByAddress(address: string): Promise<string> {
   try {
-    const { data: user, error } = await supabase
+    if (!supabase) {
+      return `Developer ${address.slice(0, 6)}...${address.slice(-4)}`
+    }
+    
+    const { data: user, error } = await supabase!
       .from('user_profiles')
       .select('name')
       .eq('wallet_address', address.toLowerCase())
@@ -73,7 +77,7 @@ async function readCoursesFromSupabase() {
   try {
     console.log('🔍 Reading courses from Supabase...')
     
-    const { data: courses, error: coursesError } = await supabase
+    const { data: courses, error: coursesError } = await supabase!!
       .from('courses')
       .select('*')
       .order('updated_at', { ascending: false })
@@ -87,7 +91,7 @@ async function readCoursesFromSupabase() {
       return []
     }
 
-    const { data: videos, error: videosError } = await supabase
+    const { data: videos, error: videosError } = await supabase!!
       .from('course_videos')
       .select('*')
       .order('order_index', { ascending: true })
@@ -135,7 +139,7 @@ async function writeCourseToSupabase(course: any) {
     console.log('💾 Writing course to Supabase:', course.title)
     
     // Insert course into courses table
-    const { data: newCourse, error: courseError } = await supabase
+    const { data: newCourse, error: courseError } = await supabase!!
       .from('courses')
       .insert([{
         title: course.title,
@@ -165,14 +169,14 @@ async function writeCourseToSupabase(course: any) {
         order_index: video.order
       }))
 
-      const { error: videosError } = await supabase
+      const { error: videosError } = await supabase!
         .from('course_videos')
         .insert(videosToInsert)
 
       if (videosError) {
         console.error('❌ Error inserting videos:', videosError)
         // Rollback: delete the course
-        await supabase.from('courses').delete().eq('id', newCourse.id)
+        await supabase!.from('courses').delete().eq('id', newCourse.id)
         return false
       }
 
@@ -192,7 +196,7 @@ async function getCourseByIdFromSupabase(courseId: string) {
     console.log('🔍 Getting course by ID from Supabase:', courseId)
     
     // Get all courses and find the one with matching generated ID
-    const { data: courses, error: coursesError } = await supabase
+    const { data: courses, error: coursesError } = await supabase!!
       .from('courses')
       .select('*')
 
@@ -210,7 +214,7 @@ async function getCourseByIdFromSupabase(courseId: string) {
     }
 
     // Get videos for this course
-    const { data: videos, error: videosError } = await supabase
+    const { data: videos, error: videosError } = await supabase!!
       .from('course_videos')
       .select('*')
       .eq('course_id', matchingCourse.id)
@@ -253,7 +257,7 @@ async function addVideosToSupabaseCourse(courseId: string, videos: any[]) {
     console.log('💾 Adding videos to course in Supabase:', courseId)
     
     // Find the course by generated ID
-    const { data: courses, error: coursesError } = await supabase
+    const { data: courses, error: coursesError } = await supabase!!
       .from('courses')
       .select('*')
 
@@ -270,7 +274,7 @@ async function addVideosToSupabaseCourse(courseId: string, videos: any[]) {
     }
 
     // Get current max order_index
-    const { data: existingVideos } = await supabase
+    const { data: existingVideos } = await supabase!
       .from('course_videos')
       .select('order_index')
       .eq('course_id', matchingCourse.id)
@@ -289,7 +293,7 @@ async function addVideosToSupabaseCourse(courseId: string, videos: any[]) {
       order_index: startOrder + index
     }))
 
-    const { error: videosError } = await supabase
+    const { error: videosError } = await supabase!
       .from('course_videos')
       .insert(videosToInsert)
 
@@ -299,7 +303,7 @@ async function addVideosToSupabaseCourse(courseId: string, videos: any[]) {
     }
 
     // Update course updated_at timestamp
-    await supabase
+    await supabase!
       .from('courses')
       .update({ updated_at: new Date().toISOString() })
       .eq('id', matchingCourse.id)
@@ -805,7 +809,7 @@ export default async (req: Request, context: Context) => {
         console.log('Deleting from Supabase:', { courseId, videoId })
         try {
           // Find the course by generated ID
-          const { data: courses, error: coursesError } = await supabase
+          const { data: courses, error: coursesError } = await supabase!!
             .from('courses')
             .select('*')
 
@@ -848,7 +852,7 @@ export default async (req: Request, context: Context) => {
             console.log('Deleting video from course:', videoId)
             
             // Find the video by generated ID
-            const { data: videos, error: videosError } = await supabase
+            const { data: videos, error: videosError } = await supabase!!
               .from('course_videos')
               .select('*')
               .eq('course_id', matchingCourse.id)
@@ -877,7 +881,7 @@ export default async (req: Request, context: Context) => {
             }
 
             // Delete the video
-            const { error: deleteError } = await supabase
+            const { error: deleteError } = await supabase!
               .from('course_videos')
               .delete()
               .eq('id', matchingVideo.id)
@@ -921,7 +925,7 @@ export default async (req: Request, context: Context) => {
             console.log('Deleting entire course:', courseId)
             
             // First delete all videos
-            const { error: videosDeleteError } = await supabase
+            const { error: videosDeleteError } = await supabase!
               .from('course_videos')
               .delete()
               .eq('course_id', matchingCourse.id)
@@ -938,7 +942,7 @@ export default async (req: Request, context: Context) => {
             }
 
             // Then delete the course
-            const { error: courseDeleteError } = await supabase
+            const { error: courseDeleteError } = await supabase!
               .from('courses')
               .delete()
               .eq('id', matchingCourse.id)
