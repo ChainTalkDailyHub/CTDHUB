@@ -1,52 +1,57 @@
-# 🚀 CTDHub Rebuild - Instruções Rápidas
+# 🚀 CTDHUB - Quick Start Guide
 
-## Status do Projeto
-✅ **COMPLETO** - Toda estrutura criada com sucesso!
+## Project Status
+✅ **PRODUCTION READY** - Complete Web3 learning platform with AI integration!
 
-## 📁 Localização
-```
-c:\Users\walli\Downloads\ctdhub-rebuild\
-```
+## 🌐 Live Platform
+**Access the live platform:** https://chaintalkdailyhub.com
 
-## ⚡ Próximos Passos
+## ⚡ Local Development Setup
 
-### 1. Instalar Dependências
+### 1. Clone Repository
 ```bash
-cd "c:\Users\walli\Downloads\ctdhub-rebuild"
+git clone https://github.com/wallisson-ctd/CTDHUB.git
+cd CTDHUB
+```
+
+### 2. Install Dependencies
+```bash
 npm install
 ```
 
-### 2. Configurar Ambiente
+### 3. Environment Configuration
 ```bash
-# Copiar arquivo de configuração
+# Copy environment template
 cp .env.example .env.local
 
-# Editar com suas chaves (IMPORTANTE!)
-notepad .env.local
+# Edit with your credentials
+nano .env.local  # or use your preferred editor
 ```
 
-**Configurações Mínimas Necessárias:**
-- `PRIVATE_KEY_TREASURY`: Sua chave privada BSC
-- `AI_API_KEY`: Chave da OpenAI ou serviço IA
-- `TOKEN_ADDRESS`: Endereço do contrato CTD
+**Required Environment Variables:**
+- `SUPABASE_URL`: Your Supabase project URL
+- `SUPABASE_ANON_KEY`: Supabase anonymous key
+- `OPENAI_API_KEY`: OpenAI API key for AI features
+- `PRIVATE_KEY_TREASURY`: BSC wallet private key (for token operations)
+- `TOKEN_ADDRESS`: CTD token contract address
 
-### 3. Executar Projeto
+### 4. Run Development Server
 ```bash
 npm run dev
 ```
 
-Acesse: `http://localhost:3000`
+Access: `http://localhost:3000`
 
-## 🎯 Funcionalidades Implementadas
+## 🎯 Platform Features
 
-### ✅ Sistema Completo
-- **Home Page**: Landing page moderna
-- **Wallet Connection**: MetaMask + BSC
-- **Curso System**: 10 módulos educacionais
-- **Quiz System**: Distribuição balanceada A→B→C→D
-- **Auto-Burn**: Queima automática após quiz
-- **Binno AI**: Chat assistente blockchain
-- **Dev Area**: Ferramentas de debug
+### ✅ Complete System
+- **Modern Landing Page**: Professional Web3 design
+- **Wallet Integration**: MetaMask + BSC Smart Chain
+- **Course Management**: Creator Studio with video integration
+- **AI-Powered Assessment**: Adaptive questioning with Binno AI
+- **Smart Contract Integration**: CTD token burn system
+- **Dual Storage**: Supabase + localStorage fallback
+- **Mobile Responsive**: Full mobile optimization
 
 ### ✅ Componentes Prontos
 - `Header.tsx` - Navegação principal
