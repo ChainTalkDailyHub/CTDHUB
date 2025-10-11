@@ -144,7 +144,7 @@ export default function CourseForm({ onSubmit, onAddToExisting, existingCourses 
               <select
                 value={selectedCourseId}
                 onChange={(e) => setSelectedCourseId(e.target.value)}
-                className="w-full px-4 py-4 ctd-panel border-2 border-gray-300 dark:border-gray-600 rounded-xl ctd-text focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-200"
+                className="w-full px-4 py-4 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-200"
               >
                 <option value="">Choose a course...</option>
                 {myCourses.map(course => (
@@ -170,7 +170,7 @@ export default function CourseForm({ onSubmit, onAddToExisting, existingCourses 
                 required
                 value={formData.title}
                 onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                className="w-full px-4 py-4 ctd-panel border-2 border-gray-300 dark:border-gray-600 rounded-xl ctd-text placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-200"
+                className="w-full px-4 py-4 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-200"
                 placeholder="e.g., Complete Blockchain Development"
                 disabled={isLoading}
               />
@@ -185,7 +185,7 @@ export default function CourseForm({ onSubmit, onAddToExisting, existingCourses 
                 required
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                className="w-full px-4 py-4 ctd-panel border-2 border-gray-300 dark:border-gray-600 rounded-xl ctd-text placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-200 resize-none"
+                className="w-full px-4 py-4 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-200 resize-none"
                 placeholder="Brief description of what students will learn..."
                 disabled={isLoading}
               />
@@ -230,7 +230,7 @@ export default function CourseForm({ onSubmit, onAddToExisting, existingCourses 
                   placeholder="Video title..."
                   value={video.title}
                   onChange={(e) => updateVideo(index, 'title', e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-600/50 border border-gray-500/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-200 backdrop-blur-sm"
+                  className="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-200"
                   disabled={isLoading}
                 />
                 
@@ -239,7 +239,7 @@ export default function CourseForm({ onSubmit, onAddToExisting, existingCourses 
                   placeholder="Video description (optional)..."
                   value={video.description}
                   onChange={(e) => updateVideo(index, 'description', e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-600/50 border border-gray-500/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-200 backdrop-blur-sm resize-none"
+                  className="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-200 resize-none"
                   disabled={isLoading}
                 />
                 
@@ -248,7 +248,7 @@ export default function CourseForm({ onSubmit, onAddToExisting, existingCourses 
                   placeholder="https://youtube.com/watch?v=..."
                   value={video.youtubeUrl}
                   onChange={(e) => updateVideo(index, 'youtubeUrl', e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-600/50 border border-gray-500/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-200 backdrop-blur-sm"
+                  className="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-200"
                   disabled={isLoading}
                 />
               </div>

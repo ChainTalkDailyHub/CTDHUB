@@ -190,8 +190,109 @@ export default function CourseDetail() {
     )
   }
 
-  const currentVideo = course.videos[currentVideoIndex]
+  const currentVideo = course.videos && course.videos.length > 0 ? course.videos[currentVideoIndex] : null
   const embedUrl = currentVideo ? getYouTubeEmbedUrl(currentVideo.youtubeUrl) : null
+
+  // Show empty state if no videos
+  if (course.totalVideos === 0 || !course.videos || course.videos.length === 0) {
+    return (
+      <div className="min-h-screen ctd-bg">
+        <Header />
+        <section className="pt-20 pb-8 px-4">
+          <div className="max-w-6xl mx-auto">
+            {/* Course Header */}
+            <div className="mb-8">
+              <div className="flex items-center gap-2 text-sm ctd-mute mb-4">
+                <a href="/courses" className="hover:text-ctd-yellow">Courses</a>
+                <span>•</span>
+                <span>{course.title}</span>
+              </div>
+              
+              <h1 className="text-4xl font-bold ctd-text mb-4">{course.title}</h1>
+              
+              <div className="flex items-center gap-6 text-sm ctd-mute mb-6">
+                <span>By {short(course.author)}</span>
+                <span>•</span>
+                <span>0 videos</span>
+                <span>•</span>
+                <span>Updated {formatDate(course.updatedAt)}</span>
+              </div>
+
+              <p className="ctd-text-secondary text-lg leading-relaxed mb-8">
+                {course.description}
+              </p>
+              
+              {/* Owner Actions */}
+              {isOwner && (
+                <div className="flex gap-4 mb-6">
+                  <button
+                    onClick={() => setShowAddVideos(true)}
+                    className="bg-ctd-yellow hover:bg-yellow-600 text-black font-semibold px-4 py-2 rounded-lg transition-colors"
+                  >
+                    + Add Videos
+                  </button>
+                  <button
+                    onClick={() => router.push(`/dev?edit=${course.id}`)}
+                    className="ctd-panel hover:bg-gray-600 dark:hover:bg-gray-600 ctd-text font-semibold px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Edit Module
+                  </button>
+                  <button
+                    onClick={handleDeleteCourse}
+                    className="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors"
+                  >
+                    🗑️ Delete Course
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Add Videos Form */}
+            {showAddVideos && isOwner && (
+              <div className="mb-8">
+                <AddVideoForm
+                  courseId={course.id}
+                  courseTitle={course.title}
+                  onAddVideos={handleAddVideos}
+                  onCancel={() => setShowAddVideos(false)}
+                />
+              </div>
+            )}
+
+            {/* Empty State */}
+            <div className="ctd-panel rounded-2xl ctd-border p-12 text-center">
+              <div className="mb-6">
+                <div className="w-24 h-24 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">📹</span>
+                </div>
+                <h3 className="text-2xl font-bold ctd-text mb-2">No Videos Yet</h3>
+                <p className="ctd-text-secondary text-lg">
+                  This course doesn't have any videos yet.
+                </p>
+              </div>
+              
+              {isOwner ? (
+                <button
+                  onClick={() => setShowAddVideos(true)}
+                  className="bg-ctd-yellow hover:bg-yellow-600 text-black font-semibold px-6 py-3 rounded-lg transition-colors"
+                >
+                  + Add First Video
+                </button>
+              ) : (
+                <a
+                  href="/courses"
+                  className="inline-block ctd-panel hover:bg-gray-200 dark:hover:bg-gray-600 ctd-text font-semibold px-6 py-3 rounded-lg transition-colors"
+                >
+                  Browse Other Courses
+                </a>
+              )}
+            </div>
+          </div>
+        </section>
+        <Footer />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen ctd-bg">
@@ -261,7 +362,7 @@ export default function CourseDetail() {
             {/* Video Player */}
             <div className="lg:col-span-2">
               <div className="ctd-panel rounded-2xl ctd-border overflow-hidden">
-                {embedUrl ? (
+                {embedUrl && currentVideo ? (
                   <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                     <iframe
                       src={embedUrl}
@@ -280,10 +381,10 @@ export default function CourseDetail() {
                 
                 <div className="p-6">
                   <h2 className="text-2xl font-bold ctd-text mb-2">
-                    {currentVideo.title}
+                    {currentVideo ? currentVideo.title : 'No Video Selected'}
                   </h2>
                   
-                  {currentVideo.description && (
+                  {currentVideo && currentVideo.description && (
                     <p className="ctd-text-secondary mb-4">
                       {currentVideo.description}
                     </p>
@@ -299,7 +400,7 @@ export default function CourseDetail() {
               </h3>
               
               <div className="space-y-3 max-h-96 overflow-y-auto">
-                {course.videos.map((video, index) => (
+                {course.videos && course.videos.length > 0 ? course.videos.map((video, index) => (
                   <button
                     key={video.id}
                     onClick={() => setCurrentVideoIndex(index)}
@@ -346,7 +447,11 @@ export default function CourseDetail() {
                       )}
                     </div>
                   </button>
-                ))}
+                )) : (
+                  <div className="text-center py-8">
+                    <p className="ctd-mute">No videos in this course yet.</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

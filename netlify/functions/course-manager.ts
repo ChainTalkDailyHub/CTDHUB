@@ -21,6 +21,40 @@ const supabase = (supabaseUrl && supabaseKey)
   ? createClient(supabaseUrl, supabaseKey)
   : null
 
+
+  // Helper function to check if course becomes orphan after video deletion
+  async function checkAndHandleOrphanCourse(courseId: string, supabase: any) {
+    try {
+      const { data: remainingVideos } = await supabase!
+        .from('course_videos')
+        .select('id')
+        .eq('course_id', courseId)
+      
+      if (!remainingVideos || remainingVideos.length === 0) {
+        console.log('⚠️ Course became orphan (no videos), auto-deleting:', courseId)
+        
+        // Auto-delete orphan course
+        const { error: deleteError } = await supabase!
+          .from('courses')
+          .delete()
+          .eq('id', courseId)
+        
+        if (deleteError) {
+          console.error('Error deleting orphan course:', deleteError)
+        } else {
+          console.log('✅ Orphan course auto-deleted successfully')
+        }
+        
+        return { wasOrphan: true, deleted: !deleteError }
+      }
+      
+      return { wasOrphan: false, deleted: false }
+    } catch (error) {
+      console.error('Error checking orphan status:', error)
+      return { wasOrphan: false, deleted: false }
+    }
+  }
+
 // Helper functions
 function ytIdFromUrl(url: string): string | null {
   const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)
@@ -897,11 +931,13 @@ export default async (req: Request, context: Context) => {
               })
             }
 
-            // Update course updated_at timestamp
-            await supabase
-              .from('courses')
-              .update({ updated_at: new Date().toISOString() })
-              .eq('id', matchingCourse.id)
+            // Update course updated_at timestamp (with null check)
+            if (supabase) {
+              await supabase
+                .from('courses')
+                .update({ updated_at: new Date().toISOString() })
+                .eq('id', matchingCourse.id)
+            }
 
             // Return updated course
             const updatedCourse = await getCourseByIdFromSupabase(courseId)
@@ -1067,7 +1103,85 @@ export default async (req: Request, context: Context) => {
       },
     })
 
-  } catch (error) {
+
+  // Cleanup existing orphan courses
+  if (method === 'POST' && url.pathname === '/cleanup-orphan-courses') {
+    try {
+      // Find courses with no videos
+      const { data: allCourses } = await supabase!
+        .from('courses')
+        .select('id, title')
+      
+      if (!allCourses) {
+        return new Response(JSON.stringify({ error: 'Failed to fetch courses' }), {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+        })
+      }
+      
+      let orphansFound = 0
+      let orphansDeleted = 0
+      const deletedCourses = []
+      
+      if (allCourses && Array.isArray(allCourses) && (allCourses as any[]).length > 0) {
+        for (const course of (allCourses as any[])) {
+          const { data: videos } = await supabase!
+            .from('course_videos')
+            .select('id')
+            .eq('course_id', course.id)
+          
+          if (!videos || (videos as any[]).length === 0) {
+          orphansFound++
+          console.log('🔍 Found orphan course:', course.title, course.id)
+          
+          // Delete orphan course
+          const { error: deleteError } = await supabase!
+            .from('courses')
+            .delete()
+            .eq('id', course.id)
+          
+          if (!deleteError) {
+            orphansDeleted++
+            deletedCourses.push({ id: course.id, title: course.title })
+            console.log('🗑️ Deleted orphan course:', course.title)
+          }
+        }
+      }
+      }
+      
+      return new Response(JSON.stringify({
+        success: true,
+        orphansFound,
+        orphansDeleted,
+        deletedCourses,
+        message: `Cleanup completed: ${orphansDeleted}/${orphansFound} orphan courses removed`
+      }), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+      })
+      
+    } catch (error: any) {
+      console.error('Error during cleanup:', error)
+      return new Response(JSON.stringify({ 
+        error: 'Cleanup failed', 
+        details: error instanceof Error ? error.message : 'Unknown error'
+      }), {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+      })
+    }
+  }
+    
+  } catch (error: any) {
     console.error('Course manager error:', error)
     return new Response(JSON.stringify({ 
       error: 'Internal server error',
