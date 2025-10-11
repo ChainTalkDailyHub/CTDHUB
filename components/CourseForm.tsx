@@ -98,25 +98,27 @@ export default function CourseForm({ onSubmit, onAddToExisting, existingCourses 
   const myCourses = existingCourses.filter(course => course.totalVideos > 0)
 
   return (
-    <div className="bg-gray-800 p-6 rounded-2xl border border-gray-700">
-      <div className="mb-6">
-        <h3 className="text-xl font-bold text-white mb-2">Create Course Content</h3>
-        <p className="text-gray-400 text-sm">
-          📚 <strong>Smart Organization:</strong> If your videos belong to the same course/module, 
+    <div className="ctd-panel p-8 rounded-2xl shadow-2xl backdrop-blur-sm">
+      <div className="mb-8">
+        <h3 className="text-2xl font-bold ctd-yellow mb-3">
+          Create Course Content
+        </h3>
+        <p className="ctd-text opacity-80 text-base leading-relaxed ctd-panel p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+          📚 <strong className="ctd-yellow">Smart Organization:</strong> If your videos belong to the same course/module, 
           select "Add to Existing Course" instead of creating a new one. This keeps content organized!
         </p>
       </div>
 
       {myCourses.length > 0 && (
-        <div className="mb-6">
-          <div className="flex gap-4 mb-4">
+        <div className="mb-8">
+          <div className="flex gap-4 mb-6">
             <button
               type="button"
               onClick={() => setMode('new')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-6 py-3 rounded-xl font-bold transition-all transform hover:scale-105 shadow-lg ${
                 mode === 'new' 
-                  ? 'bg-yellow-500 text-black' 
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white' 
+                  : 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50 border border-gray-600/50'
               }`}
             >
               🆕 New Course
@@ -124,10 +126,10 @@ export default function CourseForm({ onSubmit, onAddToExisting, existingCourses 
             <button
               type="button"
               onClick={() => setMode('existing')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-6 py-3 rounded-xl font-bold transition-all transform hover:scale-105 shadow-lg ${
                 mode === 'existing' 
-                  ? 'bg-yellow-500 text-black' 
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white' 
+                  : 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50 border border-gray-600/50'
               }`}
             >
               ➕ Add to Existing
@@ -135,14 +137,14 @@ export default function CourseForm({ onSubmit, onAddToExisting, existingCourses 
           </div>
 
           {mode === 'existing' && (
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+            <div className="mb-6">
+              <label className="block text-lg font-bold ctd-text mb-3">
                 Select Your Course
               </label>
               <select
                 value={selectedCourseId}
                 onChange={(e) => setSelectedCourseId(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                className="w-full px-4 py-4 ctd-panel border-2 border-gray-300 dark:border-gray-600 rounded-xl ctd-text focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-200"
               >
                 <option value="">Choose a course...</option>
                 {myCourses.map(course => (
@@ -156,11 +158,11 @@ export default function CourseForm({ onSubmit, onAddToExisting, existingCourses 
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-8">
         {mode === 'new' && (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-lg font-bold ctd-text mb-3">
                 Course Title *
               </label>
               <input
@@ -168,22 +170,22 @@ export default function CourseForm({ onSubmit, onAddToExisting, existingCourses 
                 required
                 value={formData.title}
                 onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                className="w-full px-4 py-4 ctd-panel border-2 border-gray-300 dark:border-gray-600 rounded-xl ctd-text placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-200"
                 placeholder="e.g., Complete Blockchain Development"
                 disabled={isLoading}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-lg font-bold ctd-text mb-3">
                 Course Description *
               </label>
               <textarea
-                rows={3}
+                rows={4}
                 required
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 resize-none"
+                className="w-full px-4 py-4 ctd-panel border-2 border-gray-300 dark:border-gray-600 rounded-xl ctd-text placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-200 resize-none"
                 placeholder="Brief description of what students will learn..."
                 disabled={isLoading}
               />
@@ -192,52 +194,52 @@ export default function CourseForm({ onSubmit, onAddToExisting, existingCourses 
         )}
 
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <label className="block text-sm font-medium text-gray-300">
+          <div className="flex items-center justify-between mb-6">
+            <label className="block text-lg font-bold ctd-text">
               Course Videos *
             </label>
             <button
               type="button"
               onClick={addVideoField}
-              className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm font-medium"
+              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-2 rounded-xl font-bold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               + Add Video
             </button>
           </div>
 
           {videos.map((video, index) => (
-            <div key={index} className="bg-gray-700 p-4 rounded-lg mb-4">
-              <div className="flex items-center justify-between mb-3">
-                <h4 className="text-sm font-medium text-gray-300">
+            <div key={index} className="ctd-panel p-6 rounded-xl mb-6 border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-lg font-bold ctd-text">
                   Video {index + 1}
                 </h4>
                 {videos.length > 1 && (
                   <button
                     type="button"
                     onClick={() => removeVideoField(index)}
-                    className="text-red-400 hover:text-red-300 text-sm"
+                    className="text-red-400 hover:text-red-300 font-medium px-3 py-1 rounded-lg hover:bg-red-900/20 transition-colors"
                   >
                     Remove
                   </button>
                 )}
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <input
                   type="text"
                   placeholder="Video title..."
                   value={video.title}
                   onChange={(e) => updateVideo(index, 'title', e.target.value)}
-                  className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  className="w-full px-4 py-3 bg-gray-600/50 border border-gray-500/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-200 backdrop-blur-sm"
                   disabled={isLoading}
                 />
                 
                 <textarea
-                  rows={2}
+                  rows={3}
                   placeholder="Video description (optional)..."
                   value={video.description}
                   onChange={(e) => updateVideo(index, 'description', e.target.value)}
-                  className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 resize-none"
+                  className="w-full px-4 py-3 bg-gray-600/50 border border-gray-500/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-200 backdrop-blur-sm resize-none"
                   disabled={isLoading}
                 />
                 
@@ -246,7 +248,7 @@ export default function CourseForm({ onSubmit, onAddToExisting, existingCourses 
                   placeholder="https://youtube.com/watch?v=..."
                   value={video.youtubeUrl}
                   onChange={(e) => updateVideo(index, 'youtubeUrl', e.target.value)}
-                  className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  className="w-full px-4 py-3 bg-gray-600/50 border border-gray-500/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-200 backdrop-blur-sm"
                   disabled={isLoading}
                 />
               </div>
@@ -255,18 +257,23 @@ export default function CourseForm({ onSubmit, onAddToExisting, existingCourses 
         </div>
 
         {error && (
-          <div className="p-3 bg-red-900/50 border border-red-500 rounded-lg">
-            <p className="text-red-200 text-sm">{error}</p>
+          <div className="p-4 bg-red-900/30 border-2 border-red-500/50 rounded-xl backdrop-blur-sm">
+            <p className="text-red-200 text-base font-medium">{error}</p>
           </div>
         )}
 
         <button
           type="submit"
           disabled={isLoading || (mode === 'existing' && !selectedCourseId)}
-          className="w-full bg-yellow-500 hover:bg-yellow-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-black font-semibold py-3 px-6 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500"
+          className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white font-bold py-4 px-8 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none focus:outline-none focus:ring-2 focus:ring-yellow-400"
         >
           {isLoading 
-            ? 'Publishing...' 
+            ? (
+              <span className="flex items-center justify-center">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                Publishing...
+              </span>
+            )
             : mode === 'existing' 
               ? 'Add Videos to Course' 
               : 'Publish Video'

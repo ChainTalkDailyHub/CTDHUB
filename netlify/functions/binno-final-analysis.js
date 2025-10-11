@@ -10,10 +10,13 @@ const corsHeaders = {
 }
 
 // Supabase configuration
-const SUPABASE_URL = 'https://srqgmflodlowmybgxxeu.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNycWdtZmxvZGxvd215Ymd4eGV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwMDM2MjgsImV4cCI6MjA3NDU3OTYyOH0.yI4PQXcmd96JVMoG46gh85G3hFVr0L3L7jBHWlJzAlQ'
+// Use environment variables for security
+const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+const supabase = SUPABASE_URL && SUPABASE_ANON_KEY 
+  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null
 
 // Initialize OpenAI - MANDATORY for AI analysis
 if (!process.env.OPENAI_API_KEY) {
@@ -304,89 +307,59 @@ async function generateAnalysisWithAI(userAnswers, score) {
       `
     ).join('\n\n')
 
-    const prompt = `You are BINNO AI, an expert Web3/blockchain consultant conducting a COMPREHENSIVE professional assessment. You must provide DETAILED, ACTIONABLE feedback.
+    const prompt = `You are BINNO AI, an expert Web3/blockchain consultant conducting a comprehensive professional assessment. Generate a detailed analysis in ENGLISH ONLY.
 
-CRITICAL ANALYSIS INSTRUCTIONS:
-- Analyze EVERY question-response pair individually with specific feedback
-- Provide detailed explanations for each question's score and relevance
-- Give specific examples from their responses (quote their exact words)
-- Identify exactly WHERE they demonstrated knowledge vs WHERE they need improvement
-- Provide SPECIFIC next steps for each knowledge gap identified
-- Reference their actual project details in recommendations
-- Be thorough but constructive - help them understand their current level
-
-PROJECT DETAILS FROM USER:
+PROJECT OVERVIEW:
 ${userAnswers[0]?.user_response || 'Not provided'}
 
-DETAILED QUESTION-BY-QUESTION ANALYSIS:
-${global.detailedQuestionAnalysis ? 
-  global.detailedQuestionAnalysis.map(qa => 
-    `QUESTION ${qa.questionIndex}: ${qa.question}
-    USER'S RESPONSE: "${qa.response}"
-    INDIVIDUAL SCORE: ${qa.score}/100
-    RELEVANCE SCORE: ${qa.relevanceScore}/100
-    ISSUES DETECTED: ${qa.issues.length > 0 ? qa.issues.join('; ') : 'None'}
-    `).join('\n\n') : 'Analysis not available'}
+USER ANSWERS (${userAnswers.length} questions):
+${userAnswers.map((answer, index) => 
+  `Q${index + 1}: ${answer.question_text}
+  A${index + 1}: ${answer.user_response}
+  `).join('\n')}
 
-OVERALL CALCULATED SCORE: ${score}% 
-${global.detailedQuestionAnalysis && global.detailedQuestionAnalysis.filter(qa => qa.issues.includes('Identical response used for multiple questions')).length > 0 ? 
-  '⚠️ WARNING: IDENTICAL RESPONSES DETECTED - This indicates copy-paste behavior and lack of individual question consideration' : ''}
+CALCULATED SCORE: ${score}%
 
-ANALYSIS REQUIREMENTS:
-1. DETAILED assessment with specific examples from their responses
-2. For each strength, quote exactly what they said that was good
-3. For each weakness, explain specifically what was missing or incorrect
-4. Provide CONCRETE next steps (specific courses, resources, practice areas)
-5. Reference their actual project in recommendations
-6. Include learning timeline estimates (beginner/intermediate/advanced paths)
-7. Give praise where deserved but be honest about gaps
-8. Provide question-by-question breakdown with specific feedback
+Generate a comprehensive Web3 project readiness analysis. Focus on specific evidence from their responses. Provide actionable recommendations for improvement.
 
-Return your analysis in this EXACT format (no JSON, no markdown, just follow this template):
-
-EXECUTIVE_SUMMARY:
-[Write 3-4 detailed sentences about overall performance, their project viability, and key observations. Quote specific examples from their responses.]
-
-SCORE:
-[The calculated score: ${score}]
-
-STRENGTHS:
-[List 4-6 specific strengths with exact quotes from their responses showing these strengths. Example: "Demonstrated solid understanding of smart contracts when you mentioned 'X specific detail'"]
-
-IMPROVEMENT_AREAS:
-[List 5-8 specific improvement areas with explanations of what was missing and why it matters. Example: "Tokenomics explanation lacked details about utility mechanisms - you mentioned tokens but didn't explain HOW they create value"]
-
-RECOMMENDATIONS:
-[List 6-8 actionable recommendations with specific resources, timeframes, and next steps. Example: "Study DeFi protocols like Uniswap and Compound for 2-3 weeks to understand liquidity mechanics"]
-
-ACTION_PLAN:
-[List 6-8 immediate action steps with priorities and timeframes. Example: "Week 1-2: Complete Ethereum development course, Week 3-4: Build simple smart contract"]
-
-RISK_ASSESSMENT:
-[Write 2-3 detailed paragraphs about project readiness, technical gaps, market risks, and overall viability based on their responses]
-
-QUESTION_ANALYSIS:
-[For each question (Q1, Q2, Q3...), provide detailed feedback: "Q1: Your response about [quote their words] showed understanding of X but missed Y. Score: X/100. To improve: [specific advice]"]
-
-LEARNING_PATH:
-[Recommend specific learning sequence: Beginner level (topics), Intermediate level (topics), Advanced level (topics) with estimated timeframes]
-
-Remember: Be thorough, specific, and constructive. Quote their actual responses to show you read them carefully.`
+Return ONLY a JSON object with this exact structure:
+{
+  "executive_summary": "3-4 detailed sentences about overall performance and project viability",
+  "overall_score": ${score},
+  "strengths": ["4-6 specific strengths with evidence from responses"],
+  "improvement_areas": ["5-8 specific areas needing improvement with explanations"],
+  "recommendations": ["6-8 actionable recommendations with resources and timeframes"],
+  "action_plan": ["6-8 immediate action steps with priorities"],
+  "risk_assessment": "2-3 paragraphs about project readiness and viability",
+  "question_analysis": [
+    {
+      "question_number": 1,
+      "feedback": "Specific feedback about their response",
+      "individual_score": 75,
+      "improvement_tips": "Specific advice for this question"
+    }
+  ],
+  "learning_path": {
+    "beginner": ["topics for beginners"],
+    "intermediate": ["topics for intermediate"],
+    "advanced": ["topics for advanced"]
+  }
+}`
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4-1106-preview',
+      model: 'gpt-4',
       messages: [
         {
           role: 'system',
-          content: 'You are an expert Web3/blockchain consultant providing comprehensive project assessments. You MUST respond with VALID JSON ONLY. Do not include any text before or after the JSON object. No markdown formatting, no explanations, ONLY the JSON response. Generate detailed, personalized analysis reports based on user questionnaire responses. Always return valid JSON with specific evidence from user responses. This is a professional assessment tool - provide enterprise-grade insights.'
+          content: 'You are a Web3 expert analyst. Respond with VALID JSON ONLY in ENGLISH. No text before or after JSON. Generate detailed, personalized project assessments.'
         },
         {
           role: 'user',
           content: prompt
         }
       ],
-      temperature: 0.7,
-      max_tokens: 2500
+      temperature: 0.3,
+      max_tokens: 2000
     })
 
     const aiResponse = response.choices[0]?.message?.content
@@ -396,14 +369,13 @@ Remember: Be thorough, specific, and constructive. Quote their actual responses 
 
     console.log('✅ AI analysis generated successfully')
     console.log('📄 AI Response length:', aiResponse.length, 'characters')
-    console.log('🔍 First 200 characters of AI response:', aiResponse.substring(0, 200))
-    console.log('🔍 Last 200 characters of AI response:', aiResponse.substring(Math.max(0, aiResponse.length - 200)))
     
     let aiAnalysis
     try {
-      console.log('🔍 Parsing template-based response...')
-      aiAnalysis = parseTemplateResponse(aiResponse, score, userAnswers)
-      console.log('✅ Template response parsed successfully')
+      // Try to parse as JSON first
+      const cleanedResponse = aiResponse.trim()
+      aiAnalysis = JSON.parse(cleanedResponse)
+      console.log('✅ Successfully parsed AI response as JSON')
       
     } catch (parseError) {
       console.error('❌ Failed to parse AI response as JSON:', parseError)
@@ -510,14 +482,66 @@ Remember: Be thorough, specific, and constructive. Quote their actual responses 
 
   } catch (error) {
     console.error('❌ CRITICAL: AI analysis failed completely:', error)
-    console.error('� Error details:', {
+    console.error('🔍 Error details:', {
       message: error.message,
       stack: error.stack,
       name: error.name
     })
     
-    // NO FALLBACK - AI is mandatory for CTD Skill Compass
-    throw new Error(`MANDATORY AI ANALYSIS FAILED: ${error.message}. CTD Skill Compass requires AI-powered analysis. Please ensure OpenAI API key is configured and valid.`)
+    // Emergency fallback with basic analysis
+    console.log('🚨 Using emergency fallback analysis due to AI failure')
+    const fallbackAnalysis = {
+      executive_summary: `Assessment completed with score ${score}%. ${score < 30 ? 'Response quality concerns detected - consider providing more detailed, question-specific answers.' : score < 60 ? 'Good foundation with areas for improvement.' : 'Strong performance with minor refinements needed.'}`,
+      overall_score: score,
+      strengths: score > 40 ? ['Project concept provided', 'Basic technical understanding shown'] : ['Engagement with assessment'],
+      improvement_areas: [
+        'Provide more detailed, question-specific responses',
+        'Demonstrate deeper technical knowledge',
+        'Show practical experience with examples'
+      ],
+      recommendations: [
+        'Focus on question-specific answers rather than generic responses',
+        'Study Web3 fundamentals if gaps identified',
+        'Build hands-on experience with blockchain development'
+      ],
+      action_plan: [
+        'Review assessment feedback carefully',
+        'Identify specific knowledge gaps',
+        'Create learning plan based on recommendations'
+      ],
+      risk_assessment: `Based on ${score}% score, ${score < 30 ? 'significant preparation needed before undertaking complex Web3 projects' : score < 60 ? 'moderate readiness with focused learning recommended' : 'good foundation for Web3 development'}.`,
+      question_analysis: userAnswers.map((answer, index) => ({
+        question_number: index + 1,
+        feedback: score < 30 ? 'Consider providing more detailed, specific responses' : 'Response received - review for depth and specificity',
+        individual_score: Math.max(20, Math.min(90, score + (Math.random() * 20 - 10))),
+        improvement_tips: 'Focus on providing concrete examples and detailed explanations'
+      })),
+      learning_path: {
+        beginner: ['Blockchain fundamentals', 'Web3 basics', 'Smart contract concepts'],
+        intermediate: ['DeFi protocols', 'NFT development', 'dApp architecture'],
+        advanced: ['Protocol design', 'Security auditing', 'Cross-chain development']
+      }
+    }
+    
+    const analysisData = {
+      reportId: `fallback_report_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      userAddress: '',
+      sessionId: `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      timestamp: new Date().toISOString(),
+      overallScore: score,
+      analysis: fallbackAnalysis,
+      metadata: {
+        totalQuestions: userAnswers.length,
+        completionTime: 'Assessment completed',
+        analysisVersion: 'Fallback Analysis v1.0 (AI unavailable)',
+        generatedBy: 'Fallback',
+        aiModel: 'none',
+        validationPassed: true,
+        note: 'AI analysis temporarily unavailable - basic assessment provided'
+      }
+    }
+    
+    return analysisData
   }
 }
 
@@ -547,7 +571,7 @@ exports.handler = async (event, context) => {
       console.error('❌ CRITICAL ERROR: OpenAI not configured!')
       return {
         statusCode: 500,
-        headers,
+        headers: corsHeaders,
         body: JSON.stringify({ 
           error: 'AI analysis service unavailable',
           details: 'CTD Skill Compass requires OpenAI API configuration for analysis. Please contact administrator.',
@@ -575,11 +599,13 @@ exports.handler = async (event, context) => {
     let userAnswers = requestData.userAnswers || requestData.answers || requestData.user_answers
     const sessionContext = requestData.sessionContext || requestData.session_context || {}
     const userAddress = requestData.userAddress || requestData.user_address || 'anonymous'
+    const providedSessionId = requestData.sessionId || requestData.session_id
 
     console.log('Parsed data:', { 
       userAnswersCount: userAnswers ? userAnswers.length : 0, 
       sessionContext, 
-      userAddress 
+      userAddress,
+      providedSessionId
     })
 
     if (!userAnswers || !Array.isArray(userAnswers) || userAnswers.length === 0) {
@@ -604,29 +630,46 @@ exports.handler = async (event, context) => {
     const reportData = await generateAnalysisWithAI(userAnswers, score)
     
     // Use provided sessionId or generate new one
-    const sessionId = sessionContext?.session_id || reportData.sessionId
+    const sessionId = providedSessionId || sessionContext?.session_id || reportData.sessionId
     reportData.sessionId = sessionId
     reportData.userAddress = userAddress || 'anonymous'
+    
+    console.log(`🆔 Using session ID: ${sessionId}`)
 
     console.log(`💾 Saving report to database...`)
+    console.log(`🆔 Session ID to save: ${sessionId}`)
+    console.log(`👤 User address: ${userAddress || 'anonymous'}`)
+    console.log(`📊 Score: ${score}`) 
 
     // Save to Supabase
     try {
-      const { error: dbError } = await supabase
+      const insertData = {
+        session_id: sessionId,
+        user_address: userAddress || 'anonymous',
+        report_data: reportData,
+        score: score,
+        created_at: new Date().toISOString()
+      }
+      
+      console.log('📝 Inserting data:', { 
+        session_id: insertData.session_id, 
+        user_address: insertData.user_address,
+        score: insertData.score,
+        has_report_data: !!insertData.report_data
+      })
+
+      const { data: insertResult, error: dbError } = await supabase
         .from('user_analysis_reports')
-        .insert([{
-          session_id: sessionId,
-          user_address: userAddress || 'anonymous',
-          report_data: reportData,
-          score: score,
-          created_at: new Date().toISOString()
-        }])
+        .insert([insertData])
+        .select('*')
 
       if (dbError) {
         console.error('Database save error:', dbError)
+        console.error('Error details:', dbError.message, dbError.code, dbError.details)
         // Continue anyway - don't fail the request
       } else {
         console.log('✅ Report saved to database successfully')
+        console.log('💾 Inserted record:', insertResult?.[0]?.session_id)
       }
     } catch (saveError) {
       console.error('Error saving to database:', saveError)

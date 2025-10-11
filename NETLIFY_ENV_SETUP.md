@@ -17,7 +17,7 @@ O botão "View Course" está mostrando "Course Not Found" porque o sistema está
 ```bash
 # Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=https://srqgmflodlowmybgxxeu.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNycWdtZmxvZGxvd215Ymd4eGV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwMDM2MjgsImV4cCI6MjA3NDU3OTYyOH0.yI4PQXcmd96JVMoG46gh85G3hFVr0L3L7jBHWlJzAlQ
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_supabase_anon_aqui
 ```
 
 ### 3. **Deploy Novamente**

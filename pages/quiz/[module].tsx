@@ -50,8 +50,8 @@ export default function QuizModule() {
               <div className="corner corner--br"></div>
               
               <div className="relative z-10 p-1 text-center">
-                <h1 className="text-2xl font-bold text-ctd-text mb-4">Module Not Found</h1>
-                <p className="text-ctd-mute mb-6">The requested quiz module could not be found.</p>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Module Not Found</h1>
+                <p className="text-gray-600 dark:text-gray-300 mb-6">The requested quiz module could not be found.</p>
                 <a href="/quiz" className="btn-primary">Back to Quiz</a>
               </div>
             </div>
@@ -125,29 +125,28 @@ export default function QuizModule() {
   }
   
   return (
-    <div className="min-h-screen bg-ctd-bg">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
       <Header />
       
-      <main className="py-24 spotlight">
+      <main className="py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {!showResults ? (
             <div>
               {/* Progress Header */}
-              <div className="mb-8">
-                <div className="flex justify-between items-center mb-4">
-                  <h1 className="text-2xl font-bold text-ctd-text drop-shadow-neon">
-                    Module {module.id}: <span className="text-ctd-yellow">{module.title}</span>
-                  </h1>
-                  <span className="text-sm text-ctd-mute">
-                    Question {currentQuestionIndex + 1} of {module.questions.length}
-                  </span>
-                </div>
+              <div className="mb-8 text-center">
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">
+                  Module {module.id}: <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">{module.title}</span>
+                </h1>
+                <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">Question {currentQuestionIndex + 1} of {module.questions.length}</p>
                 
-                <div className="w-full bg-ctd-panel rounded-full h-3 border border-ctd-border">
-                  <div 
-                    className="bg-ctd-yellow h-3 rounded-full transition-all duration-300"
-                    style={{ width: `${((currentQuestionIndex + 1) / module.questions.length) * 100}%` }}
-                  ></div>
+                {/* Progress Bar */}
+                <div className="max-w-lg mx-auto">
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 shadow-inner">
+                    <div 
+                      className="bg-gradient-to-r from-yellow-400 to-orange-500 h-3 rounded-full transition-all duration-500 shadow-lg"
+                      style={{ width: `${((currentQuestionIndex + 1) / module.questions.length) * 100}%` }}
+                    ></div>
+                  </div>
                 </div>
               </div>
               
@@ -158,47 +157,42 @@ export default function QuizModule() {
                 showResult={false}
               />
               
-              <div className="flex justify-between mt-8">
+              <div className="flex justify-between mt-8 gap-4">
                 <button
                   onClick={() => router.push('/quiz')}
-                  className="btn-ghost"
+                  className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
                 >
-                  Back to Quiz
+                  ← Back to Quiz
                 </button>
                 
                 <button
                   onClick={handleNext}
                   disabled={!selectedAnswers[currentQuestionIndex]}
-                  className={`btn-primary ${!selectedAnswers[currentQuestionIndex] ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-bold py-3 px-8 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 flex items-center gap-2 ${!selectedAnswers[currentQuestionIndex] ? 'opacity-50 cursor-not-allowed hover:scale-100 hover:shadow-xl' : 'hover:scale-105'}`}
                 >
-                  {isLastQuestion ? 'Check Answer' : 'Next'}
+                  {isLastQuestion ? '✅ Check Answer' : 'Next Question →'}
                 </button>
               </div>
             </div>
           ) : (
             /* Results Screen */
             <div className="text-center">
-              <h1 className="text-3xl font-bold text-ctd-text drop-shadow-neon mb-8">
-                Quiz <span className="text-ctd-yellow">Results</span>
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-8">
+                Quiz <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">Results</span>
               </h1>
               
-              <div className="card max-w-2xl mx-auto mb-8 relative">
-                <div className="corner corner--tl"></div>
-                <div className="corner corner--tr"></div>
-                <div className="corner corner--bl"></div>
-                <div className="corner corner--br"></div>
-                
-                <div className="relative z-10 p-1 text-center">
-                  <div className="text-6xl mb-4">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 max-w-2xl mx-auto mb-8 p-8 transition-colors duration-300">
+                <div className="text-center">
+                  <div className="text-8xl mb-6">
                     {isCompleted ? '🎉' : '😞'}
                   </div>
-                  <h2 className="text-2xl font-bold text-ctd-text mb-4">
-                    Your Score: <span className="text-ctd-yellow">{getScore()}%</span>
+                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                    Your Score: <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">{getScore()}%</span>
                   </h2>
-                  <p className="text-ctd-mute mb-6">
+                  <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
                     {isCompleted 
-                      ? 'Nice! Progress saved.' 
-                      : 'You need 70% or higher to pass. Try again!'}
+                      ? '🎯 Congratulations! Progress saved.' 
+                      : '📚 You need 70% or higher to pass. Keep learning!'}
                   </p>
                   
                   <div className="space-y-4">
@@ -215,7 +209,7 @@ export default function QuizModule() {
                 </div>
               </div>
               
-              <div className="flex gap-4 justify-center">
+              <div className="flex gap-4 justify-center flex-wrap">
                 {isCompleted ? (
                   <button
                     onClick={() => {
@@ -227,24 +221,24 @@ export default function QuizModule() {
                         router.push('/quiz');
                       }
                     }}
-                    className="btn-primary"
+                    className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 px-8 rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200 flex items-center gap-2"
                   >
-                    {module.id < 10 ? 'Next Module' : 'Complete Quiz'}
+                    {module.id < 10 ? '🚀 Next Module' : '🎯 Complete Quiz'}
                   </button>
                 ) : (
                   <button
                     onClick={() => router.push('/quiz')}
-                    className="btn-primary"
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 px-8 rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200 flex items-center gap-2"
                   >
-                    Back to Quiz
+                    🏠 Back to Quiz
                   </button>
                 )}
                 {!isCompleted && (
                   <button
                     onClick={() => window.location.reload()}
-                    className="btn-ghost"
+                    className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold py-3 px-8 rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200 flex items-center gap-2"
                   >
-                    Retry Module
+                    🔄 Retry Module
                   </button>
                 )}
               </div>

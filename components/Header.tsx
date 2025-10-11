@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import WalletButton from './WalletButton'
 import UserMenu from './UserMenuSimple'
+import ThemeToggle from './ThemeToggle'
 import { LOGO_DEFAULT_PROPS, LOGO_FALLBACK_TEXT } from '../lib/logo'
 
 export default function Header() {
@@ -38,8 +39,8 @@ export default function Header() {
   }, [])
   
   return (
-    <header className="sticky top-0 z-40 bg-ctd-panel/80 backdrop-blur border-b border-ctd-border">
-      <div className="h-[2px] w-full bg-gradient-to-r from-ctd-yellow via-ctd-holo to-ctd-yellow opacity-60"></div>
+    <header className="sticky top-0 z-40 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
+      <div className="h-[2px] w-full bg-gradient-to-r from-yellow-400 via-purple-500 to-blue-500 opacity-80"></div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           <Link href="/" className="flex items-center group">
@@ -69,17 +70,14 @@ export default function Header() {
           </Link>
           
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
-              <span className="relative z-10">Home</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
+            <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-yellow-400 transition-colors font-medium">
+              Home
             </Link>
-            <Link href="/courses" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
-              <span className="relative z-10">Courses</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
+            <Link href="/courses" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-yellow-400 transition-colors font-medium">
+              Courses
             </Link>
-            <Link href="/binno-ai" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
-              <span className="relative z-10">AI Chat</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
+            <Link href="/binno-ai" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-yellow-400 transition-colors font-medium">
+              Binno AI
             </Link>
             {isConnected && (
               <>
@@ -100,6 +98,7 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center space-x-4">
+            <ThemeToggle />
             <WalletButton />
             
             {/* User Menu Hamburger Button - Only show when connected */}

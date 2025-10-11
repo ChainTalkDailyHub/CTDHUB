@@ -1,8 +1,8 @@
 import { Handler } from '@netlify/functions'
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = 'https://srqgmflodlowmybgxxeu.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNycWdtZmxvZGxvd215YmdveGV1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyODA2NTY1OSwiZXhwIjoyMDQzNjQxNjU5fQ.R60agPe0fGd9oJHIR6A0zqP0dxXn6CCNw7U3JHk4SzQ'
+const supabaseUrl = 'process.env.SUPABASE_URL'
+const supabaseKey = 'process.env.SUPABASE_ANON_KEY'
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 

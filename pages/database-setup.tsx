@@ -93,10 +93,10 @@ export default function DatabaseSetupPage() {
       <main className="py-24 spotlight">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-ctd-text drop-shadow-neon mb-6">
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white drop-shadow-neon mb-6">
               🗄️ Database Setup
             </h1>
-            <p className="text-xl text-ctd-mute max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               Verify and initialize the CTDHUB database to ensure persistent data storage
             </p>
           </div>
@@ -112,13 +112,13 @@ export default function DatabaseSetupPage() {
 
           <div className="grid gap-8">
             {/* Database Status Check */}
-            <div className="bg-ctd-panel border border-ctd-border rounded-2xl p-8">
-              <h2 className="text-2xl font-bold text-ctd-text mb-6 flex items-center">
+            <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-2xl p-8">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
                 <span className="mr-3">🔍</span>
                 Database Status Check
               </h2>
               
-              <p className="text-ctd-mute mb-6">
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
                 Verify if all database tables are properly configured and accessible.
               </p>
 
@@ -136,13 +136,13 @@ export default function DatabaseSetupPage() {
             </div>
 
             {/* Database Initialization */}
-            <div className="bg-ctd-panel border border-ctd-border rounded-2xl p-8">
-              <h2 className="text-2xl font-bold text-ctd-text mb-6 flex items-center">
+            <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-2xl p-8">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
                 <span className="mr-3">🚀</span>
                 Database Initialization
               </h2>
               
-              <p className="text-ctd-mute mb-6">
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
                 Create missing tables and set up the database schema for data persistence.
               </p>
 
@@ -188,8 +188,8 @@ export default function DatabaseSetupPage() {
 
                   {setupResult.details && (
                     <div className="mt-4">
-                      <p className="text-ctd-mute font-medium mb-2">Details:</p>
-                      <pre className="bg-ctd-bg p-4 rounded-lg text-sm text-ctd-text overflow-x-auto">
+                      <p className="text-gray-600 dark:text-gray-300 font-medium mb-2">Details:</p>
+                      <pre className="bg-ctd-bg p-4 rounded-lg text-sm text-gray-900 dark:text-white overflow-x-auto">
                         {typeof setupResult.details === 'string' 
                           ? setupResult.details 
                           : JSON.stringify(setupResult.details, null, 2)
@@ -200,11 +200,11 @@ export default function DatabaseSetupPage() {
 
                   {setupResult.tables && (
                     <div className="mt-4">
-                      <p className="text-ctd-mute font-medium mb-2">Table Status:</p>
+                      <p className="text-gray-600 dark:text-gray-300 font-medium mb-2">Table Status:</p>
                       <div className="grid gap-2">
                         {Object.entries(setupResult.tables).map(([table, status]: [string, any]) => (
                           <div key={table} className="flex items-center justify-between p-3 bg-ctd-bg rounded-lg">
-                            <span className="font-mono text-ctd-text">{table}</span>
+                            <span className="font-mono text-gray-900 dark:text-white">{table}</span>
                             <span className={`px-2 py-1 rounded text-sm ${
                               status.exists ? 'bg-green-600 text-green-100' : 'bg-red-600 text-red-100'
                             }`}>

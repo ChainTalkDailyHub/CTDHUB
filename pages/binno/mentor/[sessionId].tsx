@@ -66,7 +66,7 @@ export default function BinnoMentorPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300 text-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full mx-auto mb-4"></div>
           <h2 className="text-2xl font-bold mb-2">Binno is preparing your mentoring session...</h2>
@@ -78,7 +78,7 @@ export default function BinnoMentorPage() {
 
   if (!mentorSession) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300 text-white flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4 text-red-400">Unable to load mentor session</h2>
           <button
@@ -95,7 +95,7 @@ export default function BinnoMentorPage() {
   const expertise = getExpertiseLevel(mentorSession.bnb_expertise_level)
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300 text-white">
       <Head>
         <title>Binno Mentoring Session - CTD Hub</title>
         <meta name="description" content="Personalized Web3 mentoring with AI" />

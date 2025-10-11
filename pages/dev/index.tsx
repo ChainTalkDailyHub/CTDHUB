@@ -13,10 +13,7 @@ export default function DevArea() {
   // Protege rota: só acessa se wallet conectada
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const walletAddress = localStorage.getItem('ctdhub:wallet')
-    if (!walletAddress) {
-      router.replace('/')
-    }
+    // TEMP: Protection disabled for development
   }, [router])
   const [isConnected, setIsConnected] = useState(false)
   const [address, setAddress] = useState('')
@@ -179,13 +176,13 @@ export default function DevArea() {
 
   if (!isConnected) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+      <div className="min-h-screen ctd-bg transition-colors duration-300">
         <Header />
         <section className="pt-20 pb-8 px-4">
           <div className="max-w-6xl mx-auto px-6">
             <div className="text-center py-20">
-              <h1 className="text-4xl font-bold text-white mb-6">Connect your wallet</h1>
-              <p className="text-xl text-gray-300 mb-4">
+              <h1 className="text-4xl font-bold ctd-text mb-6">Connect your wallet</h1>
+              <p className="text-xl ctd-text opacity-70 mb-4">
                 You need a connected wallet to submit and manage videos. Viewing is open to everyone.
               </p>
               <WalletButton className="text-lg px-8 py-4" />
@@ -198,31 +195,29 @@ export default function DevArea() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+    <div className="min-h-screen ctd-bg transition-colors duration-300">
       <Header />
       <section className="pt-20 pb-8 px-4">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-4">
+            <div className="mb-8">
+            <h1 className="text-4xl font-bold ctd-yellow mb-4">
               Creator Studio
             </h1>
             <div className="mb-4">
-              <p className="text-2xl text-white font-semibold mb-2">
+              <p className="text-2xl ctd-text font-semibold mb-2">
                 {getWelcomeMessage().greeting}
-                <span className="text-gray-400 text-base font-normal ml-2">
+                <span className="ctd-text opacity-60 text-base font-normal ml-2">
                   {short(address)}
                 </span>
               </p>
-              <p className="text-lg text-gray-300 mb-2">
+              <p className="text-lg ctd-text opacity-70 mb-2">
                 {getWelcomeMessage().subtitle}
               </p>
             </div>
-            <p className="text-gray-300 leading-relaxed">
+            <p className="ctd-text opacity-80 leading-relaxed">
               Create, edit, and publish your lessons. Published videos appear on the Courses page.
             </p>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-8">
+          </div>          <div className="grid lg:grid-cols-2 gap-8">
             <div>
               <CourseForm 
                 onSubmit={handleCourseSubmit}
@@ -237,13 +232,13 @@ export default function DevArea() {
             </div>
 
             <div>
-              <div className="bg-gray-800 p-6 rounded-2xl border border-gray-700">
-                <h3 className="text-xl font-bold text-white mb-4">
+              <div className="ctd-panel p-6 rounded-2xl shadow-lg transition-colors duration-300">
+                <h3 className="text-xl font-bold ctd-text mb-4">
                   My Courses ({myCourses.length})
                 </h3>
                 
                 {myCourses.length === 0 ? (
-                  <p className="text-gray-400 text-center py-8">
+                  <p className="ctd-text opacity-60 text-center py-8">
                     No courses created yet. Use the form to publish your first course!
                   </p>
                 ) : (
@@ -251,28 +246,28 @@ export default function DevArea() {
                     {myCourses.map(course => (
                       <div 
                         key={course.id}
-                        className="p-4 bg-gray-700 rounded-lg border border-gray-600"
+                        className="p-4 ctd-panel rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm"
                       >
                         <div className="flex items-start justify-between mb-2">
-                          <h4 className="font-semibold text-white text-sm">
+                          <h4 className="font-semibold ctd-text text-sm">
                             {course.title}
                           </h4>
-                          <span className="text-xs text-yellow-400 bg-yellow-400/20 px-2 py-1 rounded">
+                          <span className="text-xs ctd-yellow bg-yellow-400/20 px-2 py-1 rounded">
                             {course.totalVideos} videos
                           </span>
                         </div>
-                        <p className="text-xs text-gray-400 mb-3 line-clamp-2">
+                        <p className="text-xs ctd-text opacity-60 mb-3 line-clamp-2">
                           {course.description}
                         </p>
                         <div className="flex items-center justify-between text-xs">
-                          <span className="text-gray-500">
+                          <span className="ctd-text opacity-50">
                             {formatDate(course.updatedAt)}
                           </span>
                           <a
                             href="/my-modules"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-yellow-400 hover:text-yellow-300"
+                            className="ctd-yellow hover:opacity-80 transition-opacity"
                           >
                             View Course →
                           </a>

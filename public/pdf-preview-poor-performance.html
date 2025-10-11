@@ -33,7 +33,7 @@
 
         /* Header */
         .pdf-header {
-            background: linear-gradient(135deg, #FFCC33 0%, #FFA500 100%);
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
             height: 35mm;
             width: 100%;
             position: relative;
@@ -41,7 +41,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 20mm;
-            box-shadow: 0 2px 10px rgba(255, 204, 51, 0.5);
+            box-shadow: 0 2px 10px rgba(30, 41, 59, 0.5);
         }
 
         .logo-section {
@@ -51,38 +51,42 @@
         }
 
         .logo-section img {
-            height: 40px;
+            height: 60px;
             width: auto;
             object-fit: contain;
             background: transparent;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
         }
 
         .logo-fallback {
-            height: 40px;
-            width: 120px;
+            height: 60px;
+            width: 180px;
             background: linear-gradient(135deg, #FFCC33 0%, #FFA500 100%);
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 16px;
+            font-size: 20px;
             color: #000;
             letter-spacing: 1px;
             border: 2px solid #000;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
         }
 
         .logo-section p {
-            font-size: 14px;
-            color: #333;
+            font-size: 16px;
+            color: #FFCC33;
             margin: 0;
-            font-weight: 500;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
 
         .date-section {
             text-align: right;
-            font-size: 10px;
-            color: #333;
+            font-size: 12px;
+            color: #e2e8f0;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
 
         /* Content */

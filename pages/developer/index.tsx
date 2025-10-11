@@ -116,10 +116,10 @@ export default function DeveloperPage() {
       <section className="pt-20 pb-8 px-4 spotlight">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-ctd-text drop-shadow-neon mb-4">
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white drop-shadow-neon mb-4">
               Dev <span className="text-ctd-yellow">Area</span>
             </h1>
-            <p className="text-xl text-ctd-mute">
+            <p className="text-xl text-gray-600 dark:text-gray-300">
               Administrative area for official CTDHUB course creation
             </p>
           </div>
@@ -133,8 +133,8 @@ export default function DeveloperPage() {
                 <div className="corner corner--br"></div>
                 
                 <div className="relative z-10 p-1 text-center">
-                  <h3 className="text-xl font-semibold text-ctd-text mb-4">Connect Your Wallet</h3>
-                  <p className="text-ctd-mute mb-6">Connect your wallet to access the developer area</p>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Connect Your Wallet</h3>
+                  <p className="text-gray-600 dark:text-gray-300 mb-6">Connect your wallet to access the developer area</p>
                   <button
                     onClick={connectWallet}
                     className="btn-primary"
@@ -156,8 +156,8 @@ export default function DeveloperPage() {
                   
                   <div className="relative z-10 p-1 text-center">
                     <h2 className="text-2xl font-bold text-ctd-yellow mb-2">🔥 CTDHUB Admin</h2>
-                    <p className="text-lg text-ctd-text">You have exclusive access to create official CTDHUB courses!</p>
-                    <p className="text-sm text-ctd-mute mt-2">Wallet: {walletAddress}</p>
+                    <p className="text-lg text-gray-900 dark:text-white">You have exclusive access to create official CTDHUB courses!</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">Wallet: {walletAddress}</p>
                   </div>
                 </div>
               )}
@@ -171,11 +171,11 @@ export default function DeveloperPage() {
                   <div className="corner corner--br"></div>
                   
                   <div className="relative z-10 p-1">
-                    <h3 className="text-xl font-bold text-ctd-text mb-4 flex items-center">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
                       <span className="mr-3">🗄️</span>
                       Database Management
                     </h3>
-                    <p className="text-ctd-mute mb-6">
+                    <p className="text-gray-600 dark:text-gray-300 mb-6">
                       Manage the persistent database to ensure data survives deployments
                     </p>
                     
@@ -188,7 +188,7 @@ export default function DeveloperPage() {
                       </a>
                       <a
                         href="/data-migration"
-                        className="px-4 py-2 bg-ctd-border hover:bg-ctd-border/70 text-ctd-text rounded-lg transition-colors"
+                        className="px-4 py-2 bg-ctd-border hover:bg-ctd-border/70 text-gray-900 dark:text-white rounded-lg transition-colors"
                       >
                         📊 Data Migration
                       </a>
@@ -215,7 +215,7 @@ export default function DeveloperPage() {
                   
                   <div className="relative z-10 p-1">
                     <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-xl font-bold text-ctd-text">Create Official CTDHUB Course</h3>
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white">Create Official CTDHUB Course</h3>
                       <button
                         onClick={() => setShowAdminForm(!showAdminForm)}
                         className="btn-primary"
@@ -237,47 +237,47 @@ export default function DeveloperPage() {
                     {showAdminForm && (
                       <form onSubmit={handleAdminCourseSubmit} className="space-y-4">
                         <div>
-                          <label className="block text-ctd-text mb-2 font-medium">Course Title</label>
+                          <label className="block text-gray-900 dark:text-white mb-2 font-medium">Course Title</label>
                           <input
                             type="text"
                             required
                             value={adminCourseData.title}
                             onChange={(e) => setAdminCourseData(prev => ({ ...prev, title: e.target.value }))}
-                            className="w-full px-4 py-3 bg-ctd-panel border border-ctd-border rounded-lg text-ctd-text placeholder-ctd-mute focus:outline-none focus:ring-2 focus:ring-ctd-yellow"
+                            className="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-ctd-mute focus:outline-none focus:ring-2 focus:ring-yellow-400"
                             placeholder="Ex: Blockchain Fundamentals"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-ctd-text mb-2 font-medium">Description</label>
+                          <label className="block text-gray-900 dark:text-white mb-2 font-medium">Description</label>
                           <textarea
                             required
                             value={adminCourseData.description}
                             onChange={(e) => setAdminCourseData(prev => ({ ...prev, description: e.target.value }))}
-                            className="w-full px-4 py-3 bg-ctd-panel border border-ctd-border rounded-lg text-ctd-text placeholder-ctd-mute focus:outline-none focus:ring-2 focus:ring-ctd-yellow h-24 resize-none"
+                            className="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-ctd-mute focus:outline-none focus:ring-2 focus:ring-yellow-400 h-24 resize-none"
                             placeholder="Detailed course description..."
                           />
                         </div>
 
                         <div>
-                          <label className="block text-ctd-text mb-2 font-medium">YouTube URL</label>
+                          <label className="block text-gray-900 dark:text-white mb-2 font-medium">YouTube URL</label>
                           <input
                             type="url"
                             required
                             value={adminCourseData.youtubeUrl}
                             onChange={(e) => setAdminCourseData(prev => ({ ...prev, youtubeUrl: e.target.value }))}
-                            className="w-full px-4 py-3 bg-ctd-panel border border-ctd-border rounded-lg text-ctd-text placeholder-ctd-mute focus:outline-none focus:ring-2 focus:ring-ctd-yellow"
+                            className="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-ctd-mute focus:outline-none focus:ring-2 focus:ring-yellow-400"
                             placeholder="https://youtube.com/watch?v=..."
                           />
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-ctd-text mb-2 font-medium">Category</label>
+                            <label className="block text-gray-900 dark:text-white mb-2 font-medium">Category</label>
                             <select
                               value={adminCourseData.category}
                               onChange={(e) => setAdminCourseData(prev => ({ ...prev, category: e.target.value }))}
-                              className="w-full px-4 py-3 bg-ctd-panel border border-ctd-border rounded-lg text-ctd-text focus:outline-none focus:ring-2 focus:ring-ctd-yellow"
+                              className="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
                             >
                               <option value="Blockchain">Blockchain</option>
                               <option value="DeFi">DeFi</option>
@@ -288,11 +288,11 @@ export default function DeveloperPage() {
                           </div>
 
                           <div>
-                            <label className="block text-ctd-text mb-2 font-medium">Difficulty</label>
+                            <label className="block text-gray-900 dark:text-white mb-2 font-medium">Difficulty</label>
                             <select
                               value={adminCourseData.difficulty}
                               onChange={(e) => setAdminCourseData(prev => ({ ...prev, difficulty: e.target.value }))}
-                              className="w-full px-4 py-3 bg-ctd-panel border border-ctd-border rounded-lg text-ctd-text focus:outline-none focus:ring-2 focus:ring-ctd-yellow"
+                              className="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
                             >
                               <option value="Beginner">Beginner</option>
                               <option value="Intermediate">Intermediate</option>
@@ -323,13 +323,13 @@ export default function DeveloperPage() {
                   <div className="corner corner--br"></div>
                   
                   <div className="relative z-10 p-1 text-center">
-                    <h2 className="text-xl font-bold text-ctd-text mb-4">Development Area</h2>
-                    <p className="text-ctd-mute mb-4">
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Development Area</h2>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">
                       This area is reserved for CTDHUB administrators.
                       <br />
                       Only the ChainTalkDaily wallet can create official courses.
                     </p>
-                    <p className="text-sm text-ctd-mute">
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
                       Your wallet: {walletAddress}
                     </p>
                   </div>

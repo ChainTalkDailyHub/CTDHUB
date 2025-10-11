@@ -4,11 +4,11 @@ import { createClient } from '@supabase/supabase-js'
 // Initialize Supabase with multiple fallback options
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 
                    process.env.SUPABASE_URL || 
-                   'https://srqgmflodlowmybgxxeu.supabase.co'
+                   'process.env.SUPABASE_URL'
 
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 
                    process.env.SUPABASE_ANON_KEY || 
-                   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNycWdtZmxvZGxvd215Ymd4eGV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwMDM2MjgsImV4cCI6MjA3NDU3OTYyOH0.yI4PQXcmd96JVMoG46gh85G3hFVr0L3L7jBHWlJzAlQ'
+                   'process.env.SUPABASE_ANON_KEY'
 
 let supabase: any = null
 

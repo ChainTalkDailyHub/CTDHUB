@@ -397,7 +397,7 @@ export default function SkillCompassQuestionnaire() {
   if (!mounted) {
     return (
       <div className="min-h-screen bg-ctd-bg py-8 flex items-center justify-center">
-        <div className="text-ctd-text text-lg">Loading...</div>
+        <div className="text-gray-900 dark:text-white text-lg">Loading...</div>
       </div>
     )
   }
@@ -407,9 +407,9 @@ export default function SkillCompassQuestionnaire() {
     return (
       <div className="min-h-screen bg-ctd-bg py-8">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="bg-ctd-panel rounded-3xl shadow-2xl border border-ctd-border p-8">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-300 dark:border-gray-600 p-8">
             <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold text-ctd-text mb-4">
+              <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
                 <img 
                   src="/images/CTDHUB.png" 
                   alt="CTDHUB Logo" 
@@ -417,12 +417,12 @@ export default function SkillCompassQuestionnaire() {
                 />
                 Your CTD Skill Compass Analysis
               </h1>
-              <p className="text-ctd-mute text-lg">
+              <p className="text-gray-600 dark:text-gray-300 text-lg">
                 Based on your {answers.length} detailed responses
               </p>
             </div>
 
-            <div className="prose prose-lg max-w-none text-ctd-text">
+            <div className="prose prose-lg max-w-none text-gray-900 dark:text-white">
               <div dangerouslySetInnerHTML={{ __html: finalReport.replace(/\n/g, '<br />') }} />
             </div>
 
@@ -435,7 +435,7 @@ export default function SkillCompassQuestionnaire() {
               </button>
               <button
                 onClick={() => window.print()}
-                className="px-6 py-3 bg-ctd-panel border border-ctd-border text-ctd-text rounded-lg hover:bg-ctd-border transition-colors font-medium"
+                className="px-6 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg hover:bg-ctd-border transition-colors font-medium"
               >
                 Print Report
               </button>
@@ -449,26 +449,26 @@ export default function SkillCompassQuestionnaire() {
   return (
     <div className="min-h-screen bg-ctd-bg py-8">
       <div className="max-w-4xl mx-auto px-4">
-        <div className="bg-ctd-panel rounded-3xl shadow-2xl border border-ctd-border">
+        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-300 dark:border-gray-600">
           
           {/* Header */}
-          <div className="p-8 border-b border-ctd-border">
+          <div className="p-8 border-b border-gray-300 dark:border-gray-600">
             <div className="text-center">
-              <h1 className="text-3xl font-bold text-ctd-text mb-2">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                 🧭 CTD Skill Compass
               </h1>
-              <p className="text-ctd-mute text-sm mb-4">
+              <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
                 🤖 Powered by Binno AI • Questions adapt based on your responses • CTDHUB
               </p>
               
               {/* Session Info */}
               {answers.length > 0 && (
-                <div className="mb-4 p-3 bg-ctd-bg rounded-lg border border-ctd-border">
+                <div className="mb-4 p-3 bg-ctd-bg rounded-lg border border-gray-300 dark:border-gray-600">
                   <div className="flex items-center justify-center space-x-4 text-sm">
-                    <span className="text-ctd-text">
+                    <span className="text-gray-900 dark:text-white">
                       💾 Progress saved automatically
                     </span>
-                    <span className="text-ctd-mute">
+                    <span className="text-gray-600 dark:text-gray-300">
                       {answers.length} answer{answers.length !== 1 ? 's' : ''} completed
                     </span>
                     <button
@@ -484,7 +484,7 @@ export default function SkillCompassQuestionnaire() {
               
               {/* Progress */}
               <div className="flex items-center justify-center space-x-4 mb-4">
-                <span className="text-ctd-text text-sm font-medium">
+                <span className="text-gray-900 dark:text-white text-sm font-medium">
                   Question {questionNumber} of 15
                 </span>
               </div>
@@ -501,11 +501,11 @@ export default function SkillCompassQuestionnaire() {
           {/* Question */}
           <div className="p-8">
             <div className="mb-6">
-              <h2 className="text-2xl font-semibold text-ctd-text mb-4">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
                 {currentQuestion.question_text}
               </h2>
               {currentQuestion.context && (
-                <p className="text-ctd-mute text-sm">
+                <p className="text-gray-600 dark:text-gray-300 text-sm">
                   💡 {currentQuestion.context}
                 </p>
               )}
@@ -526,14 +526,14 @@ export default function SkillCompassQuestionnaire() {
                 onChange={(e) => setCurrentAnswer(e.target.value)}
                 onKeyDown={handleKeyPress}
                 placeholder="Share your thoughts and experience here..."
-                className="w-full h-40 p-4 bg-ctd-bg border border-ctd-border rounded-lg text-ctd-text placeholder-ctd-mute resize-none focus:outline-none focus:ring-2 focus:ring-ctd-yellow"
+                className="w-full h-40 p-4 bg-ctd-bg border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-ctd-mute resize-none focus:outline-none focus:ring-2 focus:ring-yellow-400"
                 disabled={isSubmitting || isGeneratingQuestion || isGeneratingReport}
               />
               <div className="flex justify-between items-center mt-2">
-                <span className="text-ctd-mute text-sm">
+                <span className="text-gray-600 dark:text-gray-300 text-sm">
                   {characterCount} characters
                 </span>
-                <span className="text-ctd-mute text-sm">
+                <span className="text-gray-600 dark:text-gray-300 text-sm">
                   Press Ctrl+Enter to submit
                 </span>
               </div>
@@ -544,7 +544,7 @@ export default function SkillCompassQuestionnaire() {
               <button
                 onClick={handlePrevious}
                 disabled={questionNumber <= 1 || isSubmitting || isGeneratingQuestion}
-                className="px-6 py-3 bg-ctd-bg border border-ctd-border text-ctd-text rounded-lg hover:bg-ctd-border transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-3 bg-ctd-bg border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg hover:bg-ctd-border transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 ← Previous
               </button>

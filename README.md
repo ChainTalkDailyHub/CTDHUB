@@ -1,9 +1,9 @@
-# 🚀 CTDHUB - Web3 Learning Ecosystem
+# 🚀 CTD HUB - Web3 Learning Ecosystem
 
 [![Deploy Status](https://api.netlify.com/api/v1/badges/687f2b27-768f-0513-1458-9568e8f9c123/deploy-status)](https://app.netlify.com/sites/extraordinary-treacle-1bc552/deploys)
 [![Live Demo](https://img.shields.io/badge/Live-Demo-green)](https://extraordinary-treacle-1bc552.netlify.app/)
 
-**CTDHUB** is a comprehensive educational platform focused on Web3 and blockchain development, specifically optimized for the BNB Chain ecosystem. The platform offers interactive courses, adaptive assessments, and AI-powered tools to accelerate blockchain development learning.
+**CTD HUB** is a comprehensive educational platform focused on Web3 and blockchain development, specifically optimized for the BNB Chain ecosystem. The platform offers interactive courses, adaptive assessments, and AI-powered tools to accelerate blockchain development learning.
 
 ## ✨ Key Features
 

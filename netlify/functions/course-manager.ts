@@ -13,10 +13,13 @@ interface CourseData {
   videos: VideoFormData[]
 }
 
-// Initialize Supabase directly
-const supabaseUrl = 'https://srqgmflodlowmybgxxeu.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNycWdtZmxvZGxvd215Ymd4eGV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwMDM2MjgsImV4cCI6MjA3NDU3OTYyOH0.yI4PQXcmd96JVMoG46gh85G3hFVr0L3L7jBHWlJzAlQ'
-const supabase = createClient(supabaseUrl, supabaseKey)
+// Initialize Supabase from environment variables
+const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+const supabase = (supabaseUrl && supabaseKey) 
+  ? createClient(supabaseUrl, supabaseKey)
+  : null
 
 // Helper functions
 function ytIdFromUrl(url: string): string | null {
@@ -760,6 +763,290 @@ export default async (req: Request, context: Context) => {
       } else {
         return new Response(JSON.stringify({ error: 'Course not found in storage' }), {
           status: 404,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+        })
+      }
+    }
+
+    // DELETE method - delete course or video
+    if (method === 'DELETE') {
+      const userAddress = req.headers.get('x-user-address')
+      const url = new URL(req.url)
+      const courseId = url.searchParams.get('courseId')
+      const videoId = url.searchParams.get('videoId')
+      
+      if (!userAddress || !userAddress.startsWith('0x')) {
+        return new Response(JSON.stringify({ error: 'Valid wallet address required' }), {
+          status: 401,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+        })
+      }
+
+      if (!courseId) {
+        return new Response(JSON.stringify({ error: 'Course ID is required' }), {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+        })
+      }
+
+      let course
+      
+      // Try Supabase first
+      if (isSupabaseAvailable()) {
+        console.log('Deleting from Supabase:', { courseId, videoId })
+        try {
+          // Find the course by generated ID
+          const { data: courses, error: coursesError } = await supabase
+            .from('courses')
+            .select('*')
+
+          if (coursesError) {
+            console.error('❌ Error fetching courses:', coursesError)
+            return new Response(JSON.stringify({ error: 'Database error' }), {
+              status: 500,
+              headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+              },
+            })
+          }
+
+          const matchingCourse = courses?.find(course => generateConsistentId(course.id) === courseId)
+          
+          if (!matchingCourse) {
+            return new Response(JSON.stringify({ error: 'Course not found' }), {
+              status: 404,
+              headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+              },
+            })
+          }
+
+          // Verify ownership
+          if (matchingCourse.author.toLowerCase() !== userAddress.toLowerCase()) {
+            return new Response(JSON.stringify({ error: 'Not authorized to delete this content' }), {
+              status: 403,
+              headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+              },
+            })
+          }
+
+          if (videoId) {
+            // Delete specific video
+            console.log('Deleting video from course:', videoId)
+            
+            // Find the video by generated ID
+            const { data: videos, error: videosError } = await supabase
+              .from('course_videos')
+              .select('*')
+              .eq('course_id', matchingCourse.id)
+
+            if (videosError) {
+              console.error('❌ Error fetching videos:', videosError)
+              return new Response(JSON.stringify({ error: 'Database error' }), {
+                status: 500,
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Access-Control-Allow-Origin': '*',
+                },
+              })
+            }
+
+            const matchingVideo = videos?.find(video => generateConsistentId(video.id) === videoId)
+            
+            if (!matchingVideo) {
+              return new Response(JSON.stringify({ error: 'Video not found' }), {
+                status: 404,
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Access-Control-Allow-Origin': '*',
+                },
+              })
+            }
+
+            // Delete the video
+            const { error: deleteError } = await supabase
+              .from('course_videos')
+              .delete()
+              .eq('id', matchingVideo.id)
+
+            if (deleteError) {
+              console.error('❌ Error deleting video:', deleteError)
+              return new Response(JSON.stringify({ error: 'Failed to delete video' }), {
+                status: 500,
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Access-Control-Allow-Origin': '*',
+                },
+              })
+            }
+
+            // Update course updated_at timestamp
+            await supabase
+              .from('courses')
+              .update({ updated_at: new Date().toISOString() })
+              .eq('id', matchingCourse.id)
+
+            // Return updated course
+            const updatedCourse = await getCourseByIdFromSupabase(courseId)
+            if (updatedCourse) {
+              console.log('✅ Video deleted successfully from Supabase')
+              return new Response(JSON.stringify({
+                success: true,
+                message: 'Video deleted successfully',
+                course: updatedCourse
+              }), {
+                status: 200,
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Access-Control-Allow-Origin': '*',
+                },
+              })
+            }
+
+          } else {
+            // Delete entire course
+            console.log('Deleting entire course:', courseId)
+            
+            // First delete all videos
+            const { error: videosDeleteError } = await supabase
+              .from('course_videos')
+              .delete()
+              .eq('course_id', matchingCourse.id)
+
+            if (videosDeleteError) {
+              console.error('❌ Error deleting course videos:', videosDeleteError)
+              return new Response(JSON.stringify({ error: 'Failed to delete course videos' }), {
+                status: 500,
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Access-Control-Allow-Origin': '*',
+                },
+              })
+            }
+
+            // Then delete the course
+            const { error: courseDeleteError } = await supabase
+              .from('courses')
+              .delete()
+              .eq('id', matchingCourse.id)
+
+            if (courseDeleteError) {
+              console.error('❌ Error deleting course:', courseDeleteError)
+              return new Response(JSON.stringify({ error: 'Failed to delete course' }), {
+                status: 500,
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Access-Control-Allow-Origin': '*',
+                },
+              })
+            }
+
+            console.log('✅ Course deleted successfully from Supabase')
+            return new Response(JSON.stringify({
+              success: true,
+              message: 'Course deleted successfully'
+            }), {
+              status: 200,
+              headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+              },
+            })
+          }
+
+        } catch (error) {
+          console.error('Supabase error during deletion:', error)
+        }
+      }
+
+      // Fallback: Delete from memory storage
+      console.log('Deleting from memory storage:', { courseId, videoId })
+      const courseIndex = coursesStorage.findIndex(c => c.id === courseId)
+      
+      if (courseIndex === -1) {
+        return new Response(JSON.stringify({ error: 'Course not found' }), {
+          status: 404,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+        })
+      }
+
+      course = coursesStorage[courseIndex]
+
+      // Verify ownership
+      if (course.author.toLowerCase() !== userAddress.toLowerCase()) {
+        return new Response(JSON.stringify({ error: 'Not authorized to delete this content' }), {
+          status: 403,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+        })
+      }
+
+      if (videoId) {
+        // Delete specific video from memory
+        const videoIndex = course.videos.findIndex((v: any) => v.id === videoId)
+        
+        if (videoIndex === -1) {
+          return new Response(JSON.stringify({ error: 'Video not found' }), {
+            status: 404,
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+            },
+          })
+        }
+
+        course.videos.splice(videoIndex, 1)
+        course.totalVideos = course.videos.length
+        course.updatedAt = Date.now()
+
+        // Update order for remaining videos
+        course.videos.forEach((video: any, index: number) => {
+          video.order = index + 1
+        })
+
+        coursesStorage[courseIndex] = course
+
+        console.log('✅ Video deleted successfully from memory storage')
+        return new Response(JSON.stringify({
+          success: true,
+          message: 'Video deleted successfully',
+          course: course
+        }), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+        })
+
+      } else {
+        // Delete entire course from memory
+        coursesStorage.splice(courseIndex, 1)
+
+        console.log('✅ Course deleted successfully from memory storage')
+        return new Response(JSON.stringify({
+          success: true,
+          message: 'Course deleted successfully'
+        }), {
+          status: 200,
           headers: {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*',

@@ -77,6 +77,72 @@ export default function CourseDetail() {
     alert(`Videos added successfully! Module now has ${updatedCourse.totalVideos} videos.`)
   }
 
+  const handleDeleteVideo = async (videoId: string, videoTitle: string) => {
+    if (!userAddress || !course) throw new Error('Authentication required')
+
+    const confirmDelete = confirm(`Are you sure you want to delete "${videoTitle}"? This action cannot be undone.`)
+    if (!confirmDelete) return
+
+    try {
+      const response = await fetch(`/.netlify/functions/course-manager?courseId=${course.id}&videoId=${videoId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-address': userAddress
+        }
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to delete video')
+      }
+
+      const result = await response.json()
+      setCourse(result.course)
+      
+      // Adjust current video index if needed
+      if (currentVideoIndex >= result.course.totalVideos) {
+        setCurrentVideoIndex(Math.max(0, result.course.totalVideos - 1))
+      }
+      
+      alert('Video deleted successfully!')
+    } catch (error) {
+      console.error('Error deleting video:', error)
+      alert(error instanceof Error ? error.message : 'Failed to delete video')
+    }
+  }
+
+  const handleDeleteCourse = async () => {
+    if (!userAddress || !course) throw new Error('Authentication required')
+
+    const confirmDelete = confirm(`Are you sure you want to delete the entire course "${course.title}"? This will delete all videos and cannot be undone.`)
+    if (!confirmDelete) return
+
+    const doubleConfirm = confirm('This is your last chance! This action will permanently delete all course content. Continue?')
+    if (!doubleConfirm) return
+
+    try {
+      const response = await fetch(`/.netlify/functions/course-manager?courseId=${course.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-address': userAddress
+        }
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to delete course')
+      }
+
+      alert('Course deleted successfully!')
+      router.push('/dev')
+    } catch (error) {
+      console.error('Error deleting course:', error)
+      alert(error instanceof Error ? error.message : 'Failed to delete course')
+    }
+  }
+
   const isOwner = course && userAddress && course.author.toLowerCase() === userAddress.toLowerCase()
 
   const formatDate = (timestamp: number) => {
@@ -89,11 +155,11 @@ export default function CourseDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+      <div className="min-h-screen ctd-bg">
         <Header />
         <section className="pt-20 pb-8 px-4">
           <div className="max-w-6xl mx-auto text-center py-20">
-            <div className="text-white text-lg">Loading course...</div>
+            <div className="ctd-text text-lg">Loading course...</div>
           </div>
         </section>
         <Footer />
@@ -103,17 +169,17 @@ export default function CourseDetail() {
 
   if (notFound || !course) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+      <div className="min-h-screen ctd-bg">
         <Header />
         <section className="pt-20 pb-8 px-4">
           <div className="max-w-6xl mx-auto text-center py-20">
-            <h1 className="text-3xl font-bold text-white mb-4">Course Not Found</h1>
-            <p className="text-gray-400 mb-8">
+            <h1 className="text-3xl font-bold ctd-text mb-4">Course Not Found</h1>
+            <p className="ctd-mute mb-8">
               The course you're looking for doesn't exist or has been removed.
             </p>
             <a
               href="/courses"
-              className="inline-block bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 py-3 rounded-lg transition-colors"
+              className="inline-block bg-ctd-yellow hover:bg-yellow-600 text-black font-semibold px-6 py-3 rounded-lg transition-colors"
             >
               Back to Courses
             </a>
@@ -128,21 +194,21 @@ export default function CourseDetail() {
   const embedUrl = currentVideo ? getYouTubeEmbedUrl(currentVideo.youtubeUrl) : null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+    <div className="min-h-screen ctd-bg">
       <Header />
       <section className="pt-20 pb-8 px-4">
         <div className="max-w-6xl mx-auto">
           {/* Course Header */}
           <div className="mb-8">
-            <div className="flex items-center gap-2 text-sm text-gray-400 mb-4">
-              <a href="/courses" className="hover:text-yellow-400">Courses</a>
+            <div className="flex items-center gap-2 text-sm ctd-mute mb-4">
+              <a href="/courses" className="hover:text-ctd-yellow">Courses</a>
               <span>•</span>
               <span>{course.title}</span>
             </div>
             
-            <h1 className="text-4xl font-bold text-white mb-4">{course.title}</h1>
+            <h1 className="text-4xl font-bold ctd-text mb-4">{course.title}</h1>
             
-            <div className="flex items-center gap-6 text-sm text-gray-400 mb-6">
+            <div className="flex items-center gap-6 text-sm ctd-mute mb-6">
               <span>By {short(course.author)}</span>
               <span>•</span>
               <span>{course.totalVideos} videos</span>
@@ -150,7 +216,7 @@ export default function CourseDetail() {
               <span>Updated {formatDate(course.updatedAt)}</span>
             </div>
 
-            <p className="text-gray-300 text-lg leading-relaxed mb-8">
+            <p className="ctd-text-secondary text-lg leading-relaxed mb-8">
               {course.description}
             </p>
             
@@ -159,15 +225,21 @@ export default function CourseDetail() {
               <div className="flex gap-4 mb-6">
                 <button
                   onClick={() => setShowAddVideos(true)}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-4 py-2 rounded-lg transition-colors"
+                  className="bg-ctd-yellow hover:bg-yellow-600 text-black font-semibold px-4 py-2 rounded-lg transition-colors"
                 >
                   + Add Videos
                 </button>
                 <button
                   onClick={() => router.push(`/dev?edit=${course.id}`)}
-                  className="bg-gray-700 hover:bg-gray-600 text-white font-semibold px-4 py-2 rounded-lg transition-colors"
+                  className="ctd-panel hover:bg-gray-600 dark:hover:bg-gray-600 ctd-text font-semibold px-4 py-2 rounded-lg transition-colors"
                 >
                   Edit Module
+                </button>
+                <button
+                  onClick={handleDeleteCourse}
+                  className="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors"
+                >
+                  🗑️ Delete Course
                 </button>
               </div>
             )}
@@ -188,7 +260,7 @@ export default function CourseDetail() {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Video Player */}
             <div className="lg:col-span-2">
-              <div className="bg-gray-800 rounded-2xl border border-gray-700 overflow-hidden">
+              <div className="ctd-panel rounded-2xl ctd-border overflow-hidden">
                 {embedUrl ? (
                   <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                     <iframe
@@ -201,18 +273,18 @@ export default function CourseDetail() {
                     />
                   </div>
                 ) : (
-                  <div className="w-full h-64 bg-gray-700 flex items-center justify-center">
-                    <p className="text-gray-400">Unable to load video</p>
+                  <div className="w-full h-64 bg-gray-300 dark:bg-gray-700 flex items-center justify-center">
+                    <p className="ctd-mute">Unable to load video</p>
                   </div>
                 )}
                 
                 <div className="p-6">
-                  <h2 className="text-2xl font-bold text-white mb-2">
+                  <h2 className="text-2xl font-bold ctd-text mb-2">
                     {currentVideo.title}
                   </h2>
                   
                   {currentVideo.description && (
-                    <p className="text-gray-300 mb-4">
+                    <p className="ctd-text-secondary mb-4">
                       {currentVideo.description}
                     </p>
                   )}
@@ -221,8 +293,8 @@ export default function CourseDetail() {
             </div>
 
             {/* Course Playlist */}
-            <div className="bg-gray-800 rounded-2xl border border-gray-700 p-6">
-              <h3 className="text-lg font-bold text-white mb-4">
+            <div className="ctd-panel rounded-2xl ctd-border p-6">
+              <h3 className="text-lg font-bold ctd-text mb-4">
                 Course Videos ({course.totalVideos})
               </h3>
               
@@ -233,12 +305,12 @@ export default function CourseDetail() {
                     onClick={() => setCurrentVideoIndex(index)}
                     className={`w-full text-left p-3 rounded-lg border transition-all ${
                       index === currentVideoIndex
-                        ? 'bg-yellow-500/20 border-yellow-500 text-white'
-                        : 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600'
+                        ? 'bg-ctd-yellow/20 border-ctd-yellow ctd-text'
+                        : 'ctd-panel ctd-border ctd-text-secondary hover:bg-gray-200 dark:hover:bg-gray-600'
                     }`}
                   >
                     <div className="flex gap-3">
-                      <div className="flex-shrink-0 w-12 h-8 bg-gray-600 rounded overflow-hidden">
+                      <div className="flex-shrink-0 w-12 h-8 bg-gray-300 dark:bg-gray-600 rounded overflow-hidden">
                         {video.thumbnail && (
                           <img
                             src={video.thumbnail}
@@ -249,17 +321,29 @@ export default function CourseDetail() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs font-medium text-gray-400">
+                          <span className="text-xs font-medium ctd-mute">
                             {index + 1}.
                           </span>
                           {index === currentVideoIndex && (
-                            <span className="text-xs text-yellow-400">▶ Playing</span>
+                            <span className="text-xs text-ctd-yellow">▶ Playing</span>
                           )}
                         </div>
                         <h4 className="font-medium text-sm line-clamp-2">
                           {video.title}
                         </h4>
                       </div>
+                      {isOwner && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleDeleteVideo(video.id, video.title)
+                          }}
+                          className="flex-shrink-0 p-1 rounded text-red-400 hover:text-red-300 hover:bg-red-500/20 transition-colors"
+                          title="Delete this video"
+                        >
+                          🗑️
+                        </button>
+                      )}
                     </div>
                   </button>
                 ))}

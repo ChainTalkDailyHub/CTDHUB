@@ -1,0 +1,416 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{
+  --bg:#000; --panel:#0E0E0E; --border:#2A2A2A; --text:#F2F2F2;
+  --muted:#A8A8A8; --yellow:#FFCC33; --holo:#8BE9FD;
+}
+
+* {
+  scroll-behavior: smooth;
+}
+
+html,body{ background:var(--bg); color:var(--text); }
+
+body.theme-neon-circuit {
+  background:
+    radial-gradient(1000px 500px at 80% -10%, rgba(255,199,0,.08), transparent 60%),
+    radial-gradient(900px 600px at -10% 80%, rgba(0,229,255,.06), transparent 60%),
+    #0A0A0A;
+}
+
+/* grade animada tipo circuito */
+.neon-grid {
+  position: relative;
+  isolation: isolate;
+}
+.neon-grid::before{
+  content:"";
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(255,199,0,.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,199,0,.08) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: gridMove 18s linear infinite;
+  opacity:.25;
+  pointer-events:none;
+  z-index:-1;
+}
+
+/* scanline sutil no topo das seções */
+.section-scan {
+  position: relative; overflow: hidden;
+}
+.section-scan::after{
+  content:"";
+  position:absolute; left:0; right:0; top:-100%;
+  height:120%; pointer-events:none;
+  background: linear-gradient(to bottom, rgba(255,199,0,.05), transparent 60%);
+  animation: scanline 8s linear infinite;
+}
+
+/* cantoneiras (ornamento nos cards) */
+.corner {
+  position:absolute; width:18px; height:18px; border:1px solid rgba(255,199,0,.6);
+  transition: all 0.3s ease;
+}
+.corner--tl{top:8px; left:8px; border-right:none; border-bottom:none; border-radius:6px 0 0 0;}
+.corner--tr{top:8px; right:8px; border-left:none; border-bottom:none; border-radius:0 6px 0 0;}
+.corner--bl{bottom:8px; left:8px; border-right:none; border-top:none; border-radius:0 0 0 6px;}
+.corner--br{bottom:8px; right:8px; border-left:none; border-top:none; border-radius:0 0 6px 0;}
+
+/* Hover effect para cantoneiras */
+.card:hover .corner {
+  border-color: rgba(255,199,0,.9);
+  box-shadow: 0 0 8px rgba(255,199,0,.3);
+}
+
+/* borda em gradiente real (não só cor) */
+.gradient-border {
+  position: relative;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, rgba(255,199,0,.6), rgba(0,229,255,.3));
+  padding: 1px;
+}
+.gradient-border > .gb-inner {
+  border-radius: inherit;
+  background: linear-gradient(180deg, var(--panel), var(--panel2));
+}
+
+/* utilitários de componente */
+.card {
+  position: relative;
+  border-radius: 1rem;
+  border: 1px solid rgba(42,42,42,.8);
+  background-color: rgba(14,14,14,.8);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0), 0 4px 20px rgba(0,0,0,.3);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 0 0 1px rgba(255,199,0,.1), 0 8px 30px rgba(0,0,0,.4);
+  transform: translateY(-2px);
+}
+
+/* Variações de cards */
+.card-feature {
+  border: 1px solid rgba(255,199,0,.2);
+  background: linear-gradient(135deg, rgba(14,14,14,.9), rgba(255,199,0,.02));
+}
+
+.card-interactive:hover {
+  border-color: rgba(255,199,0,.4);
+  box-shadow: 0 0 0 1px rgba(255,199,0,.2), 0 12px 40px rgba(0,0,0,.5);
+}
+
+.btn-primary{
+  display:inline-flex; align-items:center; gap:.5rem;
+  border-radius: .75rem; background-color: #FFCC33; color: #000;
+  font-weight: 600; padding: .75rem 1.25rem;
+  transition: all .2s ease;
+}
+.btn-primary:hover{ 
+  filter: drop-shadow(0 0 14px rgba(255,204,51,.4)); 
+}
+.btn-primary:focus{ 
+  outline: none; 
+  box-shadow: 0 0 0 2px rgba(255,204,51,.6); 
+}
+
+.btn-ghost{
+  display:inline-flex; align-items:center; gap:.5rem;
+  border-radius: .75rem; border: 1px solid #2A2A2A; 
+  color: #FFCC33; padding: .75rem 1.25rem;
+  transition: all .2s ease;
+}
+.btn-ghost:hover{ background-color: rgba(255,255,255,.05); }
+.btn-ghost:focus{ 
+  outline: none; 
+  box-shadow: 0 0 0 2px rgba(255,204,51,.4); 
+}
+
+.chip{ 
+  display:inline-flex; align-items:center; border-radius:9999px; 
+  border: 1px solid #2A2A2A; background-color: rgba(14,14,14,.7); 
+  padding: .25rem .75rem; font-size: .875rem; 
+}
+
+.spotlight{
+  position:relative; isolation:isolate;
+}
+.spotlight::before{
+  content:""; position:absolute; inset:auto auto 100% 50%; 
+  transform:translate(-50%, 0);
+  width:28rem; height:28rem; border-radius:9999px;
+  background:radial-gradient(circle, rgba(255,204,51,.18) 0%, transparent 60%);
+  pointer-events:none; z-index:-1; filter:blur(0.5px);
+}
+.focus-ring{ outline: none; box-shadow: 0 0 0 2px rgba(255,199,0,.5); }
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  background-color: #111827;
+  color: #f9fafb;
+  min-height: 100vh;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Mobile-first responsive design */
+@media (max-width: 768px) {
+  html, body {
+    font-size: 14px;
+  }
+  
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #fbbf24, #f97316);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #f59e0b, #ea580c);
+}
+
+@layer components {}
+
+
+
+@layer utilities {
+  /* Animações modernas */
+  .animate-fade-in {
+    animation: fadeIn 1s ease-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.8s ease-out;
+  }
+  
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  /* Efeito glassmorphism */
+  .glass {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .glass-dark {
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Gradientes animados */
+  .gradient-shift {
+    background: linear-gradient(45deg, #fbbf24, #f97316, #7c3aed, #3b82f6);
+    background-size: 400% 400%;
+    animation: gradientShift 8s ease infinite;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Prevenir scroll automático no Binno AI */
+.binno-container {
+  scroll-behavior: auto !important;
+}
+
+.binno-container button:focus,
+.binno-container textarea:focus,
+.binno-container input:focus {
+  scroll-margin-top: 0 !important;
+  scroll-margin-bottom: 0 !important;
+}
+
+.binno-container * {
+  scroll-margin: 0 !important;
+}
+
+/* Remover comportamento de scroll suave temporariamente para Binno */
+.binno-container * {
+  scroll-behavior: auto !important;
+}
+
+/* Garantir que textarea e botões sejam interativos */
+.binno-container textarea,
+.binno-container button {
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+/* Garantir que o container principal permita interação */
+.binno-container {
+  pointer-events: auto !important;
+  position: relative !important;
+}
+
+/* Força interatividade em textareas no Binno */
+.binno-textarea {
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 9999 !important;
+  background: rgba(30, 41, 59, 0.5) !important;
+  border: 1px solid rgba(148, 163, 184, 0.5) !important;
+  outline: none !important;
+}
+
+.binno-textarea:focus {
+  border-color: #facc15 !important;
+  box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.2) !important;
+}
+
+/* AI Analysis Content Styling */
+.ai-analysis-content {
+  line-height: 1.8;
+  font-size: 1rem;
+}
+
+.ai-analysis-content h1,
+.ai-analysis-content h2,
+.ai-analysis-content h3,
+.ai-analysis-content h4 {
+  color: #FFCC33;
+  font-weight: 600;
+  margin: 1.5rem 0 1rem 0;
+  border-left: 3px solid #FFCC33;
+  padding-left: 1rem;
+}
+
+.ai-analysis-content p {
+  margin-bottom: 1rem;
+  color: #F2F2F2;
+}
+
+.ai-analysis-content ul,
+.ai-analysis-content ol {
+  margin: 1rem 0 1rem 1.5rem;
+  color: #F2F2F2;
+}
+
+.ai-analysis-content li {
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+
+.ai-analysis-content li::marker {
+  color: #8BE9FD;
+}
+
+.ai-analysis-content strong {
+  color: #FFCC33;
+  font-weight: 600;
+}
+
+.ai-analysis-content em {
+  color: #8BE9FD;
+  font-style: italic;
+}
+
+/* Highlight boxes for important content */
+.ai-analysis-content .highlight {
+  background: linear-gradient(135deg, rgba(255, 204, 51, 0.1), rgba(139, 233, 253, 0.05));
+  border: 1px solid rgba(255, 204, 51, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+/* Score and metrics styling */
+.score-highlight {
+  background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
+  border: 2px solid #FFCC33;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.score-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #FFCC33;
+  margin-bottom: 0.25rem;
+}
+
+.score-label {
+  font-size: 0.875rem;
+  color: #8BE9FD;
+  font-weight: 500;
+}

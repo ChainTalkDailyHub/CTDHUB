@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Image from 'next/image'
 
 interface ContractCardProps {
   title?: string
@@ -49,7 +50,15 @@ export default function ContractCard({
     <div className={`bg-ctd-panel border border-ctd-border rounded-2xl p-8 ${className}`}>
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-semibold text-ctd-text flex items-center">
-          <span className="mr-3 text-2xl">🪙</span>
+          <div className="mr-3 w-8 h-8 relative">
+            <Image
+              src="/images/tokenctd.png"
+              alt="CTD Token"
+              width={32}
+              height={32}
+              className="rounded-full"
+            />
+          </div>
           {title}
         </h3>
         <span className="px-3 py-1 bg-ctd-yellow/20 text-ctd-yellow text-sm font-medium rounded-lg">

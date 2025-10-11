@@ -114,6 +114,63 @@ export default function SkillCompassQuestionnaire() {
     }
   }, [isClient])
 
+  // Restore session state on page refresh
+  useEffect(() => {
+    if (!isClient || !sessionId) return
+    
+    const sessionKey = `questionnaire_session_${sessionId}`
+    const savedSession = localStorage.getItem(sessionKey)
+    
+    if (savedSession) {
+      try {
+        const sessionData = JSON.parse(savedSession)
+        console.log('🔄 Restoring session from localStorage:', sessionData)
+        
+        // Restore state
+        if (sessionData.answers && sessionData.answers.length > 0) {
+          setAnswers(sessionData.answers)
+          setQuestionNumber(sessionData.questionNumber || sessionData.answers.length + 1)
+        }
+        
+        if (sessionData.currentQuestion) {
+          setCurrentQuestion(sessionData.currentQuestion)
+        }
+        
+        if (sessionData.isCompleted && sessionData.finalReport) {
+          setIsCompleted(true)
+          setFinalReport(sessionData.finalReport)
+          console.log('✅ Session completed - showing final report')
+        }
+        
+      } catch (error) {
+        console.error('Error restoring session:', error)
+        // Continue with fresh session if restore fails
+      }
+    }
+  }, [isClient, sessionId])
+
+  // Save session state to localStorage
+  const saveSessionState = useCallback(() => {
+    if (!isClient || !sessionId) return
+    
+    const sessionKey = `questionnaire_session_${sessionId}`
+    const sessionData = {
+      answers,
+      questionNumber,
+      currentQuestion,
+      isCompleted,
+      finalReport,
+      timestamp: Date.now()
+    }
+    
+    try {
+      localStorage.setItem(sessionKey, JSON.stringify(sessionData))
+      console.log('💾 Session state saved to localStorage')
+    } catch (error) {
+      console.error('Error saving session state:', error)
+    }
+  }, [isClient, sessionId, answers, questionNumber, currentQuestion, isCompleted, finalReport])
+
   // Update character count
   const updateCharacterCount = useCallback(() => {
     setCharacterCount(currentAnswer.length)
@@ -129,29 +186,43 @@ export default function SkillCompassQuestionnaire() {
       // Generate improved PDF HTML directly
       const pdfHTML = generateEnhancedPDFHTML(finalReport, answers)
       
-      // Create new window and print
-      const printWindow = window.open('', '_blank')
-      if (printWindow) {
-        printWindow.document.write(pdfHTML)
-        printWindow.document.close()
+      // Create new window for PDF display
+      const pdfWindow = window.open('', '_blank', 'width=1000,height=800,scrollbars=yes,resizable=yes')
+      if (pdfWindow) {
+        pdfWindow.document.write(pdfHTML)
+        pdfWindow.document.close()
         
-        // Wait for load and print
-        printWindow.onload = () => {
-          setTimeout(() => {
-            printWindow.print()
-            // Close print window after printing
-            setTimeout(() => {
-              printWindow.close()
-            }, 1000)
-          }, 500)
+        // Add print button to the PDF window without auto-printing
+        pdfWindow.onload = () => {
+          // Add a print button to the PDF window
+          const printButton = pdfWindow.document.createElement('button')
+          printButton.innerHTML = '🖨️ Imprimir PDF'
+          printButton.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: linear-gradient(135deg, #FFCC33 0%, #FFA500 100%);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 204, 51, 0.3);
+          `
+          printButton.onclick = () => {
+            pdfWindow.print()
+          }
+          pdfWindow.document.body.appendChild(printButton)
         }
+        
+        // Set window title
+        pdfWindow.document.title = 'CTD HUB - Relatório de Análise'
       }
     } catch (error) {
       console.error('Error generating PDF:', error)
-      alert('Error generating detailed PDF. Trying simplified version...')
-      
-      // Fallback to simple PDF
-      generateSimplePDF()
+      alert('Erro ao gerar o PDF. Por favor, tente novamente ou entre em contato com o suporte.')
     }
   }
 
@@ -1398,8 +1469,9 @@ export default function SkillCompassQuestionnaire() {
         setQuestionNumber(nextQuestionNumber)
         setCurrentAnswer('')
         
-        // Focus on textarea for next question
+        // Save session state after successful question generation
         setTimeout(() => {
+          saveSessionState()
           textareaRef.current?.focus()
         }, 100)
         
@@ -1450,6 +1522,9 @@ export default function SkillCompassQuestionnaire() {
         const sessionIdStr = Array.isArray(sessionId) ? sessionId[0] : sessionId || 'unknown'
         localStorage.setItem('ctdhub:last-assessment', sessionIdStr)
         localStorage.setItem('ctdhub:last-score', data.score.toString())
+        
+        // Save completed session state
+        saveSessionState()
         
         console.log('Assessment completed and saved')
       } else {
@@ -1542,17 +1617,17 @@ export default function SkillCompassQuestionnaire() {
   // Aguardar hidratação antes de renderizar conteúdo que depende do cliente
   if (!isClient) {
     return (
-      <div className="min-h-screen bg-ctd-bg py-8 flex items-center justify-center">
-        <div className="text-ctd-text text-lg">Loading...</div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300 py-8 flex items-center justify-center">
+        <div className="text-gray-900 dark:text-white text-lg">Loading...</div>
       </div>
     )
   }
 
   if (isCompleted && finalReport) {
     return (
-      <div className="min-h-screen bg-ctd-bg py-8">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300 py-8">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="bg-ctd-panel rounded-3xl shadow-2xl border border-ctd-border p-8">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-300 dark:border-gray-600 p-8">
             {/* Header */}
             <div className="text-center mb-8">
               <div className="flex items-center justify-center mx-auto mb-6">
@@ -1562,7 +1637,7 @@ export default function SkillCompassQuestionnaire() {
                   className="w-32 h-32 object-contain"
                 />
               </div>
-              <h1 className="text-4xl font-bold text-ctd-text mb-4">
+              <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
                 Assessment Complete!
               </h1>
               
@@ -1570,17 +1645,17 @@ export default function SkillCompassQuestionnaire() {
               <div className="bg-gradient-to-r from-ctd-yellow/10 to-ctd-holo/10 border border-ctd-yellow/30 rounded-xl p-6 mb-6">
                 <div className="text-center">
                   <h2 className="text-2xl font-bold text-ctd-yellow mb-2">🎉 Congratulations!</h2>
-                  <p className="text-ctd-text text-lg mb-2">
+                  <p className="text-gray-900 dark:text-white text-lg mb-2">
                     You have completed the <strong>CTD Skill Compass</strong>!
                   </p>
-                  <p className="text-ctd-mute text-sm">
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">
                     Few make it this far. You have demonstrated dedication in evaluating your Web3 skills. 
                     This is an important step in your professional growth journey.
                   </p>
                 </div>
               </div>
               
-              <p className="text-ctd-mute text-lg">
+              <p className="text-gray-600 dark:text-gray-300 text-lg">
                 Based on your {answers.length} detailed responses
               </p>
               <div className="mt-4 px-4 py-2 bg-ctd-yellow/20 rounded-lg inline-block">
@@ -1591,47 +1666,47 @@ export default function SkillCompassQuestionnaire() {
             {/* Report Content - Enhanced Layout */}
             <div className="space-y-6">
               {/* Analysis Header */}
-              <div className="bg-gradient-to-r from-ctd-bg to-ctd-panel rounded-2xl p-6 border border-ctd-border">
+              <div className="bg-gradient-to-r from-ctd-bg to-ctd-panel rounded-2xl p-6 border border-gray-300 dark:border-gray-600">
                 <div className="flex items-center mb-4">
                   <div className="bg-ctd-yellow/20 p-3 rounded-lg mr-4">
                     <span className="text-2xl">🎯</span>
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-ctd-text">Your CTD Skill Compass Analysis</h2>
-                    <p className="text-ctd-mute">BINNO AI-Powered Web3 Assessment Results</p>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Your CTD Skill Compass Analysis</h2>
+                    <p className="text-gray-600 dark:text-gray-300">BINNO AI-Powered Web3 Assessment Results</p>
                   </div>
                 </div>
                 
                 <div className="grid md:grid-cols-3 gap-4 mt-6">
-                  <div className="bg-ctd-bg/50 rounded-lg p-4 text-center border border-ctd-border/50">
+                  <div className="bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300/50 rounded-lg p-4 text-center border border-gray-300 dark:border-gray-600/50">
                     <div className="text-ctd-yellow font-bold text-lg">{answers.length}</div>
-                    <div className="text-ctd-mute text-sm">Questions Answered</div>
+                    <div className="text-gray-600 dark:text-gray-300 text-sm">Questions Answered</div>
                   </div>
-                  <div className="bg-ctd-bg/50 rounded-lg p-4 text-center border border-ctd-border/50">
+                  <div className="bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300/50 rounded-lg p-4 text-center border border-gray-300 dark:border-gray-600/50">
                     <div className="text-ctd-holo font-bold text-lg">BINNO AI</div>
-                    <div className="text-ctd-mute text-sm">Personalized Analysis</div>
+                    <div className="text-gray-600 dark:text-gray-300 text-sm">Personalized Analysis</div>
                   </div>
-                  <div className="bg-ctd-bg/50 rounded-lg p-4 text-center border border-ctd-border/50">
+                  <div className="bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300/50 rounded-lg p-4 text-center border border-gray-300 dark:border-gray-600/50">
                     <div className="text-ctd-yellow font-bold text-lg">{new Date().toLocaleDateString()}</div>
-                    <div className="text-ctd-mute text-sm">Assessment Date</div>
+                    <div className="text-gray-600 dark:text-gray-300 text-sm">Assessment Date</div>
                   </div>
                 </div>
               </div>
 
               {/* Main Analysis Content */}
-              <div className="bg-ctd-bg rounded-2xl border border-ctd-border overflow-hidden">
-                <div className="bg-gradient-to-r from-ctd-yellow/10 to-ctd-holo/10 p-4 border-b border-ctd-border">
-                  <h3 className="text-xl font-bold text-ctd-text flex items-center">
+              <div className="bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300 rounded-2xl border border-gray-300 dark:border-gray-600 overflow-hidden">
+                <div className="bg-gradient-to-r from-ctd-yellow/10 to-ctd-holo/10 p-4 border-b border-gray-300 dark:border-gray-600">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
                     <span className="mr-2">🤖</span>
                     BINNO AI Assessment Report
                   </h3>
-                  <p className="text-ctd-mute text-sm mt-1">
+                  <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">
                     Comprehensive analysis powered by BINNO AI, tailored to your responses
                   </p>
                 </div>
                 
                 <div className="p-6">
-                  <div className="prose prose-lg max-w-none text-ctd-text leading-relaxed">
+                  <div className="prose prose-lg max-w-none text-gray-900 dark:text-white leading-relaxed">
                     <div 
                       className="ai-analysis-content"
                       dangerouslySetInnerHTML={{ __html: finalReport.replace(/\n/g, '<br />') }} 
@@ -1641,34 +1716,34 @@ export default function SkillCompassQuestionnaire() {
               </div>
 
               {/* Next Steps Section */}
-              <div className="bg-gradient-to-br from-ctd-panel via-ctd-bg to-ctd-panel rounded-2xl p-6 border border-ctd-border">
+              <div className="bg-gradient-to-br from-ctd-panel via-ctd-bg to-ctd-panel rounded-2xl p-6 border border-gray-300 dark:border-gray-600">
                 <div className="flex items-center mb-4">
                   <div className="bg-ctd-holo/20 p-3 rounded-lg mr-4">
                     <span className="text-2xl">🚀</span>
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-ctd-text">Next Steps in Your Journey</h3>
-                    <p className="text-ctd-mute">Continue your Web3 development path</p>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">Next Steps in Your Journey</h3>
+                    <p className="text-gray-600 dark:text-gray-300">Continue your Web3 development path</p>
                   </div>
                 </div>
                 
                 <div className="grid md:grid-cols-2 gap-4">
-                  <div className="bg-ctd-bg/30 rounded-lg p-4 border border-ctd-border/30">
+                  <div className="bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300/30 rounded-lg p-4 border border-gray-300 dark:border-gray-600/30">
                     <div className="flex items-center mb-2">
                       <span className="mr-2">📚</span>
-                      <h4 className="font-semibold text-ctd-text">Explore Learning Paths</h4>
+                      <h4 className="font-semibold text-gray-900 dark:text-white">Explore Learning Paths</h4>
                     </div>
-                    <p className="text-ctd-mute text-sm">
+                    <p className="text-gray-600 dark:text-gray-300 text-sm">
                       Discover curated courses and resources based on your assessment
                     </p>
                   </div>
                   
-                  <div className="bg-ctd-bg/30 rounded-lg p-4 border border-ctd-border/30">
+                  <div className="bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300/30 rounded-lg p-4 border border-gray-300 dark:border-gray-600/30">
                     <div className="flex items-center mb-2">
                       <span className="mr-2">🔄</span>
-                      <h4 className="font-semibold text-ctd-text">Retake Assessment</h4>
+                      <h4 className="font-semibold text-gray-900 dark:text-white">Retake Assessment</h4>
                     </div>
-                    <p className="text-ctd-mute text-sm">
+                    <p className="text-gray-600 dark:text-gray-300 text-sm">
                       Track your progress by taking the assessment again later
                     </p>
                   </div>
@@ -1686,30 +1761,30 @@ export default function SkillCompassQuestionnaire() {
               </button>
               <button
                 onClick={() => router.push('/binno-ai')}
-                className="px-6 py-3 bg-ctd-panel border border-ctd-border text-ctd-text rounded-lg hover:bg-ctd-border/30 transition-colors font-medium"
+                className="px-6 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg hover:bg-ctd-border/30 transition-colors font-medium"
               >
                 💬 Chat with Binno AI
               </button>
               <button
                 onClick={() => router.push('/courses')}
-                className="px-6 py-3 bg-ctd-panel border border-ctd-border text-ctd-text rounded-lg hover:bg-ctd-border/30 transition-colors font-medium"
+                className="px-6 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg hover:bg-ctd-border/30 transition-colors font-medium"
               >
                 📚 Explore Courses
               </button>
               <button
                 onClick={exportToPDF}
-                className="px-6 py-3 bg-ctd-panel border border-ctd-border text-ctd-text rounded-lg hover:bg-ctd-border/30 transition-colors font-medium"
+                className="px-6 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg hover:bg-ctd-border/30 transition-colors font-medium"
               >
                 � Export PDF
               </button>
             </div>
 
             {/* Footer Info */}
-            <div className="mt-8 pt-6 border-t border-ctd-border text-center">
-              <p className="text-ctd-mute text-sm">
+            <div className="mt-8 pt-6 border-t border-gray-300 dark:border-gray-600 text-center">
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
                 💾 Your assessment has been saved. Session ID: {sessionId}
               </p>
-              <p className="text-ctd-mute text-xs mt-2">
+              <p className="text-gray-600 dark:text-gray-300 text-xs mt-2">
                 ⏰ Completed on {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}
               </p>
             </div>
@@ -1720,26 +1795,28 @@ export default function SkillCompassQuestionnaire() {
   }
 
   return (
-    <div className="min-h-screen bg-ctd-bg py-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300 py-8">
       <div className="max-w-4xl mx-auto px-4">
-        <div className="bg-ctd-panel rounded-3xl shadow-2xl border border-ctd-border">
+        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-300 dark:border-gray-600">
           {/* Header */}
-          <div className="p-8 border-b border-ctd-border">
+          <div className="p-8 border-b border-gray-300 dark:border-gray-600">
             <div className="flex justify-between items-center mb-4">
-              <h1 className="text-3xl font-bold text-ctd-text">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 {t.skillCompass}
               </h1>
-              <div className="text-sm text-ctd-mute">
+              <div className="text-sm text-gray-600 dark:text-gray-300">
                 {formatString(t.questionOf, { current: questionNumber.toString(), total: '15' })}
               </div>
             </div>
             
             {/* Progress Bar */}
-            <div className="w-full bg-ctd-border rounded-full h-2">
+            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 shadow-inner">
               <div 
-                className="bg-gradient-to-r from-ctd-yellow to-ctd-holo h-2 rounded-full transition-all duration-300"
+                className="bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-500 h-3 rounded-full transition-all duration-500 shadow-lg relative overflow-hidden"
                 style={{ width: `${(questionNumber / 15) * 100}%` }}
-              />
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
+              </div>
             </div>
           </div>
 
@@ -1758,23 +1835,28 @@ export default function SkillCompassQuestionnaire() {
             {isGeneratingQuestion ? (
               <div className="text-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ctd-yellow mx-auto mb-4"></div>
-                <p className="text-ctd-text text-lg">
+                <p className="text-gray-900 dark:text-white text-lg">
                   {t.generatingQuestion}
                 </p>
-                <p className="text-sm text-ctd-mute mt-2">
+                <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
                   {t.generatingQuestionDesc}
                 </p>
               </div>
             ) : (
               <>
                 <div className="mb-6">
-                  <h2 className="text-xl font-semibold text-ctd-text mb-4">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                     {currentQuestion.question_text}
                   </h2>
                   {currentQuestion.context && (
-                    <p className="text-sm text-ctd-mute bg-ctd-bg p-3 rounded-lg border border-ctd-border">
-                      💡 {currentQuestion.context}
-                    </p>
+                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 p-4 rounded-xl border-l-4 border-yellow-400 shadow-sm">
+                      <div className="flex items-start">
+                        <span className="text-2xl mr-3">💡</span>
+                        <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                          {currentQuestion.context}
+                        </p>
+                      </div>
+                    </div>
                   )}
                 </div>
 
@@ -1784,12 +1866,12 @@ export default function SkillCompassQuestionnaire() {
                     value={currentAnswer}
                     onChange={(e) => setCurrentAnswer(e.target.value)}
                     onKeyDown={handleKeyPress}
-                    placeholder="Share your thoughts, strategies, and insights here..."
-                    className="w-full h-32 p-4 bg-ctd-bg border border-ctd-border rounded-lg focus:ring-2 focus:ring-ctd-yellow focus:border-ctd-yellow resize-none text-ctd-text placeholder-ctd-mute"
+                    placeholder="💭 Share your thoughts, strategies, and insights here..."
+                    className="w-full h-40 p-5 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-yellow-400/50 focus:border-yellow-400 resize-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200 shadow-sm hover:shadow-md"
                     disabled={isSubmitting}
                   />
                   
-                  <div className="flex justify-between items-center text-sm text-ctd-mute">
+                  <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-300">
                     <span>{characterCount} characters</span>
                     <span>Ctrl+Enter to submit</span>
                   </div>
@@ -1805,11 +1887,11 @@ export default function SkillCompassQuestionnaire() {
           </div>
 
           {/* Action Buttons */}
-          <div className="p-8 border-t border-ctd-border flex justify-between">
+          <div className="p-8 border-t border-gray-300 dark:border-gray-600 flex justify-between">
             <button
               onClick={handlePrevious}
               disabled={questionNumber <= 1 || isSubmitting || isGeneratingQuestion}
-              className="px-6 py-3 border border-ctd-border rounded-lg text-ctd-text hover:bg-ctd-border/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+              className="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white hover:bg-ctd-border/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
             >
               {t.previousButton}
             </button>
@@ -1843,7 +1925,7 @@ export default function SkillCompassQuestionnaire() {
 
           {/* AI Status Indicator */}
           <div className="px-8 pb-4">
-            <div className="text-xs text-center text-ctd-mute bg-ctd-bg rounded-lg p-2 border border-ctd-border">
+            <div className="text-xs text-center text-gray-600 dark:text-gray-300 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300 rounded-lg p-2 border border-gray-300 dark:border-gray-600">
               {t.poweredByBinno}
             </div>
           </div>

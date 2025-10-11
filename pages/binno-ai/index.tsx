@@ -224,17 +224,17 @@ export default function BinnoAI() {
   ]
 
   return (
-    <div className="min-h-screen bg-ctd-bg flex">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300 flex">
       {/* Sidebar */}
       {showSidebar && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 lg:relative lg:bg-transparent">
-          <div className="fixed left-0 top-0 h-full w-80 bg-ctd-panel/95 backdrop-blur-md border-r border-ctd-border z-50 lg:relative lg:w-64">
-            <div className="p-4 border-b border-ctd-border">
+        <div className="fixed inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300/80 backdrop-blur-sm z-40 lg:relative lg:bg-transparent">
+          <div className="fixed left-0 top-0 h-full w-80 bg-white dark:bg-gray-800/95 backdrop-blur-md border-r border-gray-300 dark:border-gray-600 z-50 lg:relative lg:w-64">
+            <div className="p-4 border-b border-gray-300 dark:border-gray-600">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold text-ctd-text">Conversations</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Conversations</h3>
                 <button
                   onClick={() => setShowSidebar(false)}
-                  className="lg:hidden text-ctd-mute hover:text-ctd-text transition-colors"
+                  className="lg:hidden text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white transition-colors"
                 >
                   ✕
                 </button>
@@ -255,7 +255,7 @@ export default function BinnoAI() {
                   className={`p-3 rounded-lg cursor-pointer transition-all duration-200 ${
                     currentSession === session.id 
                       ? 'bg-ctd-yellow text-black' 
-                      : 'bg-ctd-panel/50 hover:bg-ctd-border/50 text-ctd-text'
+                      : 'bg-white dark:bg-gray-800/50 hover:bg-ctd-border/50 text-gray-900 dark:text-white'
                   }`}
                 >
                   <p className="font-medium truncate">{session.title}</p>
@@ -285,10 +285,10 @@ export default function BinnoAI() {
                   ☰
                 </button>
                 <div>
-                  <h1 className="text-4xl md:text-5xl font-bold text-ctd-text drop-shadow-neon mb-2">
+                  <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white drop-shadow-neon mb-2">
                     <span className="text-ctd-yellow">Binno</span> AI Assistant
                   </h1>
-                  <p className="text-xl text-ctd-mute">Your blockchain and Web3 specialist assistant</p>
+                  <p className="text-xl text-gray-600 dark:text-gray-300">Your blockchain and Web3 specialist assistant</p>
                 </div>
               </div>
               
@@ -311,7 +311,7 @@ export default function BinnoAI() {
                 <div className="corner corner--br"></div>
                 
                 <div className="relative z-10 p-1">
-                  <h3 className="text-xl font-semibold text-ctd-text mb-6">🚀 Quick Prompts</h3>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">🚀 Quick Prompts</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {quickPrompts.map(category => (
                       <div key={category.category} className="space-y-3">
@@ -320,7 +320,7 @@ export default function BinnoAI() {
                           <button
                             key={idx}
                             onClick={() => useQuickPrompt(prompt)}
-                            className="w-full text-left text-sm p-3 bg-ctd-panel/50 hover:bg-ctd-border/50 rounded-lg text-ctd-text transition-all duration-200 hover:scale-105"
+                            className="w-full text-left text-sm p-3 bg-white dark:bg-gray-800/50 hover:bg-ctd-border/50 rounded-lg text-gray-900 dark:text-white transition-all duration-200 hover:scale-105"
                           >
                             {prompt}
                           </button>
@@ -346,13 +346,13 @@ export default function BinnoAI() {
                     <div className="flex flex-col items-center justify-center h-full text-center">
                       <div className="mb-8">
                         <img 
-                          src="/images/binno-avatar.png" 
+                          src="/images/profile.png" 
                           alt="Binno AI" 
                           className="w-32 h-32 mx-auto rounded-full"
                         />
                       </div>
-                      <h2 className="text-2xl font-bold text-ctd-text mb-4">Hello! I'm <span className="text-ctd-yellow">Binno AI</span></h2>
-                      <p className="max-w-lg text-ctd-mute leading-relaxed mb-8">Your specialist assistant in blockchain, DeFi, Web3 and crypto development. Ask me anything!</p>
+                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Hello! I'm <span className="text-ctd-yellow">Binno AI</span></h2>
+                      <p className="max-w-lg text-gray-600 dark:text-gray-300 leading-relaxed mb-8">Your specialist assistant in blockchain, DeFi, Web3 and crypto development. Ask me anything!</p>
                       <div className="flex flex-wrap gap-3 justify-center max-w-2xl">
                         {['How does DeFi work?', 'Explain smart contracts', 'Yield farming strategies', 'Crypto security'].map(prompt => (
                           <button
@@ -377,7 +377,7 @@ export default function BinnoAI() {
                               className={`px-6 py-4 rounded-2xl ${
                                 message.role === 'user'
                                   ? 'bg-ctd-yellow text-black'
-                                  : 'bg-ctd-panel/80 backdrop-blur-sm text-ctd-text border border-ctd-border/50'
+                                  : 'bg-white dark:bg-gray-800/80 backdrop-blur-sm text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600/50'
                               }`}
                             >
                               <div 
@@ -386,7 +386,7 @@ export default function BinnoAI() {
                                   __html: message.content
                                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                                     .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                                    .replace(/`(.*?)`/g, '<code class="bg-ctd-panel px-1 rounded">$1</code>')
+                                    .replace(/`(.*?)`/g, '<code class="bg-white dark:bg-gray-800 px-1 rounded">$1</code>')
                                 }}
                               />
                               <div className="flex justify-between items-center mt-2">
@@ -397,7 +397,7 @@ export default function BinnoAI() {
                                   <button
                                     onClick={() => toggleFavorite(message.id)}
                                     className={`text-xs opacity-0 group-hover:opacity-100 transition-opacity ${
-                                      message.favorite ? 'text-ctd-yellow' : 'text-ctd-mute hover:text-ctd-yellow'
+                                      message.favorite ? 'text-ctd-yellow' : 'text-gray-600 dark:text-gray-300 hover:text-ctd-yellow'
                                     }`}
                                   >
                                     {message.favorite ? '★' : '☆'}
@@ -410,14 +410,14 @@ export default function BinnoAI() {
                       ))}
                       {isLoading && (
                         <div className="flex justify-start">
-                          <div className="bg-ctd-panel text-ctd-text px-4 py-3 rounded-lg">
+                          <div className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-lg">
                             <div className="flex items-center space-x-2">
                               <div className="flex space-x-1">
                                 <div className="w-2 h-2 bg-ctd-mute rounded-full animate-pulse"></div>
                                 <div className="w-2 h-2 bg-ctd-mute rounded-full animate-pulse delay-75"></div>
                                 <div className="w-2 h-2 bg-ctd-mute rounded-full animate-pulse delay-150"></div>
                               </div>
-                              <span className="text-sm text-ctd-mute">Binno is thinking...</span>
+                              <span className="text-sm text-gray-600 dark:text-gray-300">Binno is thinking...</span>
                             </div>
                           </div>
                         </div>
@@ -428,14 +428,14 @@ export default function BinnoAI() {
                 </div>
 
                 {/* Input Container */}
-                <div className="border-t border-ctd-border pt-4">
+                <div className="border-t border-gray-300 dark:border-gray-600 pt-4">
                   <div className="flex gap-3">
                     <textarea
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
                       onKeyPress={handleKeyPress}
                       placeholder="Ask Binno anything: &quot;why does my tx keep reverting?&quot;"
-                      className="flex-1 bg-ctd-panel text-ctd-text border border-ctd-border rounded-lg px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-ctd-yellow min-h-[60px] placeholder-ctd-mute"
+                      className="flex-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-yellow-400 min-h-[60px] placeholder-ctd-mute"
                       rows={2}
                     />
                     <div className="flex flex-col gap-2">

@@ -101,22 +101,22 @@ export default function MyModules() {
 
   if (!isConnected) {
     return (
-      <div className="min-h-screen bg-ctd-bg">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
         <Header />
         <main className="py-24 spotlight">
           <div className="max-w-4xl mx-auto px-6 text-center">
-            <h1 className="text-4xl font-bold text-ctd-text drop-shadow-neon mb-6">
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white drop-shadow-neon mb-6">
               My Modules
             </h1>
-            <p className="text-xl text-ctd-mute mb-8">
+            <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
               Connect your wallet to view and manage your modules.
             </p>
             <div className="card max-w-md mx-auto p-8">
               <div className="text-6xl mb-4">🔒</div>
-              <h3 className="text-xl font-semibold text-ctd-text mb-4">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                 Wallet Required
               </h3>
-              <p className="text-ctd-mute mb-6">
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
                 Please connect your wallet to access your modules and manage your content.
               </p>
               <button
@@ -134,17 +134,17 @@ export default function MyModules() {
   }
 
   return (
-    <div className="min-h-screen bg-ctd-bg">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
       <Header />
       
       <main className="py-24">
         <div className="max-w-7xl mx-auto px-6">
           {/* Header Section */}
           <div className="text-center mb-12 spotlight">
-            <h1 className="text-4xl font-bold text-ctd-text drop-shadow-neon mb-4">
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white drop-shadow-neon mb-4">
               My Modules
             </h1>
-            <p className="text-xl text-ctd-mute mb-6">
+            <p className="text-xl text-gray-600 dark:text-gray-300 mb-6">
               Manage and track your educational content
             </p>
             
@@ -165,10 +165,10 @@ export default function MyModules() {
                   )}
                 </div>
                 <div className="text-left">
-                  <h3 className="text-lg font-semibold text-ctd-text">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     {userProfile?.name || 'Anonymous Creator'}
                   </h3>
-                  <p className="text-ctd-mute text-sm">
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">
                     {short(address)} • {myCourses.length} {myCourses.length === 1 ? 'module' : 'modules'}
                   </p>
                 </div>
@@ -180,19 +180,19 @@ export default function MyModules() {
                   <div className="text-2xl font-bold text-ctd-yellow">
                     {myCourses.reduce((sum, course) => sum + course.totalVideos, 0)}
                   </div>
-                  <div className="text-sm text-ctd-mute">Videos</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">Videos</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-ctd-yellow">
                     {myCourses.reduce((sum, course) => sum + getTotalViews(course), 0)}
                   </div>
-                  <div className="text-sm text-ctd-mute">Views</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">Views</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-ctd-yellow">
                     {myCourses.length}
                   </div>
-                  <div className="text-sm text-ctd-mute">Modules</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">Modules</div>
                 </div>
               </div>
             </div>
@@ -217,16 +217,16 @@ export default function MyModules() {
           {/* Modules List */}
           {isLoading ? (
             <div className="text-center py-12">
-              <div className="text-ctd-text text-lg">Loading your modules...</div>
+              <div className="text-gray-900 dark:text-white text-lg">Loading your modules...</div>
             </div>
           ) : myCourses.length === 0 ? (
             <div className="text-center py-12">
               <div className="card max-w-2xl mx-auto p-12">
                 <div className="text-6xl mb-6">📚</div>
-                <h3 className="text-2xl font-semibold text-ctd-text mb-4">
+                <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
                   No modules yet
                 </h3>
-                <p className="text-ctd-mute mb-8">
+                <p className="text-gray-600 dark:text-gray-300 mb-8">
                   Start creating educational content and share your knowledge with the community.
                 </p>
                 <button
@@ -242,7 +242,7 @@ export default function MyModules() {
               {myCourses.map(course => (
                 <div key={course.id} className="card hover:shadow-outline transition-all duration-200 spotlight">
                   {/* Thumbnail */}
-                  <div className="aspect-video bg-ctd-panel rounded-lg mb-4 overflow-hidden">
+                  <div className="aspect-video bg-white dark:bg-gray-800 rounded-lg mb-4 overflow-hidden">
                     {course.videos[0]?.thumbnail ? (
                       <img
                         src={course.videos[0].thumbnail}
@@ -250,8 +250,8 @@ export default function MyModules() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full bg-ctd-panel flex items-center justify-center">
-                        <div className="text-ctd-mute text-4xl">📚</div>
+                      <div className="w-full h-full bg-white dark:bg-gray-800 flex items-center justify-center">
+                        <div className="text-gray-600 dark:text-gray-300 text-4xl">📚</div>
                       </div>
                     )}
                     <div className="absolute top-4 right-4">
@@ -262,16 +262,16 @@ export default function MyModules() {
                   </div>
                   
                   {/* Content */}
-                  <h3 className="font-bold text-ctd-text text-lg mb-2 line-clamp-2">
+                  <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-2 line-clamp-2">
                     {course.title}
                   </h3>
                   
-                  <p className="text-ctd-mute text-sm mb-4 line-clamp-2">
+                  <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">
                     {course.description}
                   </p>
                   
                   {/* Stats */}
-                  <div className="flex items-center justify-between text-xs text-ctd-mute mb-4">
+                  <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300 mb-4">
                     <span>{formatDate(course.updatedAt)}</span>
                     <span>{getTotalViews(course)} views</span>
                   </div>

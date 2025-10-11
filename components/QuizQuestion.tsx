@@ -18,21 +18,21 @@ export default function QuizQuestion({
   showResult 
 }: QuizQuestionProps) {
   const getOptionClass = (optionIndex: number) => {
-    let baseClass = "w-full p-4 text-left rounded-lg border transition-all duration-200 "
+    let baseClass = "w-full p-4 text-left rounded-xl border-2 transition-all duration-200 font-medium "
     
     if (!showResult) {
       if (selectedAnswer === optionIndex + 1) {
-        baseClass += "bg-ctd-yellow text-black border-ctd-yellow font-medium"
+        baseClass += "bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-yellow-400 shadow-lg transform scale-[1.02]"
       } else {
-        baseClass += "bg-ctd-panel text-ctd-text border-ctd-border hover:bg-ctd-border hover:border-ctd-yellow"
+        baseClass += "bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-yellow-400 hover:shadow-md"
       }
     } else {
       if (optionIndex + 1 === question.correctAnswer) {
-        baseClass += "bg-green-600 text-white border-green-500"
+        baseClass += "bg-gradient-to-r from-green-500 to-emerald-600 text-white border-green-500 shadow-lg"
       } else if (selectedAnswer === optionIndex + 1) {
-        baseClass += "bg-red-600 text-white border-red-500"
+        baseClass += "bg-gradient-to-r from-red-500 to-red-600 text-white border-red-500 shadow-lg"
       } else {
-        baseClass += "bg-ctd-panel text-ctd-mute border-ctd-border"
+        baseClass += "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600"
       }
     }
     
@@ -40,18 +40,13 @@ export default function QuizQuestion({
   }
   
   return (
-    <div className="card max-w-3xl mx-auto relative">
-      <div className="corner corner--tl"></div>
-      <div className="corner corner--tr"></div>
-      <div className="corner corner--bl"></div>
-      <div className="corner corner--br"></div>
-      
-      <div className="relative z-10 p-1">
-        <h3 className="text-xl font-semibold text-ctd-text mb-6">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 max-w-3xl mx-auto p-8 transition-colors duration-300">
+      <div className="relative z-10">
+        <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-8 leading-relaxed">
           {question.question}
         </h3>
         
-        <div className="space-y-3 mb-6">
+        <div className="space-y-4 mb-8">
           {question.options.map((option, index) => (
             <button
               key={index}
@@ -59,18 +54,18 @@ export default function QuizQuestion({
               disabled={showResult}
               className={getOptionClass(index)}
             >
-              <span className="font-medium mr-3 text-ctd-yellow">
+              <span className="font-bold mr-3 text-lg">
                 {String.fromCharCode(65 + index)}.
               </span>
-              {option}
+              <span className="text-left">{option}</span>
             </button>
           ))}
         </div>
         
         {showResult && (
-          <div className="mt-6 p-4 bg-ctd-panel border border-ctd-border rounded-lg">
-            <h4 className="text-sm font-semibold text-ctd-yellow mb-2">Explanation:</h4>
-            <p className="text-ctd-mute">{question.explanation}</p>
+          <div className="mt-8 p-6 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-700 rounded-xl">
+            <h4 className="text-lg font-bold text-blue-900 dark:text-blue-300 mb-3">💡 Explanation:</h4>
+            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{question.explanation}</p>
           </div>
         )}
       </div>

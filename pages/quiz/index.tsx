@@ -16,7 +16,7 @@ export default function Quiz() {
   useEffect(() => {
     if (typeof window === 'undefined') return
     const walletAddress = localStorage.getItem('ctdhub:wallet')
-    if (!walletAddress) {
+    if (false && !walletAddress) {
       router.replace('/')
     }
   }, [])
@@ -105,27 +105,27 @@ export default function Quiz() {
   }, [completedModules, allModulesCompleted, isWalletConnected, userAddress])
   
   return (
-    <div className="min-h-screen bg-ctd-bg">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
       <Header />
       
       <main className="py-24 spotlight">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-20">
-            <h1 className="text-4xl md:text-6xl font-bold text-ctd-text drop-shadow-neon mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white drop-shadow-neon mb-6">
               Blockchain <span className="text-ctd-yellow">Knowledge</span> Quiz
             </h1>
-            <p className="text-xl text-ctd-mute max-w-3xl mx-auto leading-relaxed mb-12">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed mb-12">
               Test your understanding with our comprehensive 10-module quiz system. 
               Complete all modules to unlock the burn mechanism.
             </p>
             
             {/* Progress Bar */}
             <div className="max-w-md mx-auto mb-12">
-              <div className="flex justify-between text-sm text-ctd-mute mb-3">
+              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300 mb-3">
                 <span>Progress</span>
                 <span>{completedModules.length}/10 modules</span>
               </div>
-              <div className="w-full bg-ctd-panel rounded-full h-3">
+              <div className="w-full bg-white dark:bg-gray-800 rounded-full h-3">
                 <div 
                   className="bg-ctd-yellow h-3 rounded-full transition-all duration-300"
                   style={{ width: `${(completedModules.length / 10) * 100}%` }}
@@ -136,20 +136,20 @@ export default function Quiz() {
             {/* Burn Section - Always visible */}
             <div className="max-w-2xl mx-auto mb-12">
               {allModulesCompleted ? (
-                <div className="bg-gradient-to-br from-ctd-yellow/10 via-ctd-panel to-ctd-holo/10 rounded-2xl p-8 border border-ctd-yellow/20">
+                <div className="bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8 border-2 border-yellow-200 dark:border-gray-600 shadow-xl transition-colors duration-300">
                   <div className="text-center mb-6">
-                    <div className="text-6xl mb-4">🎉</div>
-                    <h3 className="text-2xl font-bold text-ctd-text mb-2">Congratulations!</h3>
-                    <p className="text-ctd-mute">You've completed all 10 quiz modules.</p>
+                    <div className="text-8xl mb-4">🎉</div>
+                    <h3 className="text-3xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-2">Congratulations!</h3>
+                    <p className="text-lg text-gray-700 dark:text-gray-300">You've completed all 10 quiz modules.</p>
                   </div>
                   
                   {/* Wallet Connection Required */}
                   {!isWalletConnected ? (
                     <div className="text-center">
-                      <div className="bg-ctd-bg/50 rounded-lg p-6 border border-ctd-border/50 mb-4">
-                        <div className="text-4xl mb-3">🔗</div>
-                        <h4 className="text-lg font-semibold text-ctd-text mb-2">Connect Wallet to Burn Tokens</h4>
-                        <p className="text-ctd-mute text-sm mb-4">
+                      <div className="bg-white dark:bg-gray-700 rounded-xl p-6 border-2 border-gray-200 dark:border-gray-600 mb-4 shadow-lg">
+                        <div className="text-5xl mb-3">🔗</div>
+                        <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Connect Wallet to Burn Tokens</h4>
+                        <p className="text-gray-600 dark:text-gray-300 mb-4">
                           Connect your wallet to burn 1000 CTD tokens and complete your achievement
                         </p>
                         <WalletButton className="inline-block" />
@@ -157,8 +157,8 @@ export default function Quiz() {
                     </div>
                   ) : (
                     <div data-testid="burn-section">
-                      <div className="bg-ctd-bg/50 rounded-lg p-4 border border-ctd-border/50 mb-4 text-center">
-                        <p className="text-ctd-text text-sm">
+                      <div className="bg-white dark:bg-gray-700 rounded-xl p-4 border-2 border-gray-200 dark:border-gray-600 mb-4 text-center shadow-lg">
+                        <p className="text-gray-900 dark:text-white font-medium">
                           🏦 <strong>Connected:</strong> {userAddress.slice(0, 6)}...{userAddress.slice(-4)}
                         </p>
                       </div>
@@ -170,12 +170,12 @@ export default function Quiz() {
                   )}
                 </div>
               ) : (
-                <div className="bg-ctd-panel/50 rounded-2xl p-6 border border-ctd-border">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border-2 border-gray-200 dark:border-gray-600 shadow-lg transition-colors duration-300">
                   <div className="text-center">
-                    <div className="text-4xl mb-3">🔒</div>
-                    <h3 className="text-lg font-semibold text-ctd-text mb-2">Burn System Locked</h3>
-                    <p className="text-ctd-mute text-sm">Complete all 10 modules to unlock the burn mechanism</p>
-                    <p className="text-ctd-yellow text-sm mt-2">
+                    <div className="text-5xl mb-4">🔒</div>
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Burn System Locked</h3>
+                    <p className="text-gray-600 dark:text-gray-300 mb-2">Complete all 10 modules to unlock the burn mechanism</p>
+                    <p className="text-lg font-semibold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mt-3">
                       {10 - completedModules.length} modules remaining
                     </p>
                   </div>

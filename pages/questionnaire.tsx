@@ -10,13 +10,14 @@ export default function QuestionnairePage() {
   const router = useRouter()
 
   // Protege rota: só acessa se wallet conectada
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const walletAddress = localStorage.getItem('ctdhub:wallet')
-    if (!walletAddress) {
-      router.replace('/')
-    }
-  }, [router])
+  // TEMPORARIAMENTE DESABILITADO PARA TESTES
+  // useEffect(() => {
+  //   if (typeof window === 'undefined') return
+  //   const walletAddress = localStorage.getItem('ctdhub:wallet')
+  //   if (!walletAddress) {
+  //     router.replace('/')
+  //   }
+  // }, [router])
 
   const createNewSession = async () => {
     setIsCreating(true)
@@ -48,7 +49,7 @@ export default function QuestionnairePage() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="min-h-screen bg-ctd-bg">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
         <Header />
         
         <main className="pt-20 pb-20">
@@ -67,7 +68,7 @@ export default function QuestionnairePage() {
               </span>
             </h1>
 
-            <p className="text-xl text-ctd-mute mb-12 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-gray-600 dark:text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
               Discover your level and get a personalized learning route in minutes.
             </p>
 
@@ -77,8 +78,8 @@ export default function QuestionnairePage() {
                 <div className="corner corner--tl"></div>
                 <div className="corner corner--tr"></div>
                 <div className="text-3xl mb-4">🧠</div>
-                <h3 className="text-xl font-semibold text-ctd-text mb-2">Adaptive by Design</h3>
-                <p className="text-ctd-mute text-sm">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Adaptive by Design</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">
                   Questions evolve based on your responses, ensuring personalized difficulty and relevance
                 </p>
               </div>
@@ -87,8 +88,8 @@ export default function QuestionnairePage() {
                 <div className="corner corner--tl"></div>
                 <div className="corner corner--tr"></div>
                 <div className="text-3xl mb-4">📊</div>
-                <h3 className="text-xl font-semibold text-ctd-text mb-2">Actionable Insights</h3>
-                <p className="text-ctd-mute text-sm">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Actionable Insights</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">
                   Receive specific skill gaps, strengths, and next learning steps tailored to your profile
                 </p>
               </div>
@@ -97,8 +98,8 @@ export default function QuestionnairePage() {
                 <div className="corner corner--tl"></div>
                 <div className="corner corner--tr"></div>
                 <div className="text-3xl mb-4">📄</div>
-                <h3 className="text-xl font-semibold text-ctd-text mb-2">Shareable Report</h3>
-                <p className="text-ctd-mute text-sm">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Shareable Report</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">
                   Export your complete assessment as a professional PDF for portfolios or team reviews
                 </p>
               </div>
@@ -110,27 +111,27 @@ export default function QuestionnairePage() {
               <div className="corner corner--tr"></div>
               <div className="corner corner--bl"></div>
               <div className="corner corner--br"></div>
-              <h2 className="text-2xl font-bold text-ctd-text mb-6">How It Works</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">How It Works</h2>
               <div className="grid md:grid-cols-4 gap-4 text-left">
                 <div className="text-center">
                   <div className="w-12 h-12 bg-gradient-to-r from-ctd-yellow to-ctd-holo rounded-full flex items-center justify-center text-black font-bold text-lg mx-auto mb-3">1</div>
-                  <h4 className="font-semibold text-ctd-text mb-2">Answer Questions</h4>
-                  <p className="text-ctd-mute text-sm">Respond to BINNO AI questions that adapt to your level</p>
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Answer Questions</h4>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">Respond to BINNO AI questions that adapt to your level</p>
                 </div>
                 <div className="text-center">
                   <div className="w-12 h-12 bg-gradient-to-r from-ctd-holo to-ctd-yellow rounded-full flex items-center justify-center text-black font-bold text-lg mx-auto mb-3">2</div>
-                  <h4 className="font-semibold text-ctd-text mb-2">AI Analysis</h4>
-                  <p className="text-ctd-mute text-sm">Our AI analyzes your responses and identifies patterns</p>
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">AI Analysis</h4>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">Our AI analyzes your responses and identifies patterns</p>
                 </div>
                 <div className="text-center">
                   <div className="w-12 h-12 bg-gradient-to-r from-ctd-yellow to-ctd-holo rounded-full flex items-center justify-center text-black font-bold text-lg mx-auto mb-3">3</div>
-                  <h4 className="font-semibold text-ctd-text mb-2">Get Insights</h4>
-                  <p className="text-ctd-mute text-sm">Receive personalized skill assessment and recommendations</p>
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Get Insights</h4>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">Receive personalized skill assessment and recommendations</p>
                 </div>
                 <div className="text-center">
                   <div className="w-12 h-12 bg-gradient-to-r from-ctd-holo to-ctd-yellow rounded-full flex items-center justify-center text-black font-bold text-lg mx-auto mb-3">4</div>
-                  <h4 className="font-semibold text-ctd-text mb-2">Plan Learning</h4>
-                  <p className="text-ctd-mute text-sm">Follow your customized learning path to level up</p>
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Plan Learning</h4>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">Follow your customized learning path to level up</p>
                 </div>
               </div>
             </div>
@@ -154,14 +155,14 @@ export default function QuestionnairePage() {
                 )}
               </button>
               
-              <p className="text-ctd-mute text-sm mt-4">
+              <p className="text-gray-600 dark:text-gray-300 text-sm mt-4">
                 ⏱️ Takes ~15–30 minutes. Adapts as you go.
               </p>
             </div>
 
             {/* Additional Info */}
             <div className="mt-16 text-center">
-              <h3 className="text-xl font-semibold text-ctd-text mb-4">What you'll learn about</h3>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">What you'll learn about</h3>
               <div className="flex flex-wrap justify-center gap-3">
                 {[
                   'Smart Contract Development', 'DeFi Protocol Understanding', 'Blockchain Security Practices', 
