@@ -103,7 +103,7 @@ export default function DataMigrationPage() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="min-h-screen bg-ctd-bg">
+      <div className="min-h-screen bg-ctd-bg dark:bg-ctd-bg-dark">
         <Header />
         
         <main className="pt-24 pb-20">

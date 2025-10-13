@@ -1,0 +1,26 @@
+{
+  "assessment_date": "2025-10-13",
+  "cri_percent": 75,
+  "pillar_scores": [
+    { "pillar": "Protocol/Security", "level": 3 },
+    { "pillar": "Infrastructure/Scalability", "level": 4 },
+    { "pillar": "Compliance/Privacy", "level": 2 },
+    { "pillar": "Tokenomics/Treasury Ops", "level": 3 },
+    { "pillar": "Product UX & Learning", "level": 4 },
+    { "pillar": "DevEx (SDK/Docs/Tooling)", "level": 3 },
+    { "pillar": "Community & Growth", "level": 3 },
+    { "pillar": "Governance & Transparency", "level": 2 }
+  ],
+  "questionnaire_version": 1,
+  "num_questions": 12,
+  "top_risks": [
+    "Falta de auditoria de segurança formal",
+    "Documentação técnica incompleta",
+    "Governança centralizada temporária"
+  ],
+  "next_steps_14d": [
+    "Contratar auditoria de smart contracts",
+    "Completar documentação da API",
+    "Publicar roadmap de descentralização"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "contractAddress": "0xB5e0393E1D8E95bF5cf4fd11b03abD03855eB958",
+  "deployer": "0x27f79d0a52F88D04e1d04875Fe55d6C23f514Ec4",
+  "ctdToken": "0x7f890a4a575558307826C82e4cb6E671f3178bfc",
+  "projectTreasury": "0x27f79d0a52F88D04e1d04875Fe55d6C23f514Ec4",
+  "burnAmount": "1000.0",
+  "deployedAt": "2025-10-13T04:57:29.308Z",
+  "network": "BSC Mainnet",
+  "chainId": 56,
+  "transactionHash": "0x05d06eba1c5a4bb199d710fce657214a2b8498bd068ea7a5fc2fb56a5f5aa4e1",
+  "blockNumber": 64442624,
+  "gasUsed": "TBD"
+}

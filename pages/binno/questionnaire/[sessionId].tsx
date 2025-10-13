@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/router'
+import Head from 'next/head'
 import { createClient } from '@supabase/supabase-js'
 import { Language, useTranslations, formatString } from '../../../lib/i18n/translations'
 import LanguageSelector from '../../../components/LanguageSelector'
 import { apiRequest, getApiInfo } from '../../../lib/apiBase'
+import Header from '../../../components/Header'
+import Footer from '../../../components/Footer'
 
 // Supabase client with environment validation
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -74,6 +77,7 @@ export default function SkillCompassQuestionnaire() {
   // Final States
   const [isCompleted, setIsCompleted] = useState(false)
   const [finalReport, setFinalReport] = useState<string>('')
+  const [finalReportData, setFinalReportData] = useState<any>(null) // AI analysis structured data
   const [isGeneratingReport, setIsGeneratingReport] = useState(false)
   const [error, setError] = useState<string>('')
 
@@ -176,15 +180,32 @@ export default function SkillCompassQuestionnaire() {
     setCharacterCount(currentAnswer.length)
   }, [currentAnswer])
 
-  // Export PDF function with detailed analysis
+
+
+  // Export PDF function with detailed analysis  
   const exportToPDF = async () => {
-    if (!finalReport || answers.length === 0) return
+    if (!finalReportData || answers.length === 0) {
+      console.warn('❌ No analysis data or answers available for PDF generation')
+      return
+    }
 
     try {
-      console.log('🔄 Generating detailed PDF...')
+      console.log('🔄 Generating AI-powered PDF with real analysis data...')
       
-      // Generate improved PDF HTML directly
-      const pdfHTML = generateEnhancedPDFHTML(finalReport, answers)
+      // Import the new PDF generator
+      const { generateEnhancedPDFHTML } = await import('../../../lib/pdf-generator')
+      
+      // Get blockchain data from localStorage if available
+      const blockchainInfo = localStorage.getItem(`blockchain_${sessionId}`)
+      const blockchainData = blockchainInfo ? JSON.parse(blockchainInfo) : null
+      
+      // Generate PDF with actual AI analysis data
+      const pdfHTML = generateEnhancedPDFHTML(
+        finalReportData, 
+        answers, 
+        blockchainData,
+        sessionId as string
+      )
       
       // Create new window for PDF display
       const pdfWindow = window.open('', '_blank', 'width=1000,height=800,scrollbars=yes,resizable=yes')
@@ -226,27 +247,33 @@ export default function SkillCompassQuestionnaire() {
     }
   }
 
-  // Enhanced PDF generation function
-  const generateEnhancedPDFHTML = (report: string, userAnswers: any[]) => {
+  // Enhanced PDF generation function with modern CTD theme
+  const generateEnhancedPDFHTML = (report: string, userAnswers: any[], blockchainData?: any) => {
     const currentDate = new Date()
-    const dateStr = currentDate.toLocaleDateString('en-US', {
+    const dateStr = currentDate.toLocaleDateString('pt-BR', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     })
-    const timeStr = currentDate.toLocaleTimeString('en-US')
+    const timeStr = currentDate.toLocaleTimeString('pt-BR')
     
     // Extract project name from first answer
-    const projectName = userAnswers[0]?.user_response?.split('.')[0]?.trim() || 'Web3 Project'
+    const projectName = userAnswers[0]?.user_response?.split('.')[0]?.trim() || 'Projeto Web3'
+    
+    // Use blockchain data passed as parameter or get from localStorage
+    if (!blockchainData) {
+      const blockchainInfo = localStorage.getItem(`blockchain_${sessionId}`)
+      blockchainData = blockchainInfo ? JSON.parse(blockchainInfo) : null
+    }
     
     return `<!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CTD Skill Compass - Analysis Report</title>
+    <title>CTD HUB - Relatório de Análise BINNO</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         
         * {
             margin: 0;
@@ -256,10 +283,10 @@ export default function SkillCompassQuestionnaire() {
 
         body {
             font-family: 'Inter', sans-serif;
-            background: #1a1a1a;
-            padding: 20px;
+            background: #000000;
+            padding: 0;
             min-height: 100vh;
-            color: #ffffff;
+            color: #F2F2F2;
             line-height: 1.6;
         }
 
@@ -268,126 +295,212 @@ export default function SkillCompassQuestionnaire() {
             min-height: 297mm;
             background: #000000;
             margin: 0 auto;
-            box-shadow: 0 0 30px rgba(255, 204, 51, 0.4);
-            border: 1px solid #333;
             position: relative;
             overflow: hidden;
+            border: 2px solid #2A2A2A;
         }
 
-        /* Header */
+        /* Enhanced Header with CTD branding */
         .pdf-header {
-            background: linear-gradient(135deg, #FFCC33 0%, #FFA500 100%);
-            height: 100px;
+            background: linear-gradient(135deg, #FFCC33 0%, #FFC700 50%, #FFCC33 100%);
+            height: 120px;
             width: 100%;
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 40px;
-            box-shadow: 0 4px 20px rgba(255, 204, 51, 0.3);
+            box-shadow: 0 8px 32px rgba(255, 204, 51, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pdf-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="1" fill="%23000" opacity="0.1"/><circle cx="80" cy="80" r="1" fill="%23000" opacity="0.1"/><circle cx="40" cy="60" r="1" fill="%23000" opacity="0.1"/></svg>');
+            background-size: 100px 100px;
         }
 
         .logo-section {
             display: flex;
             align-items: center;
             gap: 20px;
+            z-index: 2;
+            position: relative;
         }
 
         .logo-section img {
-            height: 70px;
+            height: 80px;
             width: auto;
             object-fit: contain;
             background: transparent;
-            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
         }
 
         .logo-fallback {
-            height: 70px;
-            width: 200px;
-            background: rgba(0,0,0,0.1);
-            border-radius: 12px;
+            height: 80px;
+            width: 240px;
+            background: rgba(0,0,0,0.15);
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 700;
-            font-size: 24px;
+            font-weight: 800;
+            font-size: 28px;
             color: #000;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             border: 3px solid #000;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .header-info {
             text-align: right;
             color: #000;
+            z-index: 2;
+            position: relative;
         }
 
         .header-info h1 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 5px;
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         .header-info p {
-            font-size: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            opacity: 0.8;
+        }
+
+        .header-info .date {
+            font-size: 12px;
             font-weight: 500;
+            margin-top: 4px;
+            opacity: 0.7;
         }
         
         .pdf-content {
             padding: 40px;
-            color: #ffffff;
-            min-height: calc(297mm - 200px);
+            color: #F2F2F2;
+            min-height: calc(297mm - 220px);
+            background: linear-gradient(180deg, #000000 0%, #0E0E0E 100%);
         }
         
         .main-title {
-            font-size: 28px;
-            font-weight: 700;
+            font-size: 32px;
+            font-weight: 800;
             color: #FFCC33;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
             text-align: center;
-            text-shadow: 0 0 15px rgba(255, 204, 51, 0.5);
-            border-bottom: 2px solid #FFCC33;
-            padding-bottom: 15px;
+            text-shadow: 0 0 20px rgba(255, 204, 51, 0.6);
+            border-bottom: 3px solid #FFCC33;
+            padding-bottom: 20px;
+            position: relative;
+        }
+
+        .main-title::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #8BE9FD, transparent);
         }
 
         .assessment-info {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 40px;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 45px;
         }
 
         .info-card {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            border: 1px solid #444;
-            border-radius: 12px;
+            background: linear-gradient(135deg, #0E0E0E 0%, #1a1a1a 100%);
+            border: 2px solid #2A2A2A;
+            border-radius: 16px;
             padding: 25px;
             border-left: 4px solid #FFCC33;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #FFCC33, #8BE9FD, #FFCC33);
+            opacity: 0.6;
         }
 
         .info-card h3 {
             color: #FFCC33;
-            font-size: 18px;
+            font-size: 16px;
             margin-bottom: 15px;
-            font-weight: 600;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .info-card p {
-            margin-bottom: 8px;
-            font-size: 14px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            line-height: 1.5;
         }
 
         .info-card strong {
             color: #8BE9FD;
+            font-weight: 600;
+        }
+
+        .blockchain-info {
+            grid-column: span 3;
+            background: linear-gradient(135deg, #0E0E0E 0%, #1a1a1a 100%);
+            border: 2px solid #2A2A2A;
+            border-radius: 16px;
+            padding: 25px;
+            border-left: 4px solid #8BE9FD;
+            margin-top: 20px;
+        }
+
+        .blockchain-info h3 {
+            color: #8BE9FD;
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: 700;
         }
         
         .analysis-content {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            border: 1px solid #444;
+            background: linear-gradient(135deg, #0E0E0E 0%, #1a1a1a 100%);
+            border: 2px solid #2A2A2A;
             border-left: 4px solid #8BE9FD;
             padding: 30px;
             margin: 25px 0;
-            border-radius: 12px;
+            border-radius: 16px;
             line-height: 1.8;
             font-size: 15px;
+            position: relative;
+        }
+
+        .analysis-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #8BE9FD, #FFCC33, #8BE9FD);
+            opacity: 0.5;
         }
 
         .analysis-content h4 {
@@ -395,42 +508,49 @@ export default function SkillCompassQuestionnaire() {
             margin-top: 25px;
             margin-bottom: 15px;
             font-size: 18px;
+            font-weight: 700;
         }
 
         .questions-section {
-            margin-top: 40px;
+            margin-top: 50px;
             page-break-inside: avoid;
         }
 
         .questions-title {
-            font-size: 22px;
+            font-size: 24px;
             color: #FFCC33;
-            margin-bottom: 25px;
-            border-bottom: 1px solid #444;
-            padding-bottom: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #2A2A2A;
+            padding-bottom: 15px;
+            font-weight: 700;
         }
 
         .question-item {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            border-radius: 8px;
+            background: linear-gradient(135deg, #0E0E0E 0%, #1a1a1a 100%);
+            border: 1px solid #2A2A2A;
+            border-radius: 12px;
             margin-bottom: 20px;
-            padding: 20px;
+            padding: 25px;
+            border-left: 3px solid #8BE9FD;
         }
 
         .question-text {
             color: #8BE9FD;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             font-size: 14px;
+            line-height: 1.5;
         }
 
         .answer-text {
-            color: #ffffff;
+            color: #F2F2F2;
             font-size: 13px;
             line-height: 1.6;
-            padding-left: 15px;
-            border-left: 2px solid #444;
+            padding-left: 20px;
+            border-left: 3px solid #2A2A2A;
+            background: rgba(0,0,0,0.3);
+            padding: 15px 20px;
+            border-radius: 8px;
         }
         
         /* Educational Assessment Section Styles */
@@ -479,18 +599,27 @@ export default function SkillCompassQuestionnaire() {
             position: absolute;
             bottom: 0;
             width: 100%;
-            height: 60px;
-            background: linear-gradient(180deg, transparent 0%, #141414 50%, #000000 100%);
+            height: 80px;
+            background: linear-gradient(180deg, rgba(0,0,0,0) 0%, #0E0E0E 30%, #000000 100%);
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 40px;
             font-size: 12px;
-            color: #94A3B8;
+            color: #A8A8A8;
+            border-top: 1px solid #2A2A2A;
         }
 
         .footer-left {
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .footer-left .logo-small {
+            height: 24px;
+            width: auto;
         }
 
         .footer-right {
@@ -500,11 +629,19 @@ export default function SkillCompassQuestionnaire() {
         .footer-right .date {
             font-weight: 600;
             color: #FFCC33;
+            font-size: 13px;
         }
 
         .footer-right .website {
             color: #8BE9FD;
             font-weight: 600;
+            margin-top: 3px;
+            font-size: 11px;
+        }
+
+        .footer-right .blockchain-link {
+            color: #A8A8A8;
+            font-size: 10px;
             margin-top: 2px;
         }
 
@@ -533,32 +670,60 @@ export default function SkillCompassQuestionnaire() {
                 <div class="logo-fallback" style="display:none;">CTD HUB</div>
             </div>
             <div class="header-info">
-                <h1>Skill Compass Analysis</h1>
-                <p>BINNO AI Assessment Report</p>
+                <h1>Relatório BINNO AI</h1>
+                <p>Análise Completa de Competências Web3</p>
+                <div class="date">${dateStr} • ${timeStr}</div>
             </div>
         </div>
 
         <!-- Content -->
         <div class="pdf-content">
-            <h1 class="main-title">CTD Skill Compass Analysis</h1>
+            <h1 class="main-title">Relatório de Análise BINNO AI</h1>
 
             <!-- Assessment Info -->
             <div class="assessment-info">
                 <div class="info-card">
-                    <h3>📊 Assessment Details</h3>
-                    <p><strong>Project:</strong> ${projectName}</p>
-                    <p><strong>Questions Answered:</strong> ${userAnswers.length}</p>
-                    <p><strong>Assessment Date:</strong> ${dateStr}</p>
-                    <p><strong>Completion Time:</strong> ${timeStr}</p>
+                    <h3>📊 Detalhes da Avaliação</h3>
+                    <p><strong>Projeto:</strong> ${projectName}</p>
+                    <p><strong>Perguntas Respondidas:</strong> ${userAnswers.length}</p>
+                    <p><strong>Data da Avaliação:</strong> ${dateStr}</p>
+                    <p><strong>Horário:</strong> ${timeStr}</p>
                 </div>
                 <div class="info-card">
-                    <h3>🤖 Analysis Engine</h3>
-                    <p><strong>AI System:</strong> BINNO AI</p>
-                    <p><strong>Model:</strong> GPT-4 Enhanced</p>
-                    <p><strong>Analysis Type:</strong> Comprehensive</p>
-                    <p><strong>Report Version:</strong> 2.0</p>
+                    <h3>🤖 Engine de Análise</h3>
+                    <p><strong>Sistema IA:</strong> BINNO AI</p>
+                    <p><strong>Modelo:</strong> GPT-4 Enhanced</p>
+                    <p><strong>Tipo:</strong> Análise Completa</p>
+                    <p><strong>Versão:</strong> 3.0</p>
+                </div>
+                <div class="info-card">
+                    <h3>🔗 Blockchain</h3>
+                    <p><strong>Rede:</strong> BSC Mainnet</p>
+                    <p><strong>Contrato:</strong> CTDHUB_BINNOAI</p>
+                    <p><strong>Status:</strong> ${blockchainData ? 'Verificado' : 'Pendente'}</p>
+                    <p><strong>Session ID:</strong> ${sessionId}</p>
                 </div>
             </div>
+            
+            ${blockchainData ? `
+            <!-- Blockchain Information -->
+            <div class="blockchain-info">
+                <h3>🔐 Informações Blockchain</h3>
+                <p><strong>Hash da Transação:</strong> <span style="font-family: monospace; color: #8BE9FD; font-size: 11px;">${blockchainData.txHash}</span></p>
+                <p><strong>Endereço do Contrato:</strong> <span style="font-family: monospace; color: #8BE9FD; font-size: 11px;">0xE478e7779Ab22600A2E98bb9A3CA138029b901F5</span></p>
+                <p><strong>BscScan:</strong> <span style="color: #FFCC33;">https://bscscan.com/tx/${blockchainData.txHash}</span></p>
+                <p><strong>Timestamp Blockchain:</strong> ${new Date(blockchainData.timestamp).toLocaleString('pt-BR')}</p>
+                <p style="font-size: 12px; color: #A8A8A8; margin-top: 10px;">Esta análise foi registrada permanentemente na blockchain BSC, garantindo autenticidade e imutabilidade dos resultados.</p>
+            </div>
+            ` : `
+            <!-- Blockchain Pending -->
+            <div class="blockchain-info">
+                <h3>⏳ Verificação Blockchain Pendente</h3>
+                <p>Esta análise ainda não foi registrada na blockchain. Para garantir a autenticidade e imutabilidade dos resultados, registre esta avaliação no contrato CTDHUB_BINNOAI.</p>
+                <p><strong>Contrato BSC:</strong> <span style="font-family: monospace; color: #8BE9FD; font-size: 11px;">0xE478e7779Ab22600A2E98bb9A3CA138029b901F5</span></p>
+                <p style="font-size: 12px; color: #A8A8A8; margin-top: 10px;">Use o botão "Verificar na Blockchain" na interface para registrar permanentemente esta análise.</p>
+            </div>
+            `}
             
             <!-- Educational Assessment Sections -->
             ${(() => {
@@ -727,16 +892,17 @@ export default function SkillCompassQuestionnaire() {
 
             <!-- Questions and Answers Reference -->
             <div class="questions-section" style="page-break-before: always;">
-                <h2 class="questions-title">📋 Complete Q&A Reference</h2>
-                <p style="color: #94a3b8; font-size: 13px; margin-bottom: 20px;">Your original responses for reference</p>
+                <h2 class="questions-title">📋 Referência Completa de Perguntas e Respostas</h2>
+                <p style="color: #A8A8A8; font-size: 13px; margin-bottom: 25px; font-style: italic;">Suas respostas originais para referência futura</p>
                 ${userAnswers.map((answer, index) => `
                     <div class="question-item">
                         <div class="question-text">
-                            Q${index + 1}: ${answer.question_text}
+                            <span style="background: rgba(139, 233, 253, 0.1); padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-right: 10px;">Q${index + 1}</span>
+                            ${answer.question_text}
                         </div>
                         <div class="answer-text">
-                            ${answer.user_response.length > 300 ? 
-                              answer.user_response.substring(0, 300) + '...' : 
+                            ${answer.user_response.length > 400 ? 
+                              answer.user_response.substring(0, 400) + '...' : 
                               answer.user_response}
                         </div>
                     </div>
@@ -747,11 +913,13 @@ export default function SkillCompassQuestionnaire() {
         <!-- Footer -->
         <div class="pdf-footer">
             <div class="footer-left">
-                Generated by CTD HUB BINNO AI - Comprehensive Web3 Assessment Platform
+                <img src="/images/CTDHUB.png" alt="CTD HUB" class="logo-small" onerror="this.style.display='none';">
+                <span>Gerado por CTD HUB BINNO AI - Plataforma Completa de Avaliação Web3</span>
             </div>
             <div class="footer-right">
                 <div class="date">${dateStr}</div>
                 <div class="website">ctdhub.io</div>
+                ${blockchainData ? `<div class="blockchain-link">Verificado na BSC • Hash: ${blockchainData.txHash.substring(0, 10)}...</div>` : '<div class="blockchain-link">Aguardando verificação blockchain</div>'}
             </div>
         </div>
     </div>
@@ -1493,7 +1661,7 @@ export default function SkillCompassQuestionnaire() {
     }
   }
 
-  // Generate final AI analysis report
+  // Generate final AI analysis report with quick fallback
   const generateFinalReport = async (finalAnswers: UserAnswer[]) => {
     setIsGeneratingReport(true)
     setError('')
@@ -1501,34 +1669,80 @@ export default function SkillCompassQuestionnaire() {
     try {
       console.log('🚀 Starting final analysis with API info:', getApiInfo())
       
-      const data = await apiRequest('binno-final-analysis', {
-        method: 'POST',
-        body: JSON.stringify({
-          sessionId: sessionId,
-          userAnswers: finalAnswers,
-          language: currentLanguage
+      // First try the main analysis function
+      try {
+        const data = await apiRequest('binno-final-analysis', {
+          method: 'POST',
+          body: JSON.stringify({
+            sessionId: sessionId,
+            userAnswers: finalAnswers,
+            language: currentLanguage
+          })
         })
-      })
-      
-      if (data.success && data.analysis) {
-        console.log(`✅ Analysis generated successfully with score: ${data.score}%`)
-        console.log(`💾 Saved to database: ${data.saved ? 'Yes' : 'No'}`)
         
-        // Display analysis inline in current page
-        setFinalReport(data.analysis)
-        setIsCompleted(true)
+        if (data.success && data.analysis) {
+          console.log(`✅ Main analysis generated successfully with score: ${data.score}%`)
+          console.log(`💾 Saved to database: ${data.saved ? 'Yes' : 'No'}`)
+          console.log('📊 Structured analysis data:', data.report)
+          
+          // Store both text and structured data
+          setFinalReport(data.analysis)
+          setFinalReportData(data.report) // Store structured AI analysis data
+          setIsCompleted(true)
+          
+          // Save session ID for future reference
+          const sessionIdStr = Array.isArray(sessionId) ? sessionId[0] : sessionId || 'unknown'
+          localStorage.setItem('ctdhub:last-assessment', sessionIdStr)
+          localStorage.setItem('ctdhub:last-score', data.score.toString())
+          
+          // Save completed session state
+          saveSessionState()
+          
+          console.log('Assessment completed and saved with main function')
+          return // Success with main function
+        } else {
+          throw new Error(data.error || 'Failed to generate analysis')
+        }
         
-        // Save session ID for future reference
-        const sessionIdStr = Array.isArray(sessionId) ? sessionId[0] : sessionId || 'unknown'
-        localStorage.setItem('ctdhub:last-assessment', sessionIdStr)
-        localStorage.setItem('ctdhub:last-score', data.score.toString())
+      } catch (mainError) {
+        console.warn('⚠️ Main analysis function failed, trying quick fallback...')
+        console.warn('Main error:', mainError)
         
-        // Save completed session state
-        saveSessionState()
+        // Fallback to quick analysis
+        const quickData = await apiRequest('binno-final-analysis-quick', {
+          method: 'POST',
+          body: JSON.stringify({
+            sessionId: sessionId,
+            userAnswers: finalAnswers,
+            language: currentLanguage
+          })
+        })
         
-        console.log('Assessment completed and saved')
-      } else {
-        throw new Error(data.error || 'Failed to generate analysis')
+        if (quickData.success && quickData.analysis) {
+          console.log(`✅ Quick analysis generated successfully with score: ${quickData.score}%`)
+          console.log('⚡ Using quick analysis as fallback')
+          
+          // Store the quick analysis data
+          setFinalReport(quickData.analysis)
+          setFinalReportData(quickData.report || quickData) // Store available data
+          setIsCompleted(true)
+          
+          // Save session ID for future reference
+          const sessionIdStr = Array.isArray(sessionId) ? sessionId[0] : sessionId || 'unknown'
+          localStorage.setItem('ctdhub:last-assessment', sessionIdStr)
+          localStorage.setItem('ctdhub:last-score', quickData.score.toString())
+          
+          // Save completed session state
+          saveSessionState()
+          
+          console.log('Assessment completed and saved with quick fallback')
+          
+          // Show user that quick analysis was used
+          setError('Note: Quick analysis was used due to server optimization. Full analysis coming soon!')
+          
+        } else {
+          throw new Error(quickData.error || 'Both main and quick analysis failed')
+        }
       }
 
     } catch (error) {
@@ -1578,6 +1792,160 @@ export default function SkillCompassQuestionnaire() {
     }
   }
 
+  // Handle blockchain verification - Direct wallet interaction
+  const handleBlockchainVerification = async () => {
+    try {
+      console.log('🔗 Starting blockchain verification process...')
+      
+      // Check if user has MetaMask or compatible wallet
+      if (typeof window.ethereum === 'undefined') {
+        alert('❌ MetaMask ou uma carteira Web3 compatível é necessária para verificação blockchain.\n\nPor favor instale MetaMask e tente novamente.')
+        return
+      }
+
+      // Request wallet connection and switch to BSC if needed
+      await window.ethereum.request({ method: 'eth_requestAccounts' })
+      
+      // Switch to BSC Mainnet
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x38' }], // BSC Mainnet
+        })
+      } catch (switchError: any) {
+        // If BSC is not added, add it
+        if (switchError.code === 4902) {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: '0x38',
+              chainName: 'BNB Smart Chain',
+              nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+              rpcUrls: ['https://bsc-dataseed1.binance.org/'],
+              blockExplorerUrls: ['https://bscscan.com/']
+            }]
+          })
+        }
+      }
+      
+      const accounts = await window.ethereum.request({ method: 'eth_accounts' })
+      
+      if (!accounts || accounts.length === 0) {
+        alert('❌ Nenhuma conta conectada. Por favor conecte sua carteira e tente novamente.')
+        return
+      }
+
+      const userAddress = accounts[0]
+      console.log('👤 User address:', userAddress)
+
+      // Use ethers directly with the user's wallet
+      const provider = new (window as any).ethers.providers.Web3Provider(window.ethereum)
+      const signer = provider.getSigner()
+
+      // Contract configuration
+      const CONTRACT_ADDRESS = '0xE478e7779Ab22600A2E98bb9A3CA138029b901F5'
+      const CONTRACT_ABI = [
+        {
+          "inputs": [
+            {
+              "components": [
+                { "internalType": "address", "name": "user", "type": "address" },
+                { "internalType": "uint256", "name": "assessmentDate", "type": "uint256" },
+                { "internalType": "uint8", "name": "criPercent", "type": "uint8" },
+                { "internalType": "uint8", "name": "questionnaireVersion", "type": "uint8" },
+                { "internalType": "uint8", "name": "numQuestions", "type": "uint8" },
+                { "internalType": "uint8[8]", "name": "pillarLevels", "type": "uint8[8]" },
+                { "internalType": "bytes32", "name": "contentHash", "type": "bytes32" },
+                { "internalType": "string", "name": "uri", "type": "string" }
+              ],
+              "internalType": "struct AssessmentData",
+              "name": "data",
+              "type": "tuple"
+            }
+          ],
+          "name": "recordAssessment",
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+          "stateMutability": "payable",
+          "type": "function"
+        }
+      ]
+
+      // Create contract instance
+      const contract = new (window as any).ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer)
+
+      // Prepare assessment data
+      const reportContent = JSON.stringify({
+        sessionId: sessionId as string,
+        userAddress,
+        answers: answers.length,
+        report: finalReport.substring(0, 500), // Truncate for hash
+        timestamp: Date.now()
+      })
+
+      const contentHash = (window as any).ethers.utils.id(reportContent) // keccak256
+
+      const assessmentData = {
+        user: userAddress,
+        assessmentDate: Math.floor(Date.now() / 1000),
+        criPercent: 75, // TODO: Calculate from actual analysis
+        questionnaireVersion: 1,
+        numQuestions: Math.min(answers.length, 15),
+        pillarLevels: [2, 2, 1, 2, 2, 1, 1, 2], // TODO: Calculate from analysis
+        contentHash,
+        uri: `ctdhub://assessment/${sessionId}`
+      }
+
+      console.log('📊 Assessment data:', assessmentData)
+
+      // Send transaction
+      const tx = await contract.recordAssessment(assessmentData, {
+        value: (window as any).ethers.utils.parseEther('0.001') // 0.001 BNB fee
+      })
+
+      console.log('🔄 Transaction sent:', tx.hash)
+      alert(`🔄 Transação enviada!\n\nHash: ${tx.hash}\n\nAguarde a confirmação...`)
+
+      // Wait for confirmation
+      const receipt = await tx.wait()
+      console.log('✅ Transaction confirmed:', receipt)
+
+      // Store blockchain data locally
+      const blockchainData = {
+        txHash: receipt.hash,
+        blockNumber: receipt.blockNumber,
+        timestamp: Date.now(),
+        userAddress,
+        bscScanUrl: `https://bscscan.com/tx/${receipt.hash}`,
+        contractAddress: CONTRACT_ADDRESS
+      }
+
+      localStorage.setItem(`blockchain_${sessionId}`, JSON.stringify(blockchainData))
+
+      alert(`✅ Verificação blockchain concluída com sucesso!\n\nHash: ${receipt.hash}\nBloco: ${receipt.blockNumber}\n\nVerificar no BscScan: https://bscscan.com/tx/${receipt.hash}`)
+      
+      // Refresh the page to show updated blockchain status
+      setTimeout(() => window.location.reload(), 2000)
+      
+    } catch (error) {
+      console.error('❌ Blockchain verification error:', error)
+      let errorMessage = 'Erro desconhecido na verificação blockchain'
+      
+      if (error instanceof Error) {
+        if (error.message.includes('user rejected')) {
+          errorMessage = 'Transação cancelada pelo usuário'
+        } else if (error.message.includes('insufficient funds')) {
+          errorMessage = 'Saldo insuficiente para pagar taxa (0.001 BNB)'
+        } else if (error.message.includes('network')) {
+          errorMessage = 'Erro de conexão com a rede BSC'
+        } else {
+          errorMessage = error.message
+        }
+      }
+      
+      alert(`❌ Erro na verificação blockchain:\n\n${errorMessage}\n\nDetalhes técnicos:\nContrato: 0xE478e7779Ab22600A2E98bb9A3CA138029b901F5\nRede: BSC Mainnet\n\nTente novamente ou contate suporte.`)
+    }
+  }
+
   // Handle key press for Enter to submit
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !isSubmitting && !isGeneratingQuestion) {
@@ -1617,16 +1985,34 @@ export default function SkillCompassQuestionnaire() {
   // Aguardar hidratação antes de renderizar conteúdo que depende do cliente
   if (!isClient) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300 py-8 flex items-center justify-center">
-        <div className="text-gray-900 dark:text-white text-lg">Loading...</div>
-      </div>
+      <>
+        <Head>
+          <title>Loading - CTDHUB</title>
+          <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+        </Head>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
+          <Header />
+          <div className="py-8 flex items-center justify-center">
+            <div className="text-gray-900 dark:text-white text-lg">Loading...</div>
+          </div>
+          <Footer />
+        </div>
+      </>
     )
   }
 
   if (isCompleted && finalReport) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300 py-8">
-        <div className="max-w-4xl mx-auto px-4">
+      <>
+        <Head>
+          <title>Assessment Complete - CTDHUB</title>
+          <meta name="description" content="Your Web3 skill assessment results" />
+          <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+        </Head>
+        <div className="min-h-screen bg-ctd-bg dark:bg-ctd-bg-dark bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
+          <Header />
+        <div className="py-8">
+          <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-300 dark:border-gray-600 p-8">
             {/* Header */}
             <div className="text-center mb-8">
@@ -1658,8 +2044,40 @@ export default function SkillCompassQuestionnaire() {
               <p className="text-gray-600 dark:text-gray-300 text-lg">
                 Based on your {answers.length} detailed responses
               </p>
-              <div className="mt-4 px-4 py-2 bg-ctd-yellow/20 rounded-lg inline-block">
-                <span className="text-ctd-yellow font-semibold">✅ Report Generated Successfully</span>
+              <div className="mt-4 space-y-2">
+                <div className="px-4 py-2 bg-ctd-yellow/20 rounded-lg inline-block">
+                  <span className="text-ctd-yellow font-semibold">✅ Report Generated Successfully</span>
+                </div>
+                
+                {/* 🚀 NEW: Blockchain Verification Button */}
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="flex-shrink-0">
+                        <div className="w-8 h-8 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center">
+                          <span className="text-blue-600 dark:text-blue-400 font-bold">🔗</span>
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-400">
+                          Blockchain Verification Available
+                        </h3>
+                        <p className="text-xs text-blue-600 dark:text-blue-300 mt-1">
+                          Register your assessment permanently on BNB Smart Chain with CTDHUB-BINNOAI
+                        </p>
+                        <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                          Contract: 0xE478e7779Ab22600A2E98bb9A3CA138029b901F5
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleBlockchainVerification}
+                      className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg text-sm"
+                    >
+                      🔐 Verify On-Chain
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -1790,13 +2208,24 @@ export default function SkillCompassQuestionnaire() {
             </div>
           </div>
         </div>
-      </div>
+        </div>
+        <Footer />
+        </div>
+      </>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300 py-8">
-      <div className="max-w-4xl mx-auto px-4">
+    <>
+      <Head>
+        <title>CTD Skill Compass - Web3 Assessment | CTDHUB</title>
+        <meta name="description" content="AI-powered Web3 skill assessment with blockchain verification" />
+        <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+      </Head>
+      <div className="min-h-screen bg-ctd-bg dark:bg-ctd-bg-dark bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
+        <Header />
+      <div className="py-8">
+        <div className="max-w-4xl mx-auto px-4">
         <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-300 dark:border-gray-600">
           {/* Header */}
           <div className="p-8 border-b border-gray-300 dark:border-gray-600">
@@ -1931,6 +2360,29 @@ export default function SkillCompassQuestionnaire() {
           </div>
         </div>
       </div>
+      </div>
+      <Footer />
     </div>
+      <Head>
+        <title>BinnoAI Questionnaire - CTDHUB</title>
+        <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.addEventListener('load', function() {
+                setTimeout(function() {
+                  if (typeof window.ethers !== 'undefined') {
+                    console.log('✅ Ethers.js loaded successfully');
+                    console.log('🔍 Ethers version:', window.ethers.version);
+                  } else {
+                    console.error('❌ Ethers.js failed to load properly');
+                  }
+                }, 1000);
+              });
+            `
+          }}
+        />
+      </Head>
+    </>
   )
 }

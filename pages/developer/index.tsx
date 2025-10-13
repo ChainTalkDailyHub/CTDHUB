@@ -111,7 +111,7 @@ export default function DeveloperPage() {
   }
 
   return (
-    <div className="min-h-screen bg-ctd-bg">
+    <div className="min-h-screen bg-ctd-bg dark:bg-ctd-bg-dark">
       <Header />
       <section className="pt-20 pb-8 px-4 spotlight">
         <div className="max-w-7xl mx-auto">

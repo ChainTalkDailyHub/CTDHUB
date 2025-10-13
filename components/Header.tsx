@@ -81,15 +81,15 @@ export default function Header() {
             </Link>
             {isConnected && (
               <>
-                <Link href="/quiz" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
+                <Link href="/quiz" className="relative group text-ctd-mute dark:text-ctd-mute-dark hover:text-ctd-text dark:hover:text-ctd-text-dark transition-colors duration-300 py-2">
                   <span className="relative z-10">Quiz</span>
                   <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
                 </Link>
-                <Link href="/questionnaire" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
+                <Link href="/questionnaire" className="relative group text-ctd-mute dark:text-ctd-mute-dark hover:text-ctd-text dark:hover:text-ctd-text-dark transition-colors duration-300 py-2">
                   <span className="relative z-10">CTD Skill Compass</span>
                   <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
                 </Link>
-                <Link href="/dev" className="relative group text-ctd-mute hover:text-ctd-text transition-colors duration-300 py-2">
+                <Link href="/dev" className="relative group text-ctd-mute dark:text-ctd-mute-dark hover:text-ctd-text dark:hover:text-ctd-text-dark transition-colors duration-300 py-2">
                   <span className="relative z-10">Creator Studio</span>
                   <div className="absolute inset-0 bg-gradient-to-r from-ctd-yellow/0 to-ctd-holo/0 group-hover:from-ctd-yellow/10 group-hover:to-ctd-holo/10 rounded-lg transition-all duration-300 -mx-2"></div>
                 </Link>
@@ -105,7 +105,7 @@ export default function Header() {
             {isConnected && (
               <button
                 onClick={() => setIsUserMenuOpen(true)}
-                className="relative p-3 rounded-lg bg-gradient-to-r from-ctd-yellow/20 to-ctd-holo/20 border border-ctd-border text-ctd-yellow hover:text-ctd-holo hover:from-ctd-yellow/30 hover:to-ctd-holo/30 hover:border-ctd-yellow/50 transition-all duration-300 group"
+                className="relative p-3 rounded-lg bg-gradient-to-r from-ctd-yellow/20 to-ctd-holo/20 border border-ctd-border dark:border-ctd-border-dark text-ctd-yellow hover:text-ctd-holo hover:from-ctd-yellow/30 hover:to-ctd-holo/30 hover:border-ctd-yellow/50 transition-all duration-300 group"
                 aria-label="Abrir menu do usuário"
                 title="Menu do Usuário"
               >
@@ -117,14 +117,14 @@ export default function Header() {
                 </div>
                 
                 {/* Status indicator */}
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-ctd-holo rounded-full border-2 border-ctd-bg animate-pulse"></div>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-ctd-holo rounded-full border-2 border-ctd-bg dark:border-ctd-bg-dark animate-pulse"></div>
               </button>
             )}
             
             {/* Mobile menu button */}
             <button
               onClick={toggleMobileMenu}
-              className="md:hidden p-2 rounded-lg text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 transition-colors"
+              className="md:hidden p-2 rounded-lg text-ctd-mute dark:text-ctd-mute-dark hover:text-ctd-text dark:hover:text-ctd-text-dark hover:bg-ctd-panel dark:hover:bg-ctd-panel-dark/50 transition-colors"
               aria-label="Toggle mobile menu"
               aria-expanded={isMobileMenuOpen}
             >
@@ -149,48 +149,48 @@ export default function Header() {
         
         {/* Mobile menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-ctd-panel/95 backdrop-blur-md border-t border-ctd-border/50">
+          <div className="md:hidden bg-ctd-panel dark:bg-ctd-panel-dark/95 backdrop-blur-md border-t border-ctd-border dark:border-ctd-border-dark/50">
             <div className="px-4 py-4 space-y-2">
               <Link
                 href="/"
-                className="block px-4 py-3 text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 rounded-lg transition-colors"
+                className="block px-4 py-3 text-ctd-mute dark:text-ctd-mute-dark hover:text-ctd-text dark:hover:text-ctd-text-dark hover:bg-ctd-panel dark:hover:bg-ctd-panel-dark/50 rounded-lg transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 🏠 Home
               </Link>
               <Link
                 href="/courses"
-                className="block px-4 py-3 text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 rounded-lg transition-colors"
+                className="block px-4 py-3 text-ctd-mute dark:text-ctd-mute-dark hover:text-ctd-text dark:hover:text-ctd-text-dark hover:bg-ctd-panel dark:hover:bg-ctd-panel-dark/50 rounded-lg transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 📚 Courses
               </Link>
               <Link
                 href="/binno-ai"
-                className="block px-4 py-3 text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 rounded-lg transition-colors"
+                className="block px-4 py-3 text-ctd-mute dark:text-ctd-mute-dark hover:text-ctd-text dark:hover:text-ctd-text-dark hover:bg-ctd-panel dark:hover:bg-ctd-panel-dark/50 rounded-lg transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                � AI Chat
+                🤖 AI Chat
               </Link>
               {isConnected && (
                 <>
                   <Link
                     href="/quiz"
-                    className="block px-4 py-3 text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 rounded-lg transition-colors"
+                    className="block px-4 py-3 text-ctd-mute dark:text-ctd-mute-dark hover:text-ctd-text dark:hover:text-ctd-text-dark hover:bg-ctd-panel dark:hover:bg-ctd-panel-dark/50 rounded-lg transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    � Quiz
+                    🎯 Quiz
                   </Link>
                   <Link
                     href="/questionnaire"
-                    className="block px-4 py-3 text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 rounded-lg transition-colors"
+                    className="block px-4 py-3 text-ctd-mute dark:text-ctd-mute-dark hover:text-ctd-text dark:hover:text-ctd-text-dark hover:bg-ctd-panel dark:hover:bg-ctd-panel-dark/50 rounded-lg transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     🧭 CTD Skill Compass
                   </Link>
                   <Link
                     href="/dev"
-                    className="block px-4 py-3 text-ctd-mute hover:text-ctd-text hover:bg-ctd-panel/50 rounded-lg transition-colors"
+                    className="block px-4 py-3 text-ctd-mute dark:text-ctd-mute-dark hover:text-ctd-text dark:hover:text-ctd-text-dark hover:bg-ctd-panel dark:hover:bg-ctd-panel-dark/50 rounded-lg transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     ⚙️ Creator Studio

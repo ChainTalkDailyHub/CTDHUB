@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview: Análise Completa (15 Questões) - CTDHUB</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000;
+            color: #fff;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .container {
+            background: #1a1a1a;
+            padding: 30px;
+            border-radius: 16px;
+            border: 2px solid #2a2a2a;
+        }
+        button {
+            background: #FFCC33;
+            color: #000;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .preview-box {
+            background: #0a0a0a;
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 4px solid #8BE9FD;
+            margin: 20px 0;
+        }
+        .score-badge {
+            display: inline-block;
+            background: #00D4AA;
+            color: #000;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 204, 51, 0.1);
+            border-radius: 12px;
+            border: 1px solid #2a2a2a;
+        }
+        .section h3 {
+            color: #FFCC33;
+            margin-bottom: 15px;
+        }
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        li {
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        li::before {
+            content: '▶';
+            position: absolute;
+            left: 0;
+            color: #8BE9FD;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Preview: Análise AI Completa (15 Questões)</h1>
+        <p>Veja como será a análise quando o usuário responder todas as 15 questões do questionário:</p>
+        
+        <button onclick="showCompleteAnalysis()">🔍 Ver Análise Completa</button>
+        <button onclick="showFullPDF()">📄 Ver PDF Completo</button>
+        
+        <div class="preview-box">
+            <h2>🎯 Diferenças entre Análise Básica vs Completa</h2>
+            
+            <div class="section">
+                <h3>📝 Análise Básica (3 questões - como no teste)</h3>
+                <ul>
+                    <li>Score geral baseado em poucas respostas</li>
+                    <li>Análise superficial de strengths/weaknesses</li>
+                    <li>Sugestões genéricas de melhoria</li>
+                    <li>Study plan básico</li>
+                </ul>
+            </div>
+            
+            <div class="section">
+                <h3>🚀 Análise Completa (15 questões)</h3>
+                <ul>
+                    <li>Score detalhado por categoria (Técnico, Financeiro, Marketing, Segurança)</li>
+                    <li>Plano de estudos personalizado com timeframes específicos</li>
+                    <li>Recursos de aprendizado direcionados às lacunas identificadas</li>
+                    <li>Risk assessment completo do projeto</li>
+                    <li>Next actions imediatas priorizadas</li>
+                    <li>Roadmap de desenvolvimento personalizado</li>
+                    <li>Análise competitiva do mercado</li>
+                    <li>Sugestões de parcerias estratégicas</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="complete-analysis" style="display: none;">
+            <div class="preview-box">
+                <div class="score-badge">Score Final: 75%</div>
+                <h2>📋 Exemplo de Análise Completa</h2>
+                
+                <div class="section">
+                    <h3>💪 Pontos Fortes Identificados (15 áreas analisadas)</h3>
+                    <ul>
+                        <li>Arquitetura técnica sólida com smart contracts auditados</li>
+                        <li>Tokenomics bem estruturada com mecanismos anti-inflacionários</li>
+                        <li>Estratégia de marketing digital com foco em educação</li>
+                        <li>Parcerias estratégicas com projetos estabelecidos</li>
+                        <li>Roadmap técnico detalhado com marcos realistas</li>
+                        <li>Equipe experiente em desenvolvimento blockchain</li>
+                    </ul>
+                </div>
+                
+                <div class="section">
+                    <h3>📚 Plano de Estudos Personalizado (próximos 90 dias)</h3>
+                    <ul>
+                        <li><strong>Semanas 1-2:</strong> Advanced Solidity Patterns (Prioridade Alta)</li>
+                        <li><strong>Semanas 3-4:</strong> DeFi Yield Farming Strategies (Prioridade Alta)</li>
+                        <li><strong>Semanas 5-6:</strong> Community Building & Tokenomics (Prioridade Média)</li>
+                        <li><strong>Semanas 7-8:</strong> Smart Contract Security Auditing (Prioridade Alta)</li>
+                        <li><strong>Semanas 9-12:</strong> Go-to-Market Strategy Refinement (Prioridade Média)</li>
+                    </ul>
+                </div>
+                
+                <div class="section">
+                    <h3>🎯 Ações Imediatas (próximos 30 dias)</h3>
+                    <ul>
+                        <li>Finalizar auditoria de segurança com CertiK</li>
+                        <li>Lançar programa beta com 100 usuários selecionados</li>
+                        <li>Estabelecer parcerias com 3 projetos DeFi complementares</li>
+                        <li>Criar conteúdo educacional para onboarding de usuários</li>
+                        <li>Implementar dashboard de métricas para tracking de KPIs</li>
+                    </ul>
+                </div>
+                
+                <div class="section">
+                    <h3>⚠️ Riscos Identificados & Mitigação</h3>
+                    <ul>
+                        <li><strong>Risco:</strong> Competição acirrada → <strong>Mitigação:</strong> Foco em nicho educacional específico</li>
+                        <li><strong>Risco:</strong> Volatilidade do token → <strong>Mitigação:</strong> Implementar burning mechanism</li>
+                        <li><strong>Risco:</strong> Baixa adoção inicial → <strong>Mitigação:</strong> Programa de incentivos gamificado</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showCompleteAnalysis() {
+            document.getElementById('complete-analysis').style.display = 'block';
+        }
+        
+        function showFullPDF() {
+            // Dados completos simulando 15 questões respondidas
+            const fullAnalysisData = {
+                executive_summary: "Com base em 15 respostas detalhadas cobrindo aspectos técnicos, financeiros, marketing e governança, seu projeto demonstra maturidade excepcional com score de 75%. O CTDHUB mostra preparação sólida para lançamento, com pontos fortes em arquitetura técnica e tokenomics, mas necessita refinamento em estratégia de go-to-market e building de comunidade para maximizar sucesso no mercado competitivo de educação Web3.",
+                score: 75,
+                strengths: [
+                    "Arquitetura técnica robusta com smart contracts auditados pela CertiK",
+                    "Tokenomics dual-token inovadora (CTD/LEARN) com burning mechanism",
+                    "Plataforma AI para análise de projetos Web3 é diferencial único no mercado",
+                    "Experiência da equipe em desenvolvimento blockchain e educação",
+                    "Roadmap técnico detalhado com marcos realistas e mensuráveis",
+                    "Parcerias estratégicas estabelecidas com projetos DeFi de renome"
+                ],
+                weaknesses: [
+                    "Estratégia de go-to-market necessita maior detalhamento e validação",
+                    "Mecanismos de community building ainda em fase inicial de desenvolvimento",
+                    "Dependência excessiva de parcerias não totalmente validadas",
+                    "Métricas de sucesso e KPIs precisam ser melhor definidos e trackados"
+                ],
+                improvements: [
+                    "Desenvolver programa estruturado de beta testing com métricas claras",
+                    "Implementar sistema robusto de feedback e iteração baseado em usuários",
+                    "Criar conteúdo educacional rico para onboarding e engajamento",
+                    "Estabelecer partnerships formais com documentação e SLAs definidos",
+                    "Lançar programa de embaixadores para amplificar alcance orgânico"
+                ],
+                study_plan: [
+                    {
+                        area: "Advanced DeFi Architecture & Yield Strategies",
+                        priority: "High",
+                        resources: ["Uniswap V3 concentrated liquidity", "Compound governance mechanisms", "Curve protocol dynamics"],
+                        timeframe: "3-4 semanas",
+                        evidence: "Respostas técnicas sólidas, mas necessita aprofundar em yield farming e liquidity mining strategies"
+                    },
+                    {
+                        area: "Community Building & Token Economics",
+                        priority: "High", 
+                        resources: ["Token engineering best practices", "DAO governance structures", "Community incentive design"],
+                        timeframe: "4-6 semanas",
+                        evidence: "Tokenomics bem estruturada, mas community building precisa de frameworks mais robustos"
+                    },
+                    {
+                        area: "Go-to-Market Strategy & User Acquisition",
+                        priority: "Medium",
+                        resources: ["Web3 marketing playbooks", "Product-market fit frameworks", "Growth hacking for DeFi"],
+                        timeframe: "2-3 semanas", 
+                        evidence: "Visão de produto clara, mas execução de marketing necessita refinamento estratégico"
+                    }
+                ],
+                next_actions: [
+                    "Finalizar documentação técnica completa para desenvolvedores",
+                    "Lançar programa piloto com 50-100 usuários beta selecionados",
+                    "Implementar analytics dashboard para tracking de engagement metrics",
+                    "Estabelecer parcerias formais com 2-3 projetos DeFi complementares",
+                    "Criar série de conteúdo educacional para warm-up da comunidade",
+                    "Preparar pitch deck e documentação para próxima rodada de funding"
+                ],
+                learning_resources: [
+                    "Token Engineering Academy - Advanced Tokenomics Design",
+                    "a16z Crypto Startup School - Go-to-Market for Web3",
+                    "Messari Research Reports - DeFi Education Market Analysis",
+                    "Bankless DAO - Community Building Best Practices"
+                ],
+                risks: [
+                    "Competição intensa no espaço de educação Web3 com players estabelecidos",
+                    "Volatilidade do mercado crypto pode afetar adoção e retenção de usuários",
+                    "Regulamentações emergentes podem impactar modelo de tokenomics dual",
+                    "Dependência de parcerias externas para tração inicial do produto"
+                ],
+                copy_paste_detected: false,
+                copy_paste_explanation: "Todas as 15 respostas demonstram originalidade e conhecimento específico do projeto, sem padrões de copy-paste detectados."
+            };
+            
+            const fullUserAnswers = [
+                { question_text: "Descreva seu projeto Web3", user_response: "CTDHUB é uma plataforma educacional Web3..." },
+                { question_text: "Como garante segurança dos smart contracts?", user_response: "Implementamos auditoria CertiK..." }
+            ];
+            
+            const pdfHTML = generateFullPDFHTML(fullAnalysisData, fullUserAnswers, 'complete-session-preview');
+            
+            const pdfWindow = window.open('', '_blank', 'width=1200,height=900');
+            if (pdfWindow) {
+                pdfWindow.document.write(pdfHTML);
+                pdfWindow.document.close();
+                pdfWindow.document.title = 'CTDHUB - Análise Completa (15 Questões)';
+            }
+        }
+        
+        function generateFullPDFHTML(analysisData, userAnswers, sessionId) {
+            const currentDate = new Date();
+            const dateStr = currentDate.toLocaleDateString('pt-BR');
+            const timeStr = currentDate.toLocaleTimeString('pt-BR');
+            const score = analysisData.score || 0;
+            
+            return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>CTDHUB - Análise Completa BINNO AI</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #000000; color: #F2F2F2; line-height: 1.6; }
+        .pdf-container { width: 210mm; min-height: 297mm; background: #000000; margin: 0 auto; }
+        .pdf-header { background: linear-gradient(135deg, #FFCC33 0%, #FFC700 50%, #FFCC33 100%); height: 140px; padding: 30px 40px; display: flex; align-items: center; justify-content: space-between; }
+        .header-left { display: flex; align-items: center; gap: 25px; }
+        .ctd-logo { width: 90px; height: 90px; background: linear-gradient(135deg, #000 0%, #1a1a1a 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 24px; color: #FFCC33; letter-spacing: 2px; border: 3px solid #000; }
+        .header-info { color: #000; }
+        .header-info h1 { font-size: 32px; font-weight: 900; margin-bottom: 8px; }
+        .header-info .subtitle { font-size: 18px; font-weight: 600; opacity: 0.8; margin-bottom: 4px; }
+        .score-display { background: rgba(0,0,0,0.15); padding: 20px; border-radius: 16px; border: 3px solid #000; text-align: center; min-width: 120px; }
+        .score-number { font-size: 36px; font-weight: 900; color: #00D4AA; margin-bottom: 5px; }
+        .score-label { font-size: 14px; font-weight: 600; opacity: 0.8; }
+        .pdf-content { padding: 40px; background: linear-gradient(180deg, #000000 0%, #0A0A0A 100%); }
+        .analysis-title { font-size: 28px; font-weight: 800; color: #FFCC33; text-align: center; margin-bottom: 40px; border-bottom: 2px solid #2A2A2A; padding-bottom: 20px; }
+        .project-info { background: linear-gradient(135deg, #1a1a1a 0%, #0E0E0E 100%); padding: 25px; border-radius: 16px; border: 2px solid #2A2A2A; border-left: 4px solid #8BE9FD; margin-bottom: 30px; }
+        .project-info h3 { color: #8BE9FD; font-size: 18px; margin-bottom: 15px; font-weight: 700; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .info-item { background: rgba(255, 204, 51, 0.1); padding: 15px; border-radius: 12px; border: 1px solid #2A2A2A; }
+        .info-item strong { color: #FFCC33; display: block; margin-bottom: 5px; font-weight: 600; }
+        .executive-summary { background: linear-gradient(135deg, #1a1a1a 0%, #0E0E0E 100%); padding: 30px; border-radius: 16px; border: 2px solid #2A2A2A; border-left: 4px solid #FFCC33; margin-bottom: 30px; position: relative; }
+        .executive-summary::before { content: '💪'; position: absolute; top: -15px; right: 20px; font-size: 30px; background: #000; padding: 5px 15px; border-radius: 20px; border: 2px solid #FFCC33; }
+        .executive-summary h3 { color: #FFCC33; font-size: 20px; margin-bottom: 15px; font-weight: 700; }
+        .analysis-section { background: linear-gradient(135deg, #1a1a1a 0%, #0E0E0E 100%); padding: 25px; border-radius: 16px; border: 2px solid #2A2A2A; margin-bottom: 25px; }
+        .strengths-section { border-left: 4px solid #00D4AA; }
+        .weaknesses-section { border-left: 4px solid #FF5555; }
+        .improvements-section { border-left: 4px solid #8BE9FD; }
+        .analysis-section h3 { font-size: 18px; margin-bottom: 20px; font-weight: 700; }
+        .strengths-section h3 { color: #00D4AA; }
+        .weaknesses-section h3 { color: #FF5555; }
+        .improvements-section h3 { color: #8BE9FD; }
+        .analysis-list { list-style: none; padding: 0; }
+        .analysis-list li { padding: 12px 0; border-bottom: 1px solid #2A2A2A; padding-left: 25px; position: relative; }
+        .analysis-list li::before { content: '▶'; position: absolute; left: 0; color: #FFCC33; font-size: 12px; }
+        .study-plan { background: linear-gradient(135deg, #1a1a1a 0%, #0E0E0E 100%); padding: 30px; border-radius: 16px; border: 2px solid #2A2A2A; border-left: 4px solid #BD93F9; margin-bottom: 30px; }
+        .study-plan h3 { color: #BD93F9; font-size: 20px; margin-bottom: 25px; font-weight: 700; }
+        .study-item { background: rgba(189, 147, 249, 0.1); padding: 20px; border-radius: 12px; border: 1px solid #2A2A2A; margin-bottom: 20px; }
+        .study-item h4 { color: #BD93F9; font-size: 16px; margin-bottom: 15px; font-weight: 600; }
+        .study-details { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .study-detail { font-size: 14px; }
+        .study-detail strong { color: #8BE9FD; font-weight: 600; }
+        .next-actions { background: linear-gradient(135deg, #1a1a1a 0%, #0E0E0E 100%); padding: 25px; border-radius: 16px; border: 2px solid #2A2A2A; border-left: 4px solid #50FA7B; margin-bottom: 30px; }
+        .next-actions h3 { color: #50FA7B; font-size: 18px; margin-bottom: 20px; font-weight: 700; }
+        .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .action-item { background: rgba(80, 250, 123, 0.1); padding: 15px; border-radius: 12px; border: 1px solid #2A2A2A; font-size: 14px; }
+        .pdf-footer { background: #0A0A0A; padding: 25px 40px; border-top: 2px solid #2A2A2A; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="pdf-container">
+        <div class="pdf-header">
+            <div class="header-left">
+                <div class="ctd-logo">CTD</div>
+                <div class="header-info">
+                    <h1>CTDHUB</h1>
+                    <div class="subtitle">BINNO AI Analysis</div>
+                    <div style="font-size: 12px; opacity: 0.7;">${dateStr} • ${timeStr}</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="score-display">
+                    <div class="score-number">${score}%</div>
+                    <div class="score-label">SCORE</div>
+                </div>
+            </div>
+        </div>
+        <div class="pdf-content">
+            <h2 class="analysis-title">📊 Análise Completa do Projeto (15 Questões)</h2>
+            
+            <div class="project-info">
+                <h3>🚀 Informações do Projeto</h3>
+                <div class="info-grid">
+                    <div class="info-item"><strong>Projeto:</strong> CTDHUB Platform</div>
+                    <div class="info-item"><strong>Questões:</strong> 15 respondidas</div>
+                    <div class="info-item"><strong>Completude:</strong> 100%</div>
+                </div>
+            </div>
+            
+            <div class="executive-summary">
+                <h3>📋 Resumo Executivo</h3>
+                <p>${analysisData.executive_summary}</p>
+            </div>
+            
+            <div class="analysis-section strengths-section">
+                <h3>💪 Pontos Fortes</h3>
+                <ul class="analysis-list">
+                    ${analysisData.strengths.map(strength => `<li>${strength}</li>`).join('')}
+                </ul>
+            </div>
+            
+            <div class="analysis-section weaknesses-section">
+                <h3>⚠️ Áreas para Melhoria</h3>
+                <ul class="analysis-list">
+                    ${analysisData.weaknesses.map(weakness => `<li>${weakness}</li>`).join('')}
+                </ul>
+            </div>
+            
+            <div class="study-plan">
+                <h3>📚 Plano de Estudos Personalizado</h3>
+                ${analysisData.study_plan.map(item => `
+                    <div class="study-item">
+                        <h4>${item.area}</h4>
+                        <div class="study-details">
+                            <div class="study-detail"><strong>Prioridade:</strong> ${item.priority}</div>
+                            <div class="study-detail"><strong>Tempo:</strong> ${item.timeframe}</div>
+                        </div>
+                        <div class="study-detail"><strong>Evidência:</strong> ${item.evidence}</div>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <div class="next-actions">
+                <h3>🎯 Próximas Ações (30 dias)</h3>
+                <div class="actions-grid">
+                    ${analysisData.next_actions.map(action => `<div class="action-item">${action}</div>`).join('')}
+                </div>
+            </div>
+        </div>
+        <div class="pdf-footer">
+            <div>CTDHUB - Plataforma Educacional Web3 • Powered by BINNO AI</div>
+            <div>Análise Completa • Score: ${score}% • ${dateStr}</div>
+        </div>
+    </div>
+</body>
+</html>`;
+        }
+    </script>
+</body>
+</html>

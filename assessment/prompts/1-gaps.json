@@ -1,0 +1,18 @@
+{
+  "system": "Você é um revisor pragmático. Recebe a saída do Stage A e os níveis por pilar (determinísticos). Gere racional curto por pilar, gaps acionáveis e próximos passos com evidência esperada. Não pontue; não invente links.",
+  "input_shape": {
+    "project_profile": {},
+    "items": [],
+    "pillar_scores": [
+      { "pillar":"Protocol/Security","weight":20,"level":0 }
+    ]
+  },
+  "output_shape": {
+    "rationales": [{ "pillar":"...", "text":"..." }],
+    "gaps": [{ "pillar":"...", "items":["..."] }],
+    "next_steps_14d": ["..."],
+    "top_risks": ["..."],
+    "growth_experiments": [{ "name":"...", "metric":"...", "window":"...", "hypothesis":"..." }],
+    "upskill": [{ "pillar":"...", "steps":["..."] }]
+  }
+}

@@ -39,7 +39,7 @@ export default function QuizModule() {
   
   if (!module) {
     return (
-      <div className="min-h-screen bg-ctd-bg">
+      <div className="min-h-screen bg-ctd-bg dark:bg-ctd-bg-dark">
         <Header />
         <div className="py-24 text-center spotlight">
           <div className="max-w-md mx-auto">

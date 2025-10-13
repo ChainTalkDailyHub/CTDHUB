@@ -14,6 +14,13 @@
   directory = "netlify/functions"
   node_bundler = "esbuild"
 
+# AI Function specific timeout (120 seconds)
+[functions."binno-final-analysis"]
+  timeout = 120
+
+[functions."binno-final-analysis-quick"]
+  timeout = 60
+
 # Headers for security
 [[headers]]
   for = "/*"

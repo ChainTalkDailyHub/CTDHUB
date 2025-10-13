@@ -1,0 +1,31 @@
+{
+  "system": "Você é um normalizador. Consolide respostas repetidas de apresentação do projeto. Gere project_profile, marque duplicadas, extraia evidências (URLs/tx-hash/addr/repos/PDF/Snapshot). Não invente dados. Saída apenas JSON no schema fornecido.",
+  "schema_hint": {
+    "project_profile": {
+      "name": "string|null",
+      "token": "string|null",
+      "network": "string|null",
+      "focus": "string|null",
+      "vision": "string|null",
+      "problem": "string|null",
+      "source_question_ids": ["string"]
+    },
+    "items": [
+      {
+        "id": "string",
+        "question": "string",
+        "answer": "string",
+        "deduplicated": false,
+        "pillar_hints": ["string"],
+        "evidence": [
+          { "kind": "string", "value": "string", "note": "string" }
+        ]
+      }
+    ]
+  },
+  "rules": [
+    "N máximo de perguntas = 15 (marque mas não remova).",
+    "Se houver várias perguntas de perfil, consolide-as em project_profile e marque deduplicadas.",
+    "atribua no máximo 2 pillar_hints por item."
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "sessionId": "test-ai-real-analysis",
+  "userAnswers": [
+    {
+      "question_text": "Fale sobre seu projeto Web3. Qual é o nome do projeto, quantos tokens você planeja lançar, em qual rede blockchain (BNB Chain, Ethereum, etc.), e qual é o foco principal do projeto?",
+      "user_response": "CTDHUB é uma plataforma educacional Web3 inovadora que utiliza inteligência artificial para análise e avaliação de projetos blockchain. O projeto planeja lançar 1 bilhão de tokens CTD na BNB Smart Chain, com foco em educação DeFi e ferramentas de produtividade. Nossa visão é democratizar o acesso ao conhecimento Web3 através de análises AI personalizadas, sistema de recompensas gamificado e parcerias estratégicas com projetos estabelecidos. Solucionamos o problema da falta de análise objetiva e padronizada de projetos Web3, oferecendo avaliações baseadas em métricas confiáveis e feedback educacional.",
+      "timestamp": 1640995200000
+    },
+    {
+      "question_text": "Como o projeto garante a segurança e eficiência dos smart contracts dentro da arquitetura técnica?",
+      "user_response": "Implementamos múltiplas camadas de segurança: auditoria completa por CertiK, uso de bibliotecas OpenZeppelin, implementação de padrão multi-sig para funções críticas, timelock para mudanças de governança e formal verification para lógicas complexas. Utilizamos Chainlink para oráculos externos, Mythril para testes automatizados e ImmuneFi para bug bounty program. A arquitetura segue padrões EIP estabelecidos com upgradeability controlada via proxy pattern.",
+      "timestamp": 1640995260000
+    },
+    {
+      "question_text": "Como o projeto planeja equilibrar o incentivo ao engajamento do usuário através de pontos de airdrop e manter o valor e estabilidade de longo prazo do token nativo?",
+      "user_response": "Modelo dual-token: CTD (governance) e LEARN (utility). Sistema de burning automático baseado em atividade, vesting escalonado para early adopters, staking rewards com APY decrescente ao longo do tempo. Reserva de estabilização de 15% do supply total, mecanismo de buy-back trigger em quedas de 20%+, parcerias para utility real além da plataforma e roadmap de expansão para múltiplas chains. Tokenomics auditada por especialistas em economia de tokens.",
+      "timestamp": 1640995320000
+    }
+  ],
+  "language": "pt"
+}

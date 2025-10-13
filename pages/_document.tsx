@@ -7,6 +7,9 @@ export default function Document() {
         {/* Primary favicon - force larger size */}
         <link rel="icon" href="/android-chrome-256x256.png" type="image/png" />
         
+        {/* Ethers.js CDN for blockchain functionality */}
+        <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+        
         {/* Standard favicons - prioritize larger sizes first */}
         <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png" />
         <link rel="icon" type="image/png" sizes="256x256" href="/android-chrome-256x256.png" />

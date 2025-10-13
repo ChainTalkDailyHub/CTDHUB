@@ -1,0 +1,41 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "C:\\Users\\walli\\Downloads\\CTD-HUB-TEMA-EDUCACIONAL-FINAL\\chaintalkdaily-hub - ON - Copia\\assessment\\hardhat\\contracts\\CTDHUB_BINNOAI.sol": {
+      "lastModificationDate": 1760388802720,
+      "contentHash": "d63be6c5e4678968fe706575efe3f1df",
+      "sourceName": "contracts/CTDHUB_BINNOAI.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "CTDHUB_BINNOAI"
+      ]
+    }
+  }
+}

@@ -82,7 +82,7 @@ export default function DatabaseSetupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-ctd-bg">
+    <div className="min-h-screen bg-ctd-bg dark:bg-ctd-bg-dark">
       <Head>
         <title>Database Setup - CTDHUB</title>
         <meta name="description" content="CTDHUB Database Setup and Verification" />
@@ -189,7 +189,7 @@ export default function DatabaseSetupPage() {
                   {setupResult.details && (
                     <div className="mt-4">
                       <p className="text-gray-600 dark:text-gray-300 font-medium mb-2">Details:</p>
-                      <pre className="bg-ctd-bg p-4 rounded-lg text-sm text-gray-900 dark:text-white overflow-x-auto">
+                      <pre className="bg-ctd-bg dark:bg-ctd-bg-dark p-4 rounded-lg text-sm text-gray-900 dark:text-white overflow-x-auto">
                         {typeof setupResult.details === 'string' 
                           ? setupResult.details 
                           : JSON.stringify(setupResult.details, null, 2)
@@ -203,7 +203,7 @@ export default function DatabaseSetupPage() {
                       <p className="text-gray-600 dark:text-gray-300 font-medium mb-2">Table Status:</p>
                       <div className="grid gap-2">
                         {Object.entries(setupResult.tables).map(([table, status]: [string, any]) => (
-                          <div key={table} className="flex items-center justify-between p-3 bg-ctd-bg rounded-lg">
+                          <div key={table} className="flex items-center justify-between p-3 bg-ctd-bg dark:bg-ctd-bg-dark rounded-lg">
                             <span className="font-mono text-gray-900 dark:text-white">{table}</span>
                             <span className={`px-2 py-1 rounded text-sm ${
                               status.exists ? 'bg-green-600 text-green-100' : 'bg-red-600 text-red-100'

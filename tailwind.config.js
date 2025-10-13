@@ -15,14 +15,22 @@ module.exports = {
         dark: '#111827',
         'ctd-yellow': '#FFC700',
         'ctd-yellow-dark': '#e6b300',
+        // CTD Theme Colors with Light/Dark Support
+        'ctd-bg': '#ffffff', // Light mode background
+        'ctd-bg-dark': '#000000', // Dark mode background
+        'ctd-panel': '#f8f9fa', // Light mode panel
+        'ctd-panel-dark': '#0E0E0E', // Dark mode panel
+        'ctd-border': '#e5e7eb', // Light mode border
+        'ctd-border-dark': '#2A2A2A', // Dark mode border
+        'ctd-text': '#1f2937', // Light mode text
+        'ctd-text-dark': '#F2F2F2', // Dark mode text
+        'ctd-mute': '#6b7280', // Light mode muted text
+        'ctd-mute-dark': '#A8A8A8', // Dark mode muted text
+        // Common CTD colors (same in both themes)
         ctd: {
-          bg: '#000000',
-          panel: '#0E0E0E',
-          border: '#2A2A2A',
-          text: '#F2F2F2',
           yellow: '#FFCC33',
           holo: '#8BE9FD',
-          mute: '#A8A8A8'
+          accent: '#FFC700'
         }
       },
       boxShadow: {

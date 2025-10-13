@@ -1,0 +1,20 @@
+{
+  "contractAddress": "0x1748389BF50932d1B5620d4560d2068De83df7EA",
+  "deployer": "0x27f79d0a52F88D04e1d04875Fe55d6C23f514Ec4",
+  "timestamp": "2025-10-12T05:25:24.620Z",
+  "network": "BSC Mainnet",
+  "constructorArgs": "0000000000000000000000007f890a4a575558307826c82e4cb6e671f3178bfc00000000000000000000000027f79d0a52f88d04e1d04875fe55d6c23f514ec400000000000000000000000000000000000000000000003635c9adc5dea0000000000000000000000000000027f79d0a52f88d04e1d04875fe55d6c23f514ec4",
+  "parameters": {
+    "ctdToken": "0x7f890a4a575558307826c82e4cb6e671f3178bfc",
+    "treasury": "0x27f79d0a52f88d04e1d04875fe55d6c23f514ec4",
+    "burnAmount": "1000.0",
+    "initialOwner": "0x27f79d0a52f88d04e1d04875fe55d6c23f514ec4"
+  },
+  "improvements": [
+    "Merkle proof verification",
+    "Timelock protection",
+    "Reentrancy guard",
+    "ETH rejection",
+    "Enhanced events"
+  ]
+}

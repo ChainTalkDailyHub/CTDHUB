@@ -10,6 +10,8 @@ export default function Courses() {
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedAuthor, setSelectedAuthor] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [coursesPerPage] = useState(30) // 6 linhas x 5 colunas = 30 cursos por página
 
   useEffect(() => {
     loadCourses()
@@ -37,7 +39,23 @@ export default function Courses() {
     return matchesSearch && matchesAuthor
   })
 
+  // Paginação
+  const totalPages = Math.ceil(filteredCourses.length / coursesPerPage)
+  const indexOfLastCourse = currentPage * coursesPerPage
+  const indexOfFirstCourse = indexOfLastCourse - coursesPerPage
+  const currentCourses = filteredCourses.slice(indexOfFirstCourse, indexOfLastCourse)
+
   const uniqueAuthors = Array.from(new Set(courses.map(c => c.author)))
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, selectedAuthor])
+
+  const goToPage = (pageNumber: number) => {
+    setCurrentPage(pageNumber)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString('en-US', {
@@ -51,7 +69,7 @@ export default function Courses() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
       <Header />
       <section className="pt-20 pb-8 px-4">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12 animate-fade-in-up">
             <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
               📚 Courses
@@ -109,8 +127,9 @@ export default function Courses() {
               </a>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredCourses.map(course => (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                {currentCourses.map(course => (
                 <div key={course.id} className="card card-interactive overflow-hidden group">
                   <div className="relative">
                     {/* Main Course Link - goes to first video if available, otherwise course page */}
@@ -123,11 +142,11 @@ export default function Courses() {
                           <img
                             src={course.videos[0].thumbnail}
                             alt={course.title}
-                            className="w-full h-48 object-cover"
+                            className="w-full h-40 object-cover"
                           />
                         ) : (
-                          <div className="w-full h-48 bg-gradient-to-br from-yellow-100 to-orange-100 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center">
-                            <div className="text-6xl">📚</div>
+                          <div className="w-full h-40 bg-gradient-to-br from-yellow-100 to-orange-100 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center">
+                            <div className="text-4xl">📚</div>
                           </div>
                         )}
                         <div className="absolute top-4 right-4">
@@ -142,12 +161,12 @@ export default function Courses() {
                         </div>
                       </div>
                       
-                      <div className="p-6">
-                        <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-2 line-clamp-2 group-hover:text-purple-600 dark:group-hover:text-yellow-400 transition-colors">
+                      <div className="p-4">
+                        <h3 className="font-bold text-gray-900 dark:text-white text-base mb-2 line-clamp-2 group-hover:text-purple-600 dark:group-hover:text-yellow-400 transition-colors">
                           {course.title}
                         </h3>
                         
-                        <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">
+                        <p className="text-gray-600 dark:text-gray-300 text-xs mb-3 line-clamp-2">
                           {course.description}
                         </p>
                         
@@ -160,10 +179,10 @@ export default function Courses() {
                     
                     {/* Course Playlist Button */}
                     {course.videos.length > 1 && (
-                      <div className="px-6 pb-4">
+                      <div className="px-4 pb-3">
                         <Link
                           href={`/courses/${course.id}`}
-                          className="block w-full text-center px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-lg font-medium text-sm transition-all duration-200 hover:shadow-lg"
+                          className="block w-full text-center px-3 py-2 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-lg font-medium text-xs transition-all duration-200 hover:shadow-lg"
                         >
                           📋 View Full Course ({course.totalVideos} videos)
                         </Link>
@@ -171,8 +190,87 @@ export default function Courses() {
                     )}
                   </div>
                 </div>
-              ))}
-            </div>
+                ))}
+              </div>
+
+              {/* Paginação */}
+              {totalPages > 1 && (
+                <div className="mt-12 flex flex-col items-center space-y-4">
+                  <div className="text-sm text-gray-600 dark:text-gray-300">
+                    Showing {indexOfFirstCourse + 1}-{Math.min(indexOfLastCourse, filteredCourses.length)} of {filteredCourses.length} courses
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    {/* Previous Button */}
+                    <button
+                      onClick={() => goToPage(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="px-3 py-2 text-sm font-medium text-gray-500 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      ← Previous
+                    </button>
+
+                    {/* Page Numbers */}
+                    {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                      let pageNumber;
+                      if (totalPages <= 7) {
+                        pageNumber = i + 1;
+                      } else if (currentPage <= 4) {
+                        pageNumber = i + 1;
+                      } else if (currentPage >= totalPages - 3) {
+                        pageNumber = totalPages - 6 + i;
+                      } else {
+                        pageNumber = currentPage - 3 + i;
+                      }
+
+                      return (
+                        <button
+                          key={pageNumber}
+                          onClick={() => goToPage(pageNumber)}
+                          className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                            currentPage === pageNumber
+                              ? 'bg-yellow-400 text-gray-900 shadow-lg'
+                              : 'text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                          }`}
+                        >
+                          {pageNumber}
+                        </button>
+                      );
+                    })}
+
+                    {/* Next Button */}
+                    <button
+                      onClick={() => goToPage(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className="px-3 py-2 text-sm font-medium text-gray-500 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      Next →
+                    </button>
+                  </div>
+
+                  {/* Quick Jump */}
+                  {totalPages > 10 && (
+                    <div className="flex items-center space-x-2 text-sm">
+                      <span className="text-gray-600 dark:text-gray-300">Jump to page:</span>
+                      <input
+                        type="number"
+                        min="1"
+                        max={totalPages}
+                        value={currentPage}
+                        onChange={(e) => {
+                          const page = parseInt(e.target.value);
+                          if (page >= 1 && page <= totalPages) {
+                            goToPage(page);
+                          }
+                        }}
+                        className="w-16 px-2 py-1 text-center bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                      />
+                      <span className="text-gray-600 dark:text-gray-300">of {totalPages}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>

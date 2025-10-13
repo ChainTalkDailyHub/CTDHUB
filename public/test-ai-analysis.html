@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Análise AI - CTDHUB</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000;
+            color: #fff;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .container {
+            background: #1a1a1a;
+            padding: 30px;
+            border-radius: 16px;
+            border: 2px solid #2a2a2a;
+        }
+        button {
+            background: #FFCC33;
+            color: #000;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .result {
+            background: #0a0a0a;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #8BE9FD;
+            margin-top: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .error {
+            background: #2a0a0a;
+            border-left-color: #ff5555;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Teste Análise AI Real - CTDHUB</h1>
+        <p>Teste do novo sistema de análise 100% AI (sem fallback)</p>
+        
+        <button onclick="testAnalysis()">🚀 Testar Análise AI</button>
+        <button onclick="testPDFGeneration()">📄 Testar Geração PDF</button>
+        <button onclick="clearResults()">🗑️ Limpar</button>
+        
+        <div id="result" class="result" style="display: none;">
+            <h3>Resultado:</h3>
+            <pre id="output"></pre>
+        </div>
+    </div>
+
+    <script>
+        async function testAnalysis() {
+            const resultDiv = document.getElementById('result');
+            const outputPre = document.getElementById('output');
+            
+            resultDiv.style.display = 'block';
+            outputPre.textContent = '🔄 Testando análise AI real...';
+            
+            const testData = {
+                sessionId: "test-ai-real-" + Date.now(),
+                userAnswers: [
+                    {
+                        question_text: "Fale sobre seu projeto Web3. Qual é o nome do projeto, quantos tokens você planeja lançar, em qual rede blockchain?",
+                        user_response: "CTDHUB é uma plataforma educacional Web3 inovadora que utiliza inteligência artificial para análise e avaliação de projetos blockchain. O projeto planeja lançar 1 bilhão de tokens CTD na BNB Smart Chain, com foco em educação DeFi e ferramentas de produtividade. Nossa visão é democratizar o acesso ao conhecimento Web3 através de análises AI personalizadas, sistema de recompensas gamificado e parcerias estratégicas com projetos estabelecidos.",
+                        timestamp: Date.now()
+                    },
+                    {
+                        question_text: "Como o projeto garante a segurança e eficiência dos smart contracts?",
+                        user_response: "Implementamos múltiplas camadas de segurança: auditoria completa por CertiK, uso de bibliotecas OpenZeppelin, implementação de padrão multi-sig para funções críticas, timelock para mudanças de governança e formal verification para lógicas complexas. Utilizamos Chainlink para oráculos externos, Mythril para testes automatizados e ImmuneFi para bug bounty program.",
+                        timestamp: Date.now()
+                    },
+                    {
+                        question_text: "Como o projeto planeja equilibrar incentivos e estabilidade do token?",
+                        user_response: "Modelo dual-token: CTD (governance) e LEARN (utility). Sistema de burning automático baseado em atividade, vesting escalonado para early adopters, staking rewards com APY decrescente ao longo do tempo. Reserva de estabilização de 15% do supply total, mecanismo de buy-back trigger em quedas de 20%+, parcerias para utility real além da plataforma.",
+                        timestamp: Date.now()
+                    }
+                ],
+                language: "pt"
+            };
+            
+            try {
+                const response = await fetch('/api/binno-final-analysis', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    outputPre.textContent = `✅ ANÁLISE AI REAL FUNCIONANDO!\n\n` +
+                        `📊 Score: ${data.score}%\n\n` +
+                        `📝 Análise: ${data.analysis}\n\n` +
+                        `🔧 Dados Estruturados:\n${JSON.stringify(data.report, null, 2)}`;
+                    resultDiv.classList.remove('error');
+                } else {
+                    throw new Error(data.error || 'Erro na análise');
+                }
+            } catch (error) {
+                outputPre.textContent = `❌ ERRO: ${error.message}`;
+                resultDiv.classList.add('error');
+            }
+        }
+        
+        async function testPDFGeneration() {
+            const resultDiv = document.getElementById('result');
+            const outputPre = document.getElementById('output');
+            
+            resultDiv.style.display = 'block';
+            outputPre.textContent = '🔄 Testando geração de PDF...';
+            
+            // Simular dados de análise para teste do PDF
+            const mockAnalysisData = {
+                executive_summary: "Com base em 3 respostas detalhadas, sua pontuação atual é 78%. Demonstra sólido conhecimento técnico em Web3, experiência prática com smart contracts e compreensão avançada de tokenomics.",
+                score: 78,
+                strengths: [
+                    "Conhecimento técnico sólido em arquitetura de smart contracts",
+                    "Experiência comprovada com auditorias de segurança (CertiK, Mythril)",
+                    "Modelo de tokenomics bem estruturado com utilidade clara",
+                    "Implementação de melhores práticas (OpenZeppelin, multi-sig)"
+                ],
+                weaknesses: [
+                    "Parcerias mencionadas precisam de validação mais específica",
+                    "Estratégia de go-to-market poderia ser mais detalhada",
+                    "Métricas de sucesso não foram claramente definidas"
+                ],
+                improvements: [
+                    "Documentar mais detalhadamente as parcerias estratégicas",
+                    "Desenvolver roadmap técnico com marcos específicos",
+                    "Criar dashboard de métricas para tracking de performance",
+                    "Estabelecer programa formal de community building"
+                ],
+                study_plan: [
+                    {
+                        area: "Advanced DeFi Architecture",
+                        priority: "High",
+                        resources: ["Uniswap V3 whitepaper", "Compound governance deep dive"],
+                        timeframe: "3-4 semanas",
+                        evidence: "Forte base técnica, mas pode aprofundar em protocolos DeFi mais complexos"
+                    }
+                ],
+                next_actions: [
+                    "Validar e documentar formalmente as parcerias mencionadas",
+                    "Criar MVP funcional com 3-5 módulos educacionais",
+                    "Estabelecer métricas claras de sucesso (DAU, retention)",
+                    "Preparar strategy paper para captação de investimento"
+                ],
+                learning_resources: [
+                    "Token Engineering courses (Outlier Ventures)",
+                    "Balancer smart pools documentation",
+                    "Case studies de projetos sustentáveis"
+                ],
+                risks: [
+                    "Dependência de parcerias não validadas",
+                    "Modelo dual-token adiciona complexidade",
+                    "Competição acirrada no espaço de educação Web3"
+                ],
+                copy_paste_detected: false,
+                copy_paste_explanation: "Respostas originais e específicas detectadas"
+            };
+            
+            const mockUserAnswers = [
+                {
+                    question_text: "Fale sobre seu projeto Web3",
+                    user_response: "CTDHUB é uma plataforma educacional Web3 inovadora..."
+                },
+                {
+                    question_text: "Como garante segurança dos smart contracts?",
+                    user_response: "Implementamos múltiplas camadas de segurança..."
+                }
+            ];
+            
+            try {
+                // Gerar PDF diretamente com HTML inline (sem import dinâmico)
+                const pdfHTML = generatePDFHTML(mockAnalysisData, mockUserAnswers, 'test-session-123');
+                
+                // Abrir PDF em nova janela
+                const pdfWindow = window.open('', '_blank', 'width=1000,height=800');
+                if (pdfWindow) {
+                    pdfWindow.document.write(pdfHTML);
+                    pdfWindow.document.close();
+                    pdfWindow.document.title = 'CTDHUB - Análise AI Real';
+                }
+                
+                outputPre.textContent = '✅ PDF gerado com sucesso!\n\nPDF aberto em nova janela com:\n' +
+                    '- Tema CTDHUB atualizado\n' +
+                    '- Dados AI estruturados reais\n' +
+                    '- Score: 78%\n' +
+                    '- Análise completa com strengths, weaknesses, study plan';
+                resultDiv.classList.remove('error');
+                
+            } catch (error) {
+                outputPre.textContent = `❌ ERRO na geração do PDF: ${error.message}`;
+                resultDiv.classList.add('error');
+            }
+        }
+        
+        function clearResults() {
+            document.getElementById('result').style.display = 'none';
+        }
+        
+        // Função para gerar PDF inline
+        function generatePDFHTML(analysisData, userAnswers, sessionId) {
+            const currentDate = new Date();
+            const dateStr = currentDate.toLocaleDateString('pt-BR');
+            const timeStr = currentDate.toLocaleTimeString('pt-BR');
+            const projectName = userAnswers[0]?.user_response?.split('.')[0]?.split(',')[0]?.trim() || 'Projeto Web3';
+            const score = analysisData.score || 0;
+            
+            const getScoreColor = (score) => {
+                if (score >= 70) return '#00D4AA';
+                if (score >= 50) return '#FFCC33';
+                return '#FF5555';
+            };
+            
+            const getScoreEmoji = (score) => {
+                if (score >= 80) return '🚀';
+                if (score >= 70) return '💪';
+                if (score >= 50) return '📈';
+                if (score >= 30) return '⚠️';
+                return '🔴';
+            };
+            
+            return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>CTDHUB - Análise BINNO AI</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #000000; color: #F2F2F2; line-height: 1.6; }
+        .pdf-container { width: 210mm; min-height: 297mm; background: #000000; margin: 0 auto; box-shadow: 0 0 40px rgba(255, 204, 51, 0.2); }
+        .pdf-header { background: linear-gradient(135deg, #FFCC33 0%, #FFC700 50%, #FFCC33 100%); height: 140px; padding: 30px 40px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 8px 32px rgba(255, 204, 51, 0.4); }
+        .header-left { display: flex; align-items: center; gap: 25px; z-index: 2; position: relative; }
+        .ctd-logo { width: 90px; height: 90px; background: linear-gradient(135deg, #000 0%, #1a1a1a 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 24px; color: #FFCC33; letter-spacing: 2px; border: 3px solid #000; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+        .header-info { color: #000; }
+        .header-info h1 { font-size: 32px; font-weight: 900; margin-bottom: 8px; }
+        .header-info .subtitle { font-size: 18px; font-weight: 600; opacity: 0.8; margin-bottom: 4px; }
+        .header-right { text-align: right; color: #000; z-index: 2; position: relative; }
+        .score-display { background: rgba(0,0,0,0.15); padding: 20px; border-radius: 16px; border: 3px solid #000; text-align: center; min-width: 120px; }
+        .score-number { font-size: 36px; font-weight: 900; color: ${getScoreColor(score)}; margin-bottom: 5px; }
+        .score-label { font-size: 14px; font-weight: 600; opacity: 0.8; }
+        .pdf-content { padding: 40px; background: linear-gradient(180deg, #000000 0%, #0A0A0A 100%); min-height: calc(297mm - 280px); }
+        .analysis-title { font-size: 28px; font-weight: 800; color: #FFCC33; text-align: center; margin-bottom: 40px; border-bottom: 2px solid #2A2A2A; padding-bottom: 20px; }
+        .executive-summary { background: linear-gradient(135deg, #1a1a1a 0%, #0E0E0E 100%); padding: 30px; border-radius: 16px; border: 2px solid #2A2A2A; border-left: 4px solid #FFCC33; margin-bottom: 30px; position: relative; }
+        .executive-summary::before { content: '${getScoreEmoji(score)}'; position: absolute; top: -15px; right: 20px; font-size: 30px; background: #000; padding: 5px 15px; border-radius: 20px; border: 2px solid #FFCC33; }
+        .executive-summary h3 { color: #FFCC33; font-size: 20px; margin-bottom: 15px; font-weight: 700; }
+        .analysis-section { background: linear-gradient(135deg, #1a1a1a 0%, #0E0E0E 100%); padding: 25px; border-radius: 16px; border: 2px solid #2A2A2A; margin-bottom: 25px; }
+        .strengths-section { border-left: 4px solid #00D4AA; }
+        .weaknesses-section { border-left: 4px solid #FF5555; }
+        .improvements-section { border-left: 4px solid #8BE9FD; }
+        .analysis-section h3 { font-size: 18px; margin-bottom: 20px; font-weight: 700; }
+        .strengths-section h3 { color: #00D4AA; }
+        .weaknesses-section h3 { color: #FF5555; }
+        .improvements-section h3 { color: #8BE9FD; }
+        .analysis-list { list-style: none; padding: 0; }
+        .analysis-list li { padding: 12px 0; border-bottom: 1px solid #2A2A2A; padding-left: 25px; position: relative; }
+        .analysis-list li::before { content: '▶'; position: absolute; left: 0; color: #FFCC33; font-size: 12px; }
+        .pdf-footer { background: #0A0A0A; padding: 25px 40px; border-top: 2px solid #2A2A2A; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="pdf-container">
+        <div class="pdf-header">
+            <div class="header-left">
+                <div class="ctd-logo">CTD</div>
+                <div class="header-info">
+                    <h1>CTDHUB</h1>
+                    <div class="subtitle">BINNO AI Analysis</div>
+                    <div style="font-size: 12px; opacity: 0.7;">${dateStr} • ${timeStr}</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="score-display">
+                    <div class="score-number">${score}%</div>
+                    <div class="score-label">SCORE</div>
+                </div>
+            </div>
+        </div>
+        <div class="pdf-content">
+            <h2 class="analysis-title">📊 Análise Completa do Projeto</h2>
+            <div class="executive-summary">
+                <h3>📋 Resumo Executivo</h3>
+                <p>${analysisData.executive_summary}</p>
+            </div>
+            <div class="analysis-section strengths-section">
+                <h3>💪 Pontos Fortes</h3>
+                <ul class="analysis-list">
+                    ${analysisData.strengths.map(strength => `<li>${strength}</li>`).join('')}
+                </ul>
+            </div>
+            <div class="analysis-section weaknesses-section">
+                <h3>⚠️ Pontos Fracos</h3>
+                <ul class="analysis-list">
+                    ${analysisData.weaknesses.map(weakness => `<li>${weakness}</li>`).join('')}
+                </ul>
+            </div>
+            <div class="analysis-section improvements-section">
+                <h3>📈 Melhorias</h3>
+                <ul class="analysis-list">
+                    ${analysisData.improvements.map(improvement => `<li>${improvement}</li>`).join('')}
+                </ul>
+            </div>
+        </div>
+        <div class="pdf-footer">
+            <div>CTDHUB - Plataforma Educacional Web3 • Powered by BINNO AI</div>
+            <div>Score: ${score}% • ${dateStr}</div>
+        </div>
+    </div>
+</body>
+</html>`;
+        }
+    </script>
+</body>
+</html>

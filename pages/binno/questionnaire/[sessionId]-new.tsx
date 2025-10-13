@@ -396,7 +396,7 @@ export default function SkillCompassQuestionnaire() {
   // Não renderizar até estar montado
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-ctd-bg py-8 flex items-center justify-center">
+      <div className="min-h-screen bg-ctd-bg dark:bg-ctd-bg-dark py-8 flex items-center justify-center">
         <div className="text-gray-900 dark:text-white text-lg">Loading...</div>
       </div>
     )
@@ -405,7 +405,7 @@ export default function SkillCompassQuestionnaire() {
   // Relatório final
   if (isCompleted && finalReport) {
     return (
-      <div className="min-h-screen bg-ctd-bg py-8">
+      <div className="min-h-screen bg-ctd-bg dark:bg-ctd-bg-dark py-8">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-300 dark:border-gray-600 p-8">
             <div className="text-center mb-8">
@@ -447,7 +447,7 @@ export default function SkillCompassQuestionnaire() {
   }
 
   return (
-    <div className="min-h-screen bg-ctd-bg py-8">
+    <div className="min-h-screen bg-ctd-bg dark:bg-ctd-bg-dark py-8">
       <div className="max-w-4xl mx-auto px-4">
         <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-300 dark:border-gray-600">
           
@@ -463,7 +463,7 @@ export default function SkillCompassQuestionnaire() {
               
               {/* Session Info */}
               {answers.length > 0 && (
-                <div className="mb-4 p-3 bg-ctd-bg rounded-lg border border-gray-300 dark:border-gray-600">
+                <div className="mb-4 p-3 bg-ctd-panel dark:bg-ctd-panel-dark rounded-lg border border-ctd-border dark:border-ctd-border-dark">
                   <div className="flex items-center justify-center space-x-4 text-sm">
                     <span className="text-gray-900 dark:text-white">
                       💾 Progress saved automatically
@@ -489,7 +489,7 @@ export default function SkillCompassQuestionnaire() {
                 </span>
               </div>
               
-              <div className="w-full bg-ctd-bg rounded-full h-2">
+              <div className="w-full bg-ctd-panel dark:bg-ctd-panel-dark rounded-full h-2">
                 <div 
                   className="bg-ctd-yellow h-2 rounded-full transition-all duration-300 ease-out"
                   style={{ width: `${(questionNumber / 15) * 100}%` }}
@@ -526,7 +526,7 @@ export default function SkillCompassQuestionnaire() {
                 onChange={(e) => setCurrentAnswer(e.target.value)}
                 onKeyDown={handleKeyPress}
                 placeholder="Share your thoughts and experience here..."
-                className="w-full h-40 p-4 bg-ctd-bg border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-ctd-mute resize-none focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                className="w-full h-40 p-4 bg-ctd-panel dark:bg-ctd-panel-dark border border-ctd-border dark:border-ctd-border-dark rounded-lg text-ctd-text dark:text-ctd-text-dark placeholder-ctd-mute dark:placeholder-ctd-mute-dark resize-none focus:outline-none focus:ring-2 focus:ring-yellow-400"
                 disabled={isSubmitting || isGeneratingQuestion || isGeneratingReport}
               />
               <div className="flex justify-between items-center mt-2">
@@ -544,7 +544,7 @@ export default function SkillCompassQuestionnaire() {
               <button
                 onClick={handlePrevious}
                 disabled={questionNumber <= 1 || isSubmitting || isGeneratingQuestion}
-                className="px-6 py-3 bg-ctd-bg border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg hover:bg-ctd-border transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-3 bg-ctd-panel dark:bg-ctd-panel-dark border border-ctd-border dark:border-ctd-border-dark text-ctd-text dark:text-ctd-text-dark rounded-lg hover:bg-ctd-border dark:hover:bg-ctd-border-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 ← Previous
               </button>

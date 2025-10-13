@@ -30,6 +30,13 @@
 - **Quiz Modules**: Blockchain knowledge tests
 - **Wallet Integration**: Web3 wallet connectivity
 
+### 🔥 QuizBurner System - NEW!
+- **Smart Contract Integration**: Public blockchain proof for token burns
+- **Eligibility Verification**: On-chain verification before burning
+- **Multi-Network Support**: BSC mainnet, opBNB, and testnets
+- **Public Transparency**: All burns recorded with verifiable events
+- **Gas Optimized**: Efficient contract design for minimal transaction costs
+
 ## 🛠 Technology Stack
 
 ### Frontend
@@ -44,10 +51,17 @@
 - **OpenAI API** - GPT-4 integration for AI functionalities
 - **Netlify Hosting** - Automatic deployment with global CDN
 
+### Blockchain & Smart Contracts
+- **Hardhat Framework** - Smart contract development and deployment
+- **Ethers.js 6.13.0** - Blockchain interaction library
+- **OpenZeppelin Contracts** - Security-audited smart contract components
+- **QuizBurner Contract** - Custom burning mechanism with public proof
+
 ### Integrations
 - **Web3 Wallets** - MetaMask and other wallet support
 - **YouTube API** - Video embedding and management
 - **GitHub Actions** - Automated CI/CD
+- **BSCScan API** - Contract verification and monitoring
 - **PDF Generation** - Exportable reports
 
 ## 📋 Project Structure
@@ -99,20 +113,42 @@ cd CTDHUB
 npm install
 ```
 
-3. **Configure environment variables**
+3. **Quick Setup (Recommended)**
 ```bash
-# Create .env.local
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_key
-OPENAI_API_KEY=your_openai_key
+# Automated configuration for QuizBurner
+node setup-quizburner.js
 ```
 
-4. **Run development server**
+4. **Manual Configuration** (Alternative)
+```bash
+# Copy environment template
+cp .env.example .env.local
+
+# Edit .env.local with your values:
+# - Supabase credentials
+# - OpenAI API key
+# - Blockchain private keys
+# - Contract addresses
+```
+
+5. **Deploy QuizBurner Smart Contract** (Optional)
+```bash
+# Install Hardhat dependencies
+npm install
+
+# Deploy to BSC mainnet
+npm run deploy:bsc
+
+# Verify contract
+npm run verify:bsc
+```
+
+6. **Run development server**
 ```bash
 npm run dev
 ```
 
-5. **Access locally**
+7. **Access locally**
 ```
 http://localhost:3000
 ```
@@ -298,12 +334,39 @@ Acesse `http://localhost:3000`
 
 ## 🔧 Scripts Disponíveis
 
+### Frontend Development
 ```bash
 npm run dev          # Servidor de desenvolvimento
 npm run build        # Build de produção
 npm run start        # Servidor de produção
 npm run lint         # Verificação de código
 npm run type-check   # Verificação TypeScript
+```
+
+### QuizBurner Smart Contract
+```bash
+# Setup and Configuration
+node setup-quizburner.js      # Automated setup wizard
+
+# Hardhat Development
+npm run compile               # Compile smart contracts
+npm run test:hardhat         # Run contract tests
+npx hardhat node            # Local blockchain network
+
+# Deployment Scripts
+npm run deploy:bsc           # Deploy to BSC mainnet
+npm run deploy:opbnb         # Deploy to opBNB mainnet
+npm run deploy:testnet       # Deploy to BSC testnet
+npm run deploy:local         # Deploy to local network
+
+# Contract Verification
+npm run verify:bsc           # Verify on BSCScan
+npm run verify:opbnb         # Verify on opBNBScan
+npm run verify:testnet       # Verify on testnet
+
+# Treasury Management
+npm run treasury:approve     # Approve QuizBurner for token spending
+npm run treasury:balance     # Check treasury balance
 ```
 
 ## 📁 Estrutura do Projeto
@@ -316,8 +379,15 @@ ctdhub-rebuild/
 │   ├── WalletButton.tsx # Botão de conexão wallet
 │   ├── CourseCard.tsx  # Card de curso
 │   ├── QuizQuestion.tsx # Componente de pergunta
-│   ├── BurnBadge.tsx   # Badge de queima de tokens
+│   ├── BurnBadge.tsx   # Badge de queima com proof blockchain
 │   └── ContractAnalyzer.tsx # Analisador de contratos
+├── contracts/          # Smart Contracts (NEW!)
+│   ├── QuizBurner.sol  # Contract de queima com proof público
+│   └── interfaces/     # Interfaces dos contratos
+├── scripts/            # Scripts de deploy Hardhat
+│   ├── deploy-quizburner.ts # Deploy automatizado
+│   ├── verify-quizburner.ts # Verificação no explorer
+│   └── treasury-approve.ts  # Aprovação do treasury
 ├── pages/              # Páginas Next.js
 │   ├── index.tsx       # Página inicial
 │   ├── courses/        # Sistema de cursos

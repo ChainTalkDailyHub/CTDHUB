@@ -1,0 +1,22 @@
+{
+  "name": "ctdhub-binnoai-hardhat",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "hardhat compile",
+    "deploy:bsc": "hardhat run scripts/deploy.ts --network bsc",
+    "verify:bsc": "hardhat run scripts/verify.ts --network bsc",
+    "record:bsc": "hardhat run scripts/record.ts --network bsc",
+    "hash": "ts-node scripts/hashCanonical.ts"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "dotenv": "^16.4.5",
+    "hardhat": "^2.22.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "ethers": "^6.13.2"
+  }
+}

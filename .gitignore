@@ -34,6 +34,13 @@ yarn-error.log*
 .env.production.local
 .env.production
 
+# Additional security patterns
+*.env
+**/private-keys/**
+**/*.key
+**/secrets/**
+hardhat-vars.json
+
 # API Keys and secrets - NEVER COMMIT
 *.key
 *.pem

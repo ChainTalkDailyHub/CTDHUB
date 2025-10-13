@@ -104,68 +104,138 @@ function parseStudyPlan(planText: string) {
   }];
 }
 
-function calculateScore(userAnswers: any[]) {
+function calculateScore(userAnswers: any[]): number {
   if (!userAnswers || !userAnswers.length) return 0;
-  let total = 0;
-  for (const a of userAnswers) {
-    const len = (a?.user_response || '').trim().length;
-    const quality = Math.min(10, len / 20);
-    total += quality;
+  
+  const responses = userAnswers.map(a => (a?.user_response || '').trim());
+  const uniqueResponses = new Set(responses);
+  
+  // Major penalty for copy-paste behavior
+  const hasRepeatedResponses = uniqueResponses.size < responses.length;
+  const globalPenalty = hasRepeatedResponses ? 30 : 0;
+  
+  let totalScore = 0;
+  
+  for (const answer of userAnswers) {
+    const response = (answer?.user_response || '').toLowerCase().trim();
+    let questionScore = 40; // Start with moderate base score, not 100%
+    
+    // Length quality (max 25 points)
+    if (response.length < 10) {
+      questionScore = 15;
+    } else if (response.length < 30) {
+      questionScore = 25;
+    } else if (response.length > 100) {
+      questionScore += 15; // Bonus for detailed responses
+    }
+    
+    // Content analysis (max 35 points)
+    const hasTechnicalTerms = /blockchain|smart.?contract|defi|nft|web3|dapp|token|crypto|solidity|ethereum|bnb/i.test(response);
+    const hasSpecificDetails = /https?:\/\/|0x[a-fA-F0-9]{40}|github|gitlab|contract|audit|testnet|mainnet/i.test(response);
+    const isGenericProject = /projeto|platform|sistema|application/i.test(response) && response.length < 50;
+    
+    if (hasTechnicalTerms) questionScore += 15;
+    if (hasSpecificDetails) questionScore += 20; // Real evidence gets higher score
+    if (isGenericProject) questionScore -= 20; // Generic responses penalized
+    
+    // Pattern detection for low-effort responses
+    const repeatedPattern = /(.)\1{4,}/;
+    const meaninglessPattern = /^[a-z]{15,}$/i;
+    
+    if (repeatedPattern.test(response)) {
+      questionScore = 5; // Very low score for repeated chars
+    }
+    
+    if (meaninglessPattern.test(response)) {
+      questionScore = 10; // Low score for meaningless text
+    }
+    
+    // Apply global penalty for copy-paste behavior
+    questionScore -= globalPenalty;
+    
+    // Ensure realistic bounds - NO automatic high scores
+    questionScore = Math.max(5, Math.min(80, questionScore)); // Max 80%, not 100%
+    
+    totalScore += questionScore;
   }
-  return Math.round((total / (userAnswers.length * 10)) * 100);
+  
+  const finalScore = Math.round(totalScore / userAnswers.length);
+  
+  // Additional reality check - if most responses are generic, cap the score
+  const avgLength = responses.reduce((sum, r) => sum + r.length, 0) / responses.length;
+  if (avgLength < 40 && finalScore > 50) {
+    return Math.min(finalScore, 35); // Cap low-effort responses
+  }
+  
+  return finalScore;
 }
 
-async function getStructuredAnalysisJSON(userAnswers: any[], score: number, language = 'en') {
-  // Fallback if no OpenAI key
-  if (!OPENAI_API_KEY) return buildFallbackJSON(userAnswers, score, language);
+async function getStructuredAnalysisJSON(userAnswers: any[], score: number, language = 'pt') {
+  console.log('🤖 Starting AI analysis - NO FALLBACK MODE');
+  
+  if (!OPENAI_API_KEY) {
+    throw new Error('❌ OPENAI_API_KEY is required. Configure environment variable.');
+  }
 
   const condensed = userAnswers
-    .map((a, i) => `Q${i + 1}: ${a.question_text}\nA${i + 1}: ${a.user_response || ''}`)
+    .map((a, i) => `Q${i + 1}: ${a.question_text || a.question}\nA${i + 1}: ${a.user_response || 'No response'}`)
     .join('\n\n');
 
-  const system = `You are Binno AI, a Web3 assessor for CTDHub. Return ONLY valid JSON, no prose.`;
-  const user = `
-Context:
-- Total answers: ${userAnswers.length}
-- Overall score: ${score}%
-- Language: ${language}
+  const system = `You are BinnoAI, an expert Web3 project analyst for CTDHUB platform. 
 
-Rules:
-- If answers are positive/good: acknowledge strengths and suggest improvements if any.
-- If answers show gaps: point out exactly what's wrong and what to study next.
-- Provide specific learning resources and study plans for identified gaps.
-- Include realistic timelines for skill development.
-- Reference specific quotes from user responses as evidence.
-- Keep it concise but actionable with detailed study recommendations.
-Return your analysis in this EXACT template format (no JSON, no markdown):
+CRITICAL: Respond ONLY with valid JSON in this EXACT structure:
+{
+  "executive_summary": "Based on ${userAnswers.length} detailed responses, provide comprehensive assessment with score ${score}%. Professional analysis for Web3 project evaluation.",
+  "strengths": ["Specific technical strength 1", "Strategic advantage 2", "Market positioning 3"],
+  "weaknesses": ["Technical gap 1", "Strategic weakness 2", "Market challenge 3"],
+  "improvements": ["Actionable technical improvement 1", "Strategic enhancement 2", "Operational optimization 3"],
+  "study_plan": [
+    {
+      "area": "Technical focus area (e.g., Smart Contract Security, DeFi Architecture)",
+      "priority": "High/Medium/Low",
+      "resources": ["Specific technical resource 1", "Learning material 2"],
+      "timeframe": "2-4 weeks",
+      "evidence": "Direct quote from user response demonstrating this need"
+    }
+  ],
+  "next_actions": ["Immediate technical action 1", "Strategic initiative 2", "Operational task 3"],
+  "learning_resources": ["Technical documentation 1", "Educational platform 2", "Industry report 3"],
+  "risks": ["Technical risk 1", "Market risk 2", "Operational risk 3"],
+  "copy_paste_detected": false,
+  "copy_paste_explanation": "Analysis of response authenticity and patterns"
+}
 
-EXECUTIVE_SUMMARY:
-[Write 2-3 sentences about overall assessment and copy-paste detection]
+Score interpretation:
+- 80-100%: Exceptional Web3 project ready for mainnet deployment
+- 65-79%: Strong foundation with minor optimizations needed
+- 45-64%: Good concept requiring strategic improvements
+- 25-44%: Basic understanding needing significant development
+- 0-24%: Fundamental gaps requiring intensive learning
 
-SCORE:
-[The calculated score: ${score}]
+Focus areas for analysis:
+- Technical architecture & smart contract security
+- Tokenomics design & sustainability 
+- Market positioning & competitive advantage
+- Team expertise & execution capability
+- Community building & go-to-market strategy`;
 
-STRENGTHS:
-[List 2-4 genuine strengths if any, or write "Limited strengths demonstrated"]
+  const user = `Analyze this Web3 project based on ${userAnswers.length} questionnaire responses. Calculated score: ${score}%
 
-WEAKNESSES:
-[List 3-5 specific weakness areas including copy-paste issues]
+Project Responses:
+${condensed}
 
-IMPROVEMENTS:
-[List 3-5 actionable improvements]
+Requirements:
+- Provide expert-level analysis appropriate for score ${score}%
+- Focus on technical depth, strategic insights, and actionable recommendations  
+- Identify specific strengths, weaknesses, and improvement opportunities
+- Create personalized study plan with concrete resources and timelines
+- Assess risks and provide mitigation strategies
+- Ensure all recommendations are Web3/blockchain industry specific
 
-STUDY_PLAN:
-[Write: AREA: [area] | PRIORITY: [High/Medium/Low] | RESOURCES: [resources] | TIMEFRAME: [timeframe] | EVIDENCE: [evidence from responses]]
-
-COPY_PASTE_DETECTED:
-[Write YES or NO, then explain if copy-paste was found]
-
-Remember: Be brutally honest about copy-paste behavior and response quality.
-
-Answers:
-${condensed}`;
+Deliver comprehensive professional analysis in the specified JSON format.`;
 
   try {
+    console.log('🚀 Calling OpenAI API...');
     const resp = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -174,7 +244,8 @@ ${condensed}`;
       },
       body: JSON.stringify({
         model: 'gpt-4o-mini',
-        temperature: 0.3,
+        temperature: 0.4,
+        max_tokens: 2500,
         response_format: { type: 'json_object' },
         messages: [
           { role: 'system', content: system },
@@ -183,14 +254,26 @@ ${condensed}`;
       })
     });
 
-    if (!resp.ok) throw new Error(`OpenAI ${resp.status}`);
+    if (!resp.ok) {
+      const errorText = await resp.text();
+      console.error('❌ OpenAI API Error:', resp.status, errorText);
+      throw new Error(`OpenAI API error ${resp.status}: ${errorText}`);
+    }
+    
     const data = await resp.json();
     const content = data?.choices?.[0]?.message?.content || '';
-    const parsed = parseTemplateResponse(content, score);
-    return sanitizeReport(parsed);
+    
+    console.log('✅ AI Response received:', content.substring(0, 200) + '...');
+    
+    // Parse the JSON directly
+    const analysisData = JSON.parse(content);
+    console.log('✅ AI Analysis parsed successfully');
+    
+    return sanitizeReport(analysisData);
+    
   } catch (err) {
-    console.error('OpenAI error:', err);
-    return buildFallbackJSON(userAnswers, score, language);
+    console.error('❌ Complete AI Analysis Failed:', err);
+    throw new Error(`AI Analysis failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
   }
 }
 
