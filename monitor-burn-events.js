@@ -13,8 +13,6 @@ const CTD_TOKEN_ADDRESS = '0x7f890a4a575558307826C82e4cb6E671f3178bfc'
 // ABI do contrato
 const BURNER_ABI = [
   'event QuizCompleted(address indexed user, string quizId, uint256 amountBurned, uint256 timestamp)',
-  'function totalBurned() external view returns (uint256)',
-  'function burnCount() external view returns (uint256)',
   'function getUserInfo(address user) external view returns (bool hasCompleted, uint256 burnedAmount, uint256 burnTimestamp, string quizId)'
 ]
 
@@ -45,14 +43,10 @@ async function main() {
     // Status inicial
     console.log('\n📊 STATUS INICIAL:\n')
     
-    const totalBurned = await burnerContract.totalBurned()
-    const burnCount = await burnerContract.burnCount()
     const treasuryBalance = await tokenContract.balanceOf(TREASURY_ADDRESS)
     const deadBalance = await tokenContract.balanceOf(DEAD_ADDRESS)
     const allowance = await tokenContract.allowance(TREASURY_ADDRESS, BURNER_CONTRACT_ADDRESS)
     
-    console.log(`   Total Burned: ${ethers.formatEther(totalBurned)} CTD`)
-    console.log(`   Burn Count: ${burnCount.toString()} completions`)
     console.log(`   Treasury Balance: ${ethers.formatEther(treasuryBalance)} CTD`)
     console.log(`   Dead Address Balance: ${ethers.formatEther(deadBalance)} CTD`)
     console.log(`   Allowance: ${ethers.formatEther(allowance)} CTD`)
@@ -90,14 +84,10 @@ async function main() {
       
       // Status atualizado
       try {
-        const newTotalBurned = await burnerContract.totalBurned()
-        const newBurnCount = await burnerContract.burnCount()
         const newTreasuryBalance = await tokenContract.balanceOf(TREASURY_ADDRESS)
         const newDeadBalance = await tokenContract.balanceOf(DEAD_ADDRESS)
         
         console.log('\n   📊 Status Atualizado:')
-        console.log(`      - Total Burned: ${ethers.formatEther(newTotalBurned)} CTD`)
-        console.log(`      - Burn Count: ${newBurnCount.toString()}`)
         console.log(`      - Treasury: ${ethers.formatEther(newTreasuryBalance)} CTD`)
         console.log(`      - Dead Address: ${ethers.formatEther(newDeadBalance)} CTD`)
       } catch (err) {
