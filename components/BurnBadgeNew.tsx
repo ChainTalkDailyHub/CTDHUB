@@ -77,22 +77,15 @@ export default function BurnBadgeNew() {
           quizId
         })
 
-        // Endereço de teste - permitir múltiplas queimas
-        const TEST_ADDRESS = '0x80Bd46dE8529588E7829963036348b2F50714618'
-        const isTestAddress = address.toLowerCase() === TEST_ADDRESS.toLowerCase()
-
-        if (hasCompleted && !isTestAddress) {
+        // Verificar se já completou o burn
+        if (hasCompleted) {
           setIsEligible(false)
           setEligibilityReason('Already completed! You can only burn once.')
           setCheckingEligibility(false)
           return
         }
 
-        if (isTestAddress && hasCompleted) {
-          console.log('🧪 Endereço de teste - permitindo múltiplas queimas')
-        }
-
-        // Verificar elegibilidade no contrato
+        // Verificar elegibilidade no contrato (apenas para não-test addresses)
         const [eligible, reason] = await contract.canBurnTokens(address)
         
         console.log('✅ Elegibilidade:', { eligible, reason })
