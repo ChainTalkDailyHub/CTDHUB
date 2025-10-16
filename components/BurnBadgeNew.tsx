@@ -9,11 +9,6 @@ const BSC_RPC_URL = 'https://bsc-dataseed.binance.org/'
 const BURNER_CONTRACT_ADDRESS = '0xB5e0393E1D8E95bF5cf4fd11b03abD03855eB958'
 const BSCSCAN_API_KEY = '1A8YXSRK5VIPP3IQN3RYA4K2HVXH81MM4E'
 
-// Gas price mínimo seguro para BSC (5 Gwei em Wei)
-// Previne alerta "suspeito" do MetaMask causado por gas muito baixo
-// BSC não suporta EIP-1559, então usamos gas price tradicional mais alto
-const MIN_SAFE_GAS_PRICE = BigInt(5) * BigInt(1e9) // 5 Gwei
-
 // ABI simplificada do contrato CTDQuizBurner
 const BURNER_CONTRACT_ABI = [
   'function burnQuizTokens(string quizId) external',
@@ -137,25 +132,13 @@ export default function BurnBadgeNew() {
         }
 
         const gasPrice = BigInt(gasPriceData.result) // Wei
-        console.log('💨 Gas Price da rede:', gasPrice.toString(), 'Wei')
-
-        // CORREÇÃO: Garantir gas price mínimo seguro (5 Gwei)
-        // Gas muito baixo causa alerta "suspeito" no MetaMask
-        // BSC não suporta EIP-1559, então usamos gas price tradicional mais alto
-        const safeGasPrice = gasPrice > MIN_SAFE_GAS_PRICE ? gasPrice : MIN_SAFE_GAS_PRICE
-        
-        if (gasPrice < MIN_SAFE_GAS_PRICE) {
-          console.warn('⚠️ Gas price da rede muito baixo!')
-          console.log(`   Rede: ${Number(gasPrice) / 1e9} Gwei`)
-          console.log(`   Usando mínimo seguro: ${Number(MIN_SAFE_GAS_PRICE) / 1e9} Gwei`)
-          console.log('   ℹ️  Isso previne alerta "suspicious" do MetaMask')
-        }
+        console.log('💨 Gas Price:', gasPrice.toString(), 'Wei')
 
         // 2. Estimar gasLimit (baseado em testes: ~80k, usamos 100k para segurança)
         const estimatedGasLimit = BigInt(100000)
 
-        // 3. Calcular custo em Wei (usando gas price seguro)
-        const gasCostWei = safeGasPrice * estimatedGasLimit
+        // 3. Calcular custo em Wei
+        const gasCostWei = gasPrice * estimatedGasLimit
 
         // 4. Converter para BNB
         const gasCostBNB = Number(gasCostWei) / 1e18
@@ -178,15 +161,14 @@ export default function BurnBadgeNew() {
         const gasCostUSD = gasCostBNB * bnbPriceUSD
 
         console.log('📊 Estimativa de Gas:', {
-          gasPriceNetwork: gasPrice.toString(),
-          gasPriceUsed: safeGasPrice.toString(),
+          gasPrice: gasPrice.toString(),
           gasLimit: estimatedGasLimit.toString(),
           gasCostBNB,
           gasCostUSD
         })
 
         setEstimatedGas({
-          gasPrice: safeGasPrice, // Usar gas price seguro
+          gasPrice, // Gas price da rede
           gasLimit: estimatedGasLimit,
           gasCostBNB,
           gasCostUSD
@@ -262,52 +244,16 @@ export default function BurnBadgeNew() {
 
       // 5. Gerar quiz ID único
       const quizId = `quiz_${address}_${Date.now()}`
-      console.log('📝 Quiz ID:', quizId)
+      console.log('📝 Chamando burnQuizTokens com quizId:', quizId)
 
-      // 6. Obter gas price seguro (mínimo 5 Gwei)
-      const feeData = await provider.getFeeData()
-      const networkGasPrice = feeData.gasPrice || BigInt(0)
-      const safeGasPrice = networkGasPrice > MIN_SAFE_GAS_PRICE 
-        ? networkGasPrice 
-        : MIN_SAFE_GAS_PRICE
-
-      console.log('⛽ Gas Price:')
-      console.log(`   Rede: ${Number(networkGasPrice) / 1e9} Gwei`)
-      console.log(`   Usando: ${Number(safeGasPrice) / 1e9} Gwei (mínimo seguro)`)
-
-      // 7. PREPARAR TRANSAÇÃO MANUALMENTE (fix para Trust Wallet)
-      console.log('📦 Preparando transação...')
-      
-      // Criar transação populada com a função e parâmetros
-      const populatedTx = await contract.burnQuizTokens.populateTransaction(quizId)
-      console.log('✅ Transação preparada')
-      console.log('   Data:', populatedTx.data?.slice(0, 20) + '...')
-      console.log('   Data length:', populatedTx.data?.length)
-      
-      // Verificar se data está presente
-      if (!populatedTx.data || populatedTx.data === '0x' || populatedTx.data.length < 10) {
-        throw new Error('❌ ERRO: Transaction data is empty! Cannot proceed.')
-      }
-
-      // 8. Enviar transação manualmente com data correto
-      console.log('📤 Enviando transação...')
-      const tx = await signer.sendTransaction({
-        to: BURNER_CONTRACT_ADDRESS,
-        data: populatedTx.data, // Data da função burnQuizTokens
-        gasLimit: 100000,
-        gasPrice: safeGasPrice
-      })
+      // 6. Executar transação (usuário vai assinar na wallet)
+      // IMPORTANTE: SEM OPTIONS! Deixar wallet decidir gas price
+      const tx = await contract.burnQuizTokens(quizId)
       console.log('⏳ Transação enviada:', tx.hash)
-      console.log('   Verificar em:', `https://bscscan.com/tx/${tx.hash}`)
 
-      // 9. Aguardar confirmação
+      // 7. Aguardar confirmação
       const receipt = await tx.wait()
-      
-      if (!receipt) {
-        throw new Error('Transaction receipt is null')
-      }
-      
-      console.log('✅ Transação confirmada! Block:', receipt.blockNumber)
+      console.log('✅ Transação confirmada! Block:', receipt?.blockNumber)
 
       setBurnResult({
         success: true,
