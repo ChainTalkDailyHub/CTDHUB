@@ -276,12 +276,11 @@ export default function BurnBadgeNew() {
       console.log(`   Rede: ${Number(networkGasPrice) / 1e9} Gwei`)
       console.log(`   Usando: ${Number(safeGasPrice) / 1e9} Gwei (mínimo seguro)`)
 
-      // 7. Executar transação LEGACY (Type 0) com gas price personalizado
-      // BSC não suporta EIP-1559, então forçamos transação legacy
+      // 7. Executar transação com gas price personalizado
+      // Removido type: 0 para compatibilidade com Trust Wallet
       const tx = await contract.burnQuizTokens(quizId, {
         gasLimit: 100000, // Gas limit fixo
-        gasPrice: safeGasPrice, // Gas price seguro (mínimo 5 Gwei)
-        type: 0 // Forçar transação legacy (Type 0) - CRÍTICO para BSC
+        gasPrice: safeGasPrice // Gas price seguro (mínimo 5 Gwei)
       })
       console.log('⏳ Transação enviada:', tx.hash)
 
