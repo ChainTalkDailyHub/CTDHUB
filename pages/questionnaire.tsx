@@ -4,7 +4,7 @@ export default function Questionnaire() {
   return (
     <>
       <Head>
-        <title>CTD Skill Compass - Em Construção</title>
+        <title>CTD Skill Compass - Under Construction</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
 
@@ -17,7 +17,7 @@ export default function Questionnaire() {
 
         body {
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-          background: linear-gradient(135deg, #3a4a2f 0%, #5a6b4a 50%, #3a4a2f 100%);
+          background: #ffffff;
           min-height: 100vh;
           overflow: hidden;
           position: relative;
@@ -34,7 +34,7 @@ export default function Questionnaire() {
         /* Partículas flutuantes de fundo */
         .particle {
           position: absolute;
-          background: rgba(234, 179, 8, 0.1);
+          background: rgba(255, 204, 51, 0.15);
           border-radius: 50%;
           animation: float 20s infinite;
         }
@@ -61,18 +61,22 @@ export default function Questionnaire() {
           z-index: 10;
           padding: 2rem;
           max-width: 900px;
+          margin: 0 auto;
         }
 
         .logo-container {
-          margin-bottom: 3rem;
+          margin-bottom: 2rem;
           animation: fadeInDown 1s ease-out;
+          display: flex;
+          justify-content: center;
+          align-items: center;
         }
 
         .logo {
-          max-width: 500px;
+          max-width: 400px;
           width: 100%;
           height: auto;
-          filter: drop-shadow(0 10px 30px rgba(234, 179, 8, 0.3));
+          filter: drop-shadow(0 10px 30px rgba(255, 204, 51, 0.3));
           animation: pulse 3s ease-in-out infinite;
         }
 
@@ -99,9 +103,9 @@ export default function Questionnaire() {
         .title {
           font-size: 3rem;
           font-weight: bold;
-          color: #eab308;
+          color: #FFCC33;
           margin-bottom: 1rem;
-          text-shadow: 0 0 20px rgba(234, 179, 8, 0.5);
+          text-shadow: 0 0 20px rgba(255, 204, 51, 0.5);
           animation: fadeInUp 1s ease-out 0.3s both;
         }
 
@@ -118,7 +122,7 @@ export default function Questionnaire() {
 
         .subtitle {
           font-size: 1.5rem;
-          color: #fef08a;
+          color: #6b7280;
           margin-bottom: 2rem;
           animation: fadeInUp 1s ease-out 0.6s both;
         }
@@ -126,7 +130,7 @@ export default function Questionnaire() {
         .construction-text {
           font-size: 2.5rem;
           font-weight: bold;
-          color: #ffffff;
+          color: #1f2937;
           margin-bottom: 1.5rem;
           animation: fadeInUp 1s ease-out 0.9s both;
         }
@@ -140,16 +144,16 @@ export default function Questionnaire() {
           width: 100%;
           max-width: 400px;
           height: 8px;
-          background: rgba(255, 255, 255, 0.2);
+          background: #e5e7eb;
           border-radius: 10px;
           overflow: hidden;
           margin: 0 auto 1rem;
-          box-shadow: 0 0 10px rgba(234, 179, 8, 0.3);
+          box-shadow: 0 0 10px rgba(255, 204, 51, 0.3);
         }
 
         .loading-progress {
           height: 100%;
-          background: linear-gradient(90deg, #eab308, #fbbf24, #eab308);
+          background: linear-gradient(90deg, #FFCC33, #FFC700, #FFCC33);
           background-size: 200% 100%;
           border-radius: 10px;
           animation: loading 2s ease-in-out infinite, shimmer 1.5s linear infinite;
@@ -175,7 +179,7 @@ export default function Questionnaire() {
         }
 
         .loading-text {
-          color: #fef08a;
+          color: #6b7280;
           font-size: 1.1rem;
         }
 
@@ -200,7 +204,7 @@ export default function Questionnaire() {
         }
 
         .message {
-          color: #d4d4a8;
+          color: #6b7280;
           font-size: 1.2rem;
           margin-top: 2rem;
           animation: fadeInUp 1s ease-out 1.5s both;
@@ -273,11 +277,11 @@ export default function Questionnaire() {
           }
           
           .construction-text {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
           }
           
           .logo {
-            max-width: 300px;
+            max-width: 280px;
           }
           
           .tool-icon {
@@ -301,24 +305,24 @@ export default function Questionnaire() {
         {/* Conteúdo principal */}
         <div className="container">
           <div className="logo-container">
-            <img src="/images/profile.png" alt="CTD Hub Logo" className="logo" />
+            <img src="/CTDHUB.png" alt="CTD Hub Logo" className="logo" />
           </div>
           
-          <h1 className="title">Skill Compass</h1>
-          <p className="subtitle">Sua bússola de habilidades</p>
+          <h1 className="title">CTD Skill Compass</h1>
+          <p className="subtitle">Your skills compass</p>
           
-          <h2 className="construction-text">🚧 Em Construção 🚧</h2>
+          <h2 className="construction-text">🚧 I'm building, come back soon! 🚧</h2>
           
           <div className="loading-container">
             <div className="loading-bar">
               <div className="loading-progress"></div>
             </div>
-            <p className="loading-text">Carregando</p>
+            <p className="loading-text">Loading</p>
           </div>
           
           <p className="message">
-            Estamos trabalhando duro para trazer algo incrível para você!<br />
-            Em breve, você poderá explorar e desenvolver suas habilidades.
+            We're working hard to bring you something amazing!<br />
+            Soon you'll be able to explore and develop your skills.
           </p>
         </div>
       </div>
