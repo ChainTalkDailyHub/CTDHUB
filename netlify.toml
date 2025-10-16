@@ -1,6 +1,6 @@
 # Build settings for Next.js on Netlify
 [build]
-  publish = "out"
+  publish = ".next"
   command = "npm run netlify:build"
   functions = "netlify/functions"
 
