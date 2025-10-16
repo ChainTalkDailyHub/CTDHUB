@@ -1,0 +1,200 @@
+
+> ctdhub-platform@0.1.0 build
+> next build
+
+  Ôû▓ Next.js 14.2.33
+  - Environments: .env.local, .env.production
+
+   Skipping linting
+   Checking validity of types ...
+   Creating an optimized production build ...
+2025-10-16T00:55:42.063Z next:build:webpack-build using separate compiler workers
+2025-10-16T00:55:43.297Z next:jsconfig-paths-plugin tsconfig.json or jsconfig.json paths: { '@/*': [ './*' ] }
+2025-10-16T00:55:43.298Z next:jsconfig-paths-plugin resolved baseUrl: {
+  baseUrl: 'C:\\Users\\walli\\Downloads\\CTD-HUB-TEMA-EDUCACIONAL-FINAL\\chaintalkdaily-hub - ON - Copia',
+  isImplicit: true
+}
+2025-10-16T00:55:43.311Z next:jsconfig-paths-plugin tsconfig.json or jsconfig.json paths: { '@/*': [ './*' ] }
+2025-10-16T00:55:43.311Z next:jsconfig-paths-plugin resolved baseUrl: {
+  baseUrl: 'C:\\Users\\walli\\Downloads\\CTD-HUB-TEMA-EDUCACIONAL-FINAL\\chaintalkdaily-hub - ON - Copia',
+  isImplicit: true
+}
+2025-10-16T00:55:43.338Z next:jsconfig-paths-plugin tsconfig.json or jsconfig.json paths: { '@/*': [ './*' ] }
+2025-10-16T00:55:43.338Z next:jsconfig-paths-plugin resolved baseUrl: {
+  baseUrl: 'C:\\Users\\walli\\Downloads\\CTD-HUB-TEMA-EDUCACIONAL-FINAL\\chaintalkdaily-hub - ON - Copia',
+  isImplicit: true
+}
+2025-10-16T00:55:43.411Z next:build:webpack-build starting compiler server
+2025-10-16T00:55:43.411Z next:build:webpack-build starting server compiler
+2025-10-16T00:55:43.934Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.935Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.935Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.935Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.935Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.935Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.935Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.936Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.936Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.936Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.936Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.936Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.936Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.936Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.936Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.936Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.936Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.936Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.936Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.936Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.936Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.937Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.937Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.937Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.937Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.937Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.937Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.937Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.937Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.937Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.958Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.958Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.958Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.958Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.958Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.958Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.958Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.958Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.958Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.958Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.959Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.959Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.959Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.959Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.959Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.959Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.959Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.959Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.959Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.959Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.959Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.959Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.959Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.960Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.960Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.960Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.960Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.960Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.961Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.961Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.970Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.970Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.970Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.970Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.970Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.970Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.971Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.971Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.971Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.971Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.971Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.971Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.971Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.971Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.971Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.971Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.971Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.971Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.971Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.971Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.971Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.971Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.971Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.971Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.971Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.972Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.978Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.978Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.978Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.978Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.985Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.986Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.986Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.986Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.986Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.986Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.986Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.986Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.986Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.986Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.986Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.986Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.986Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.986Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.987Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.987Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.987Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.987Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.987Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.987Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.987Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.987Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.987Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.987Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.987Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.987Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.987Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.987Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.987Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:43.988Z next:jsconfig-paths-plugin moduleName did not match any paths pattern next-route-loader
+2025-10-16T00:55:44.041Z next:jsconfig-paths-plugin skipping request as it is an absolute path C:\Users\walli\Downloads\CTD-HUB-TEMA-EDUCACIONAL-FINAL\chaintalkdaily-hub - ON - Copia\components\ErrorBoundary
+2025-10-16T00:55:44.052Z next:jsconfig-paths-plugin skipping request as it is an absolute path C:\Users\walli\Downloads\CTD-HUB-TEMA-EDUCACIONAL-FINAL\chaintalkdaily-hub - ON - Copia\components\ErrorBoundary
+2025-10-16T00:55:44.056Z next:jsconfig-paths-plugin skipping request as it is an absolute path C:\Users\walli\Downloads\CTD-HUB-TEMA-EDUCACIONAL-FINAL\chaintalkdaily-hub - ON - Copia\components\ErrorBoundary
+2025-10-16T00:55:44.056Z next:jsconfig-paths-plugin skipping request as it is an absolute path C:\Users\walli\Downloads\CTD-HUB-TEMA-EDUCACIONAL-FINAL\chaintalkdaily-hub - ON - Copia\components\ErrorBoundary
+2025-10-16T00:55:44.063Z next:jsconfig-paths-plugin skipping request as it is an absolute path C:\Users\walli\Downloads\CTD-HUB-TEMA-EDUCACIONAL-FINAL\chaintalkdaily-hub - ON - Copia\lib\storage
+2025-10-16T00:55:44.064Z next:jsconfig-paths-plugin skipping request as it is a relative path ../components/Header
+2025-10-16T00:55:44.064Z next:jsconfig-paths-plugin skipping request as it is a relative path ../components/Header
+2025-10-16T00:55:44.064Z next:jsconfig-paths-plugin skipping request as it is an absolute path C:\Users\walli\Downloads\CTD-HUB-TEMA-EDUCACIONAL-FINAL\chaintalkdaily-hub - ON - Copia\components\Header
+2025-10-16T00:55:44.064Z next:jsconfig-paths-plugin skipping request as it is an absolute path C:\Users\walli\Downloads\CTD-HUB-TEMA-EDUCACIONAL-FINAL\chaintalkdaily-hub - ON - Copia\components\Header
+2025-10-16T00:55:44.066Z next:jsconfig-paths-plugin skipping request as it is an absolute path C:\Users\walli\Downloads\CTD-HUB-TEMA-EDUCACIONAL-FINAL\chaintalkdaily-hub - ON - Copia\components\Header
+2025-10-16T00:55:44.066Z next:jsconfig-paths-plugin skipping request as it is an absolute path C:\Users\walli\Downloads\CTD-HUB-TEMA-EDUCACIONAL-FINAL\chaintalkdaily-hub - ON - Copia\components\Header
+2025-10-16T00:55:44.067Z next:jsconfig-paths-plugin skipping request as it is a relative path ../components/Footer
+2025-10-16T00:55:44.068Z next:jsconfig-paths-plugin skipping request as it is a relative path ../components/Footer
+2025-10-16T00:55:44.068Z next:jsconfig-paths-plugin skipping request as it is an absolute path C:\Users\walli\Downloads\CTD-HUB-TEMA-EDUCACIONAL-FINAL\chaintalkdaily-hub - ON - Copia\components\Footer
+2025-10-16T00:55:44.068Z next:jsconfig-paths-plugin skipping request as it is an absolute path C:\Users\walli\Downloads\CTD-HUB-TEMA-EDUCACIONAL-FINAL\chaintalkdaily-hub - ON - Copia\components\Footer
+2025-10-16T00:55:44.069Z next:jsconfig-paths-plugin skipping request as it is an absolute path C:\Users\walli\Downloads\CTD-HUB-TEMA-EDUCACIONAL-FINAL\chaintalkdaily-hub - ON - Copia\components\Footer
+2025-10-16T00:55:44.069Z next:jsconfig-paths-plugin skipping request as it is an absolute path C:\Users\walli\Downloads\CTD-HUB-TEMA-EDUCACIONAL-FINAL\chaintalkdaily-hub - ON - Copia\components\Footer
+2025-10-16T00:55:44.070Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../../lib/binno
+2025-10-16T00:55:44.070Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../../lib/binno-questionnaire
+2025-10-16T00:55:44.070Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../../lib/binno-questionnaire
+2025-10-16T00:55:44.070Z next:jsconfig-paths-plugin skipping request as it is an absolute path C:\Users\walli\Downloads\CTD-HUB-TEMA-EDUCACIONAL-FINAL\chaintalkdaily-hub - ON - Copia\lib\ethers-bsc
+2025-10-16T00:55:44.070Z next:jsconfig-paths-plugin skipping request as it is an absolute path C:\Users\walli\Downloads\CTD-HUB-TEMA-EDUCACIONAL-FINAL\chaintalkdaily-hub - ON - Copia\lib\storage
+2025-10-16T00:55:44.070Z next:jsconfig-paths-plugin skipping request as it is an absolute path C:\Users\walli\Downloads\CTD-HUB-TEMA-EDUCACIONAL-FINAL\chaintalkdaily-hub - ON - Copia\lib\aiContext
+2025-10-16T00:55:44.070Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../../lib/supabase-storage
+2025-10-16T00:55:44.070Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../../lib/courses-storage
+2025-10-16T00:55:44.070Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../../lib/courses-storage
+2025-10-16T00:55:44.070Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../../lib/supabase-storage
+2025-10-16T00:55:44.070Z next:jsconfig-paths-plugin skipping request as it is a relative path ../dev/videos
+2025-10-16T00:55:44.071Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../../lib/storage
+2025-10-16T00:55:44.071Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../../lib/server-storage
+2025-10-16T00:55:44.071Z next:jsconfig-paths-plugin skipping request as it is a relative path ../dev/videos
+2025-10-16T00:55:44.071Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../lib/storage
+2025-10-16T00:55:44.071Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../components/Header
+2025-10-16T00:55:44.072Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../components/Footer
+2025-10-16T00:55:44.072Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../components/Header
+2025-10-16T00:55:44.072Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../components/Footer
+2025-10-16T00:55:44.073Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../lib/storage
+2025-10-16T00:55:44.073Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../components/Header
+2025-10-16T00:55:44.073Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../components/Footer
+2025-10-16T00:55:44.074Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../components/Header
+2025-10-16T00:55:44.074Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../components/Footer
+2025-10-16T00:55:44.075Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../lib/storage
+2025-10-16T00:55:44.075Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../lib/storage
+2025-10-16T00:55:44.075Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../../lib/binno
+2025-10-16T00:55:44.075Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../../lib/binno-questionnaire
+2025-10-16T00:55:44.075Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../../lib/binno-questionnaire
+2025-10-16T00:55:44.075Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../../lib/supabase-storage
+2025-10-16T00:55:44.075Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../../lib/courses-storage
+2025-10-16T00:55:44.075Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../../lib/courses-storage
+2025-10-16T00:55:44.075Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../../lib/storage
+2025-10-16T00:55:44.075Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../../lib/server-storage
+2025-10-16T00:55:44.075Z next:jsconfig-paths-plugin skipping request as it is a relative path ../../../lib/supabase-storage

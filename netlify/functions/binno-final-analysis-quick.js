@@ -1,3 +1,4 @@
+
 const OpenAI = require('openai')
 
 // CORS headers for all responses

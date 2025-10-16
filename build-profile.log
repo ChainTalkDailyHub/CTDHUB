@@ -1,0 +1,11 @@
+
+> ctdhub-platform@0.1.0 build
+> next build --profile
+
+ ÔÜá Profiling is enabled. Note: This may affect performance.
+  Ôû▓ Next.js 14.2.33
+  - Environments: .env.local, .env.production
+
+   Skipping linting
+   Checking validity of types ...
+   Creating an optimized production build ...

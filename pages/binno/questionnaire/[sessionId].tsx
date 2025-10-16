@@ -118,37 +118,24 @@ export default function SkillCompassQuestionnaire() {
     }
   }, [isClient])
 
-  // Restore session state on page refresh
+  // Restore session state on page refresh (robusto)
   useEffect(() => {
     if (!isClient || !sessionId) return
-    
     const sessionKey = `questionnaire_session_${sessionId}`
     const savedSession = localStorage.getItem(sessionKey)
-    
     if (savedSession) {
       try {
         const sessionData = JSON.parse(savedSession)
-        console.log('🔄 Restoring session from localStorage:', sessionData)
-        
-        // Restore state
-        if (sessionData.answers && sessionData.answers.length > 0) {
-          setAnswers(sessionData.answers)
-          setQuestionNumber(sessionData.questionNumber || sessionData.answers.length + 1)
-        }
-        
-        if (sessionData.currentQuestion) {
-          setCurrentQuestion(sessionData.currentQuestion)
-        }
-        
+        // Sempre restaura todas as respostas e estado
+        setAnswers(sessionData.answers || [])
+        setQuestionNumber(sessionData.questionNumber || (sessionData.answers ? sessionData.answers.length + 1 : 1))
+        setCurrentQuestion(sessionData.currentQuestion || FIRST_QUESTION)
         if (sessionData.isCompleted && sessionData.finalReport) {
           setIsCompleted(true)
           setFinalReport(sessionData.finalReport)
-          console.log('✅ Session completed - showing final report')
         }
-        
       } catch (error) {
         console.error('Error restoring session:', error)
-        // Continue with fresh session if restore fails
       }
     }
   }, [isClient, sessionId])
@@ -1596,12 +1583,7 @@ export default function SkillCompassQuestionnaire() {
     setError('')
 
     try {
-      console.log(`📝 Submitting answer for question ${questionNumber}`)
-      console.log(`📊 Answer length: ${currentAnswer.length} characters`)
-      
-      // Clear any previous errors
-      setError('')
-      
+      // ...existing code...
       // Add current answer to answers array
       const newAnswer: UserAnswer = {
         question_id: currentQuestion.id,
@@ -1609,52 +1591,35 @@ export default function SkillCompassQuestionnaire() {
         user_response: currentAnswer.trim(),
         timestamp: Date.now()
       }
-
       const updatedAnswers = [...answers, newAnswer]
       setAnswers(updatedAnswers)
-
       // Check if questionnaire is complete (15 questions)
       if (questionNumber >= 15) {
-        console.log('🎯 Questionnaire complete, generating final report...')
         try {
           await generateFinalReport(updatedAnswers)
         } catch (reportError) {
-          console.error('Error generating final report:', reportError)
-          setError('Falha ao gerar relatório final. Por favor, tente novamente.')
+          setError('Falha ao gerar relatório final. Suas respostas estão salvas. Tente novamente mais tarde. Você NÃO precisa recomeçar o questionário.')
         }
         return
       }
-
       // Generate next question
-      console.log(`🔄 Generating question ${questionNumber + 1}...`)
       setIsGeneratingQuestion(true)
       const nextQuestionNumber = questionNumber + 1
-      
       try {
         const nextQuestion = await generateNextQuestion(nextQuestionNumber)
-        
         setCurrentQuestion(nextQuestion)
         setQuestionNumber(nextQuestionNumber)
         setCurrentAnswer('')
-        
-        // Save session state after successful question generation
         setTimeout(() => {
           saveSessionState()
           textareaRef.current?.focus()
         }, 100)
-        
-        console.log(`✅ Successfully generated question ${nextQuestionNumber}`)
       } catch (questionError) {
-        console.error('Error generating next question:', questionError)
-        setError(`Falha ao gerar questão ${nextQuestionNumber}. Erro: ${questionError instanceof Error ? questionError.message : 'Erro desconhecido'}. Por favor, recarregue a página e tente novamente.`)
-        // Revert state if question generation fails
-        setAnswers(answers) // Keep previous state
+        setError(`Falha ao gerar questão ${nextQuestionNumber}. Suas respostas estão salvas. Tente novamente mais tarde. Você NÃO precisa recomeçar o questionário.`)
+        setAnswers(answers)
       }
-
     } catch (error) {
-      console.error('Error submitting answer:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
-      setError(`Falha ao processar sua resposta: ${errorMessage}. Verifique sua conexão e tente novamente.`)
+      setError('Erro de rede ou servidor. Suas respostas estão salvas. Tente novamente mais tarde. Você NÃO precisa recomeçar o questionário.')
     } finally {
       setIsSubmitting(false)
       setIsGeneratingQuestion(false)

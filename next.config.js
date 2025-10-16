@@ -2,9 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  // Netlify deployment optimization
-  output: process.env.NETLIFY ? 'export' : undefined,
-  trailingSlash: process.env.NETLIFY ? true : false,
+  // Netlify handles output automatically
+  trailingSlash: false,
   images: {
     remotePatterns: [
       {
@@ -22,7 +21,7 @@ const nextConfig = {
     ],
     formats: ['image/webp', 'image/avif'],
     // Netlify image optimization
-    unoptimized: process.env.NETLIFY ? true : false,
+    unoptimized: true,
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
