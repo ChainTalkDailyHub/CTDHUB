@@ -9,9 +9,10 @@ const BSC_RPC_URL = 'https://bsc-dataseed.binance.org/'
 const BURNER_CONTRACT_ADDRESS = '0xB5e0393E1D8E95bF5cf4fd11b03abD03855eB958'
 const BSCSCAN_API_KEY = '1A8YXSRK5VIPP3IQN3RYA4K2HVXH81MM4E'
 
-// Gas price mínimo seguro para BSC (3 Gwei em Wei)
+// Gas price mínimo seguro para BSC (5 Gwei em Wei)
 // Previne alerta "suspeito" do MetaMask causado por gas muito baixo
-const MIN_SAFE_GAS_PRICE = BigInt(3) * BigInt(1e9) // 3 Gwei
+// BSC não suporta EIP-1559, então usamos gas price tradicional mais alto
+const MIN_SAFE_GAS_PRICE = BigInt(5) * BigInt(1e9) // 5 Gwei
 
 // ABI simplificada do contrato CTDQuizBurner
 const BURNER_CONTRACT_ABI = [
@@ -138,14 +139,16 @@ export default function BurnBadgeNew() {
         const gasPrice = BigInt(gasPriceData.result) // Wei
         console.log('💨 Gas Price da rede:', gasPrice.toString(), 'Wei')
 
-        // CORREÇÃO: Garantir gas price mínimo seguro (3 Gwei)
+        // CORREÇÃO: Garantir gas price mínimo seguro (5 Gwei)
         // Gas muito baixo causa alerta "suspeito" no MetaMask
+        // BSC não suporta EIP-1559, então usamos gas price tradicional mais alto
         const safeGasPrice = gasPrice > MIN_SAFE_GAS_PRICE ? gasPrice : MIN_SAFE_GAS_PRICE
         
         if (gasPrice < MIN_SAFE_GAS_PRICE) {
           console.warn('⚠️ Gas price da rede muito baixo!')
           console.log(`   Rede: ${Number(gasPrice) / 1e9} Gwei`)
           console.log(`   Usando mínimo seguro: ${Number(MIN_SAFE_GAS_PRICE) / 1e9} Gwei`)
+          console.log('   ℹ️  Isso previne alerta "suspicious" do MetaMask')
         }
 
         // 2. Estimar gasLimit (baseado em testes: ~80k, usamos 100k para segurança)
@@ -261,7 +264,8 @@ export default function BurnBadgeNew() {
       const quizId = `quiz_${address}_${Date.now()}`
       console.log('📝 Chamando burnQuizTokens com quizId:', quizId)
 
-      // 6. Obter gas price seguro (mínimo 3 Gwei)
+      // 6. Obter gas price seguro (mínimo 5 Gwei)
+      // IMPORTANTE: Usar gas price mais alto para evitar alerta do MetaMask
       const feeData = await provider.getFeeData()
       const networkGasPrice = feeData.gasPrice || BigInt(0)
       const safeGasPrice = networkGasPrice > MIN_SAFE_GAS_PRICE 
@@ -270,12 +274,14 @@ export default function BurnBadgeNew() {
 
       console.log('⛽ Gas Price:')
       console.log(`   Rede: ${Number(networkGasPrice) / 1e9} Gwei`)
-      console.log(`   Usando: ${Number(safeGasPrice) / 1e9} Gwei`)
+      console.log(`   Usando: ${Number(safeGasPrice) / 1e9} Gwei (mínimo seguro)`)
 
-      // 7. Executar transação com gas price personalizado
+      // 7. Executar transação LEGACY (Type 0) com gas price personalizado
+      // BSC não suporta EIP-1559, então forçamos transação legacy
       const tx = await contract.burnQuizTokens(quizId, {
         gasLimit: 100000, // Gas limit fixo
-        gasPrice: safeGasPrice // Gas price seguro (mínimo 3 Gwei)
+        gasPrice: safeGasPrice, // Gas price seguro (mínimo 5 Gwei)
+        type: 0 // Forçar transação legacy (Type 0) - CRÍTICO para BSC
       })
       console.log('⏳ Transação enviada:', tx.hash)
 

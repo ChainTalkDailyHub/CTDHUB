@@ -1,4 +1,4 @@
-# 🎯 Teste Final - Sistema de Burn CTDHUB
+s# 🎯 Teste Final - Sistema de Burn CTDHUB
 
 ## 📅 Data: 16 de Outubro de 2025
 
