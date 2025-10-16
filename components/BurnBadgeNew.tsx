@@ -17,13 +17,6 @@ const BURNER_CONTRACT_ABI = [
   'function hasCompletedQuiz(address user) external view returns (bool)'
 ]
 
-interface EstimatedGas {
-  gasPrice: bigint
-  gasLimit: bigint
-  gasCostBNB: number
-  gasCostUSD: number
-}
-
 interface BurnResult {
   success: boolean
   txHash?: string
@@ -37,7 +30,6 @@ export default function BurnBadgeNew() {
   const [isEligible, setIsEligible] = useState(false)
   const [eligibilityReason, setEligibilityReason] = useState('')
   const [userAddress, setUserAddress] = useState<string>('')
-  const [estimatedGas, setEstimatedGas] = useState<EstimatedGas | null>(null)
   const [burnResult, setBurnResult] = useState<BurnResult | null>(null)
 
   useEffect(() => {
@@ -85,11 +77,19 @@ export default function BurnBadgeNew() {
           quizId
         })
 
-        if (hasCompleted) {
+        // Endereço de teste - permitir múltiplas queimas
+        const TEST_ADDRESS = '0x80Bd46dE8529588E7829963036348b2F50714618'
+        const isTestAddress = address.toLowerCase() === TEST_ADDRESS.toLowerCase()
+
+        if (hasCompleted && !isTestAddress) {
           setIsEligible(false)
           setEligibilityReason('Already completed! You can only burn once.')
           setCheckingEligibility(false)
           return
+        }
+
+        if (isTestAddress && hasCompleted) {
+          console.log('🧪 Endereço de teste - permitindo múltiplas queimas')
         }
 
         // Verificar elegibilidade no contrato
@@ -111,80 +111,6 @@ export default function BurnBadgeNew() {
 
     checkEligibility()
   }, [isClient])
-
-  // Estimar custo de gas
-  useEffect(() => {
-    if (!isClient || !isEligible) return
-
-    const estimateGasCost = async () => {
-      try {
-        console.log('⛽ Estimando custo de gas...')
-
-        // 1. Obter gasPrice atual da rede BSC via BscScan API
-        const gasPriceResponse = await fetch(
-          `https://api.bscscan.com/api?module=proxy&action=eth_gasPrice&apikey=${BSCSCAN_API_KEY}`
-        )
-        const gasPriceData = await gasPriceResponse.json()
-        
-        if (gasPriceData.status !== '1') {
-          console.error('❌ Erro ao obter gas price:', gasPriceData)
-          return
-        }
-
-        const gasPrice = BigInt(gasPriceData.result) // Wei
-        console.log('💨 Gas Price:', gasPrice.toString(), 'Wei')
-
-        // 2. Estimar gasLimit (baseado em testes: ~80k, usamos 100k para segurança)
-        const estimatedGasLimit = BigInt(100000)
-
-        // 3. Calcular custo em Wei
-        const gasCostWei = gasPrice * estimatedGasLimit
-
-        // 4. Converter para BNB
-        const gasCostBNB = Number(gasCostWei) / 1e18
-
-        // 5. Obter preço do BNB em USD via BscScan API
-        const bnbPriceResponse = await fetch(
-          `https://api.bscscan.com/api?module=stats&action=bnbprice&apikey=${BSCSCAN_API_KEY}`
-        )
-        const bnbPriceData = await bnbPriceResponse.json()
-        
-        if (bnbPriceData.status !== '1') {
-          console.error('❌ Erro ao obter preço BNB:', bnbPriceData)
-          return
-        }
-
-        const bnbPriceUSD = parseFloat(bnbPriceData.result.ethusd)
-        console.log('💵 Preço BNB:', bnbPriceUSD, 'USD')
-
-        // 6. Calcular custo em USD
-        const gasCostUSD = gasCostBNB * bnbPriceUSD
-
-        console.log('📊 Estimativa de Gas:', {
-          gasPrice: gasPrice.toString(),
-          gasLimit: estimatedGasLimit.toString(),
-          gasCostBNB,
-          gasCostUSD
-        })
-
-        setEstimatedGas({
-          gasPrice, // Gas price da rede
-          gasLimit: estimatedGasLimit,
-          gasCostBNB,
-          gasCostUSD
-        })
-
-      } catch (error) {
-        console.error('❌ Erro ao estimar gas:', error)
-      }
-    }
-
-    estimateGasCost()
-    
-    // Atualizar estimativa a cada 30 segundos
-    const interval = setInterval(estimateGasCost, 30000)
-    return () => clearInterval(interval)
-  }, [isClient, isEligible])
 
   const handleBurn = async () => {
     if (!isClient || !window.ethereum) {
@@ -318,39 +244,6 @@ export default function BurnBadgeNew() {
             <p className="text-green-400 font-medium">✅ You are eligible to burn!</p>
             <p className="text-green-300/70 text-sm mt-1">Complete the burn to claim your achievement</p>
           </div>
-
-          {estimatedGas ? (
-            <div className="ctd-bg rounded-lg p-4 mb-4 space-y-2">
-              <h3 className="font-semibold ctd-text mb-3">💰 Transaction Cost</h3>
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <p className="text-gray-400">⛽ Gas Price</p>
-                  <p className="ctd-text font-mono">
-                    {(Number(estimatedGas.gasPrice) / 1e9).toFixed(2)} Gwei
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-400">📊 Gas Limit</p>
-                  <p className="ctd-text font-mono">
-                    {estimatedGas.gasLimit.toString()}
-                  </p>
-                </div>
-              </div>
-              <div className="pt-3 border-t border-gray-700">
-                <p className="text-gray-400 text-sm mb-1">Your Cost (gas only):</p>
-                <p className="ctd-yellow text-xl font-bold">
-                  {estimatedGas.gasCostBNB.toFixed(6)} BNB
-                </p>
-                <p className="text-gray-400 text-sm">
-                  ≈ ${estimatedGas.gasCostUSD.toFixed(2)} USD
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="ctd-bg rounded-lg p-4 mb-4">
-              <p className="text-gray-400 text-sm">⏳ Calculating gas cost...</p>
-            </div>
-          )}
 
           <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-4 mb-6">
             <h3 className="font-semibold ctd-text mb-2">🔥 What will be burned:</h3>
