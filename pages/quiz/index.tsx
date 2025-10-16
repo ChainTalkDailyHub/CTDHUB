@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import QuizModuleCard from '@/components/QuizModuleCard'
-import BurnBadge from '@/components/BurnBadge'
+import BurnBadgeNew from '@/components/BurnBadgeNew'
 import WalletButton from '@/components/WalletButton'
 import { quizModules } from '@/lib/quizData'
 
@@ -162,10 +162,7 @@ export default function Quiz() {
                           🏦 <strong>Connected:</strong> {userAddress.slice(0, 6)}...{userAddress.slice(-4)}
                         </p>
                       </div>
-                      <BurnBadge 
-                        isEnabled={allModulesCompleted}
-                        userAddress={userAddress}
-                      />
+                      <BurnBadgeNew />
                     </div>
                   )}
                 </div>
