@@ -262,10 +262,9 @@ export default function BurnBadgeNew() {
 
       // 5. Gerar quiz ID único
       const quizId = `quiz_${address}_${Date.now()}`
-      console.log('📝 Chamando burnQuizTokens com quizId:', quizId)
+      console.log('📝 Quiz ID:', quizId)
 
       // 6. Obter gas price seguro (mínimo 5 Gwei)
-      // IMPORTANTE: Usar gas price mais alto para evitar alerta do MetaMask
       const feeData = await provider.getFeeData()
       const networkGasPrice = feeData.gasPrice || BigInt(0)
       const safeGasPrice = networkGasPrice > MIN_SAFE_GAS_PRICE 
@@ -276,16 +275,38 @@ export default function BurnBadgeNew() {
       console.log(`   Rede: ${Number(networkGasPrice) / 1e9} Gwei`)
       console.log(`   Usando: ${Number(safeGasPrice) / 1e9} Gwei (mínimo seguro)`)
 
-      // 7. Executar transação com gas price personalizado
-      // Removido type: 0 para compatibilidade com Trust Wallet
-      const tx = await contract.burnQuizTokens(quizId, {
-        gasLimit: 100000, // Gas limit fixo
-        gasPrice: safeGasPrice // Gas price seguro (mínimo 5 Gwei)
+      // 7. PREPARAR TRANSAÇÃO MANUALMENTE (fix para Trust Wallet)
+      console.log('📦 Preparando transação...')
+      
+      // Criar transação populada com a função e parâmetros
+      const populatedTx = await contract.burnQuizTokens.populateTransaction(quizId)
+      console.log('✅ Transação preparada')
+      console.log('   Data:', populatedTx.data?.slice(0, 20) + '...')
+      console.log('   Data length:', populatedTx.data?.length)
+      
+      // Verificar se data está presente
+      if (!populatedTx.data || populatedTx.data === '0x' || populatedTx.data.length < 10) {
+        throw new Error('❌ ERRO: Transaction data is empty! Cannot proceed.')
+      }
+
+      // 8. Enviar transação manualmente com data correto
+      console.log('📤 Enviando transação...')
+      const tx = await signer.sendTransaction({
+        to: BURNER_CONTRACT_ADDRESS,
+        data: populatedTx.data, // Data da função burnQuizTokens
+        gasLimit: 100000,
+        gasPrice: safeGasPrice
       })
       console.log('⏳ Transação enviada:', tx.hash)
+      console.log('   Verificar em:', `https://bscscan.com/tx/${tx.hash}`)
 
-      // 8. Aguardar confirmação
+      // 9. Aguardar confirmação
       const receipt = await tx.wait()
+      
+      if (!receipt) {
+        throw new Error('Transaction receipt is null')
+      }
+      
       console.log('✅ Transação confirmada! Block:', receipt.blockNumber)
 
       setBurnResult({
