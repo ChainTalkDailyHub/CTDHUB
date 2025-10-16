@@ -39,6 +39,8 @@ export default function BurnBadgeNew() {
   // Verificar elegibilidade do usuário
   useEffect(() => {
     if (!isClient) return
+    // Não recarregar se já teve sucesso na queima
+    if (burnResult?.success) return
 
     const checkEligibility = async () => {
       try {
@@ -103,7 +105,7 @@ export default function BurnBadgeNew() {
     }
 
     checkEligibility()
-  }, [isClient])
+  }, [isClient, burnResult?.success])
 
   const handleBurn = async () => {
     if (!isClient || !window.ethereum) {
@@ -221,7 +223,31 @@ export default function BurnBadgeNew() {
         🔥 Burn Your Badge
       </h2>
 
-      {checkingEligibility ? (
+      {/* Mostrar resultado da queima com prioridade */}
+      {burnResult?.success ? (
+        <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 mb-4">
+          <p className="text-green-400 font-bold text-lg mb-2">🎉 Burn Completed Successfully!</p>
+          <p className="text-green-300/70 text-sm mb-4">
+            Your transaction has been confirmed on the blockchain
+          </p>
+          {burnResult.txHash && (
+            <a
+              href={`https://bscscan.com/tx/${burnResult.txHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg text-sm font-bold transition-colors shadow-lg"
+            >
+              📋 View Transaction on BscScan →
+            </a>
+          )}
+          <div className="mt-4 pt-4 border-t border-green-500/20">
+            <p className="text-green-300/70 text-xs">
+              ✅ 1000 CTD tokens burned permanently<br/>
+              ✅ Your achievement is now recorded on-chain
+            </p>
+          </div>
+        </div>
+      ) : checkingEligibility ? (
         <div className="text-center py-4">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-ctd-yellow mb-2"></div>
           <p className="ctd-text">Checking eligibility...</p>
@@ -248,24 +274,7 @@ export default function BurnBadgeNew() {
             </ul>
           </div>
 
-          {burnResult?.success ? (
-            <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 mb-4">
-              <p className="text-green-400 font-bold mb-2">✅ Burn Successful!</p>
-              <p className="text-green-300/70 text-sm mb-3">
-                Your transaction has been confirmed on the blockchain
-              </p>
-              {burnResult.txHash && (
-                <a
-                  href={`https://bscscan.com/tx/${burnResult.txHash}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                >
-                  View on BscScan →
-                </a>
-              )}
-            </div>
-          ) : burnResult?.error ? (
+          {burnResult?.error ? (
             <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-4">
               <p className="text-red-400 font-bold mb-2">❌ Transaction Failed</p>
               <p className="text-red-300/70 text-sm">{burnResult.error}</p>
