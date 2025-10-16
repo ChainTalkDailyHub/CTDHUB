@@ -9,6 +9,10 @@ const BSC_RPC_URL = 'https://bsc-dataseed.binance.org/'
 const BURNER_CONTRACT_ADDRESS = '0xB5e0393E1D8E95bF5cf4fd11b03abD03855eB958'
 const BSCSCAN_API_KEY = '1A8YXSRK5VIPP3IQN3RYA4K2HVXH81MM4E'
 
+// Gas price mínimo seguro para BSC (3 Gwei em Wei)
+// Previne alerta "suspeito" do MetaMask causado por gas muito baixo
+const MIN_SAFE_GAS_PRICE = BigInt(3) * BigInt(1e9) // 3 Gwei
+
 // ABI simplificada do contrato CTDQuizBurner
 const BURNER_CONTRACT_ABI = [
   'function burnQuizTokens(string quizId) external',
@@ -132,13 +136,23 @@ export default function BurnBadgeNew() {
         }
 
         const gasPrice = BigInt(gasPriceData.result) // Wei
-        console.log('💨 Gas Price:', gasPrice.toString(), 'Wei')
+        console.log('💨 Gas Price da rede:', gasPrice.toString(), 'Wei')
+
+        // CORREÇÃO: Garantir gas price mínimo seguro (3 Gwei)
+        // Gas muito baixo causa alerta "suspeito" no MetaMask
+        const safeGasPrice = gasPrice > MIN_SAFE_GAS_PRICE ? gasPrice : MIN_SAFE_GAS_PRICE
+        
+        if (gasPrice < MIN_SAFE_GAS_PRICE) {
+          console.warn('⚠️ Gas price da rede muito baixo!')
+          console.log(`   Rede: ${Number(gasPrice) / 1e9} Gwei`)
+          console.log(`   Usando mínimo seguro: ${Number(MIN_SAFE_GAS_PRICE) / 1e9} Gwei`)
+        }
 
         // 2. Estimar gasLimit (baseado em testes: ~80k, usamos 100k para segurança)
         const estimatedGasLimit = BigInt(100000)
 
-        // 3. Calcular custo em Wei
-        const gasCostWei = gasPrice * estimatedGasLimit
+        // 3. Calcular custo em Wei (usando gas price seguro)
+        const gasCostWei = safeGasPrice * estimatedGasLimit
 
         // 4. Converter para BNB
         const gasCostBNB = Number(gasCostWei) / 1e18
@@ -161,14 +175,15 @@ export default function BurnBadgeNew() {
         const gasCostUSD = gasCostBNB * bnbPriceUSD
 
         console.log('📊 Estimativa de Gas:', {
-          gasPrice: gasPrice.toString(),
+          gasPriceNetwork: gasPrice.toString(),
+          gasPriceUsed: safeGasPrice.toString(),
           gasLimit: estimatedGasLimit.toString(),
           gasCostBNB,
           gasCostUSD
         })
 
         setEstimatedGas({
-          gasPrice,
+          gasPrice: safeGasPrice, // Usar gas price seguro
           gasLimit: estimatedGasLimit,
           gasCostBNB,
           gasCostUSD
@@ -246,11 +261,25 @@ export default function BurnBadgeNew() {
       const quizId = `quiz_${address}_${Date.now()}`
       console.log('📝 Chamando burnQuizTokens com quizId:', quizId)
 
-      // 6. Executar transação (usuário vai assinar no MetaMask)
-      const tx = await contract.burnQuizTokens(quizId)
+      // 6. Obter gas price seguro (mínimo 3 Gwei)
+      const feeData = await provider.getFeeData()
+      const networkGasPrice = feeData.gasPrice || BigInt(0)
+      const safeGasPrice = networkGasPrice > MIN_SAFE_GAS_PRICE 
+        ? networkGasPrice 
+        : MIN_SAFE_GAS_PRICE
+
+      console.log('⛽ Gas Price:')
+      console.log(`   Rede: ${Number(networkGasPrice) / 1e9} Gwei`)
+      console.log(`   Usando: ${Number(safeGasPrice) / 1e9} Gwei`)
+
+      // 7. Executar transação com gas price personalizado
+      const tx = await contract.burnQuizTokens(quizId, {
+        gasLimit: 100000, // Gas limit fixo
+        gasPrice: safeGasPrice // Gas price seguro (mínimo 3 Gwei)
+      })
       console.log('⏳ Transação enviada:', tx.hash)
 
-      // 7. Aguardar confirmação
+      // 8. Aguardar confirmação
       const receipt = await tx.wait()
       console.log('✅ Transação confirmada! Block:', receipt.blockNumber)
 
