@@ -17,7 +17,7 @@ export default function Questionnaire() {
 
         body {
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-          background: #ffffff;
+          background: #1a202c;
           min-height: 100vh;
           overflow: hidden;
           position: relative;
@@ -122,7 +122,7 @@ export default function Questionnaire() {
 
         .subtitle {
           font-size: 1.5rem;
-          color: #6b7280;
+          color: #9ca3af;
           margin-bottom: 2rem;
           animation: fadeInUp 1s ease-out 0.6s both;
         }
@@ -130,7 +130,7 @@ export default function Questionnaire() {
         .construction-text {
           font-size: 2.5rem;
           font-weight: bold;
-          color: #1f2937;
+          color: #ffffff;
           margin-bottom: 1.5rem;
           animation: fadeInUp 1s ease-out 0.9s both;
         }
@@ -179,7 +179,7 @@ export default function Questionnaire() {
         }
 
         .loading-text {
-          color: #6b7280;
+          color: #9ca3af;
           font-size: 1.1rem;
         }
 
@@ -204,7 +204,7 @@ export default function Questionnaire() {
         }
 
         .message {
-          color: #6b7280;
+          color: #9ca3af;
           font-size: 1.2rem;
           margin-top: 2rem;
           animation: fadeInUp 1s ease-out 1.5s both;
@@ -222,9 +222,10 @@ export default function Questionnaire() {
 
         .tool-icon {
           position: absolute;
-          font-size: 3rem;
-          opacity: 0.15;
+          font-size: 4rem;
+          opacity: 0.4;
           animation: toolFloat 15s infinite;
+          filter: drop-shadow(0 0 15px rgba(255, 204, 51, 0.6));
         }
 
         @keyframes toolFloat {
@@ -266,6 +267,54 @@ export default function Questionnaire() {
           animation-delay: 6s;
         }
 
+        .tool-icon:nth-child(5) {
+          top: 50%;
+          left: 5%;
+          animation-delay: 1s;
+        }
+
+        .tool-icon:nth-child(6) {
+          top: 40%;
+          right: 8%;
+          animation-delay: 3s;
+        }
+
+        .tool-icon:nth-child(7) {
+          top: 70%;
+          left: 25%;
+          animation-delay: 5s;
+        }
+
+        .tool-icon:nth-child(8) {
+          top: 30%;
+          left: 30%;
+          animation-delay: 7s;
+        }
+
+        .tool-icon:nth-child(9) {
+          bottom: 35%;
+          right: 20%;
+          animation-delay: 8s;
+        }
+
+        .tool-icon:nth-child(10) {
+          top: 15%;
+          left: 50%;
+          animation-delay: 9s;
+        }
+
+        .tool-icon:nth-child(11) {
+          bottom: 10%;
+          left: 40%;
+          animation-delay: 10s;
+        }
+
+        .tool-icon:nth-child(12) {
+          top: 60%;
+          right: 35%;
+          animation-delay: 11s;
+        }
+
         /* Responsividade */
         @media (max-width: 768px) {
           .title {
@@ -285,7 +334,7 @@ export default function Questionnaire() {
           }
           
           .tool-icon {
-            font-size: 2rem;
+            font-size: 2.5rem;
           }
         }
       `}</style>
@@ -300,6 +349,14 @@ export default function Questionnaire() {
           <div className="tool-icon">⚙️</div>
           <div className="tool-icon">🛠️</div>
           <div className="tool-icon">⚡</div>
+          <div className="tool-icon">💡</div>
+          <div className="tool-icon">🚀</div>
+          <div className="tool-icon">🔨</div>
+          <div className="tool-icon">🎨</div>
+          <div className="tool-icon">📊</div>
+          <div className="tool-icon">🔥</div>
+          <div className="tool-icon">💻</div>
+          <div className="tool-icon">⭐</div>
         </div>
 
         {/* Conteúdo principal */}
