@@ -279,9 +279,9 @@ export default function Home() {
                 href="https://dappbay.bnbchain.org/detail/chain-talk-daily-hub" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold rounded-lg transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg"
+                className="bnb-badge hover:scale-105 transition-transform duration-200 cursor-pointer"
               >
-                <span>🚀</span>
+                <Image src="/bnb-logo.png" alt="BNB Chain" width={24} height={24} />
                 <span>View on DappBay</span>
               </a>
             </div>
