@@ -256,9 +256,9 @@ export default function BurnBadgeNew() {
         <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-4">
           <p className="text-blue-400 font-medium mb-3">🔍 Check Your Quiz Status</p>
           <p className="text-blue-300/70 text-sm mb-4">{eligibilityReason}</p>
-          {burnTxHash && (
+          {burnResult?.txHash && (
             <a
-              href={`https://bscscan.com/tx/${burnTxHash}`}
+              href={`https://bscscan.com/tx/${burnResult.txHash}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-500 hover:to-emerald-500 transition-all shadow-lg"
