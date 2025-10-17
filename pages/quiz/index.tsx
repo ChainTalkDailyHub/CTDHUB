@@ -138,7 +138,18 @@ export default function Quiz() {
               {allModulesCompleted ? (
                 <div className="bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8 border-2 border-yellow-200 dark:border-gray-600 shadow-xl transition-colors duration-300">
                   <div className="text-center mb-6">
-                    <div className="text-8xl mb-4">🎉</div>
+                    <div className="flex justify-center mb-4">
+                      <div className="animate-float">
+                        <img 
+                          src="/images/binnoquiz.png" 
+                          alt="Congratulations Binno" 
+                          className="w-48 h-auto"
+                          style={{
+                            filter: 'drop-shadow(0 0 2px rgba(255, 204, 51, 0.9)) drop-shadow(0 0 4px rgba(255, 204, 51, 0.7)) drop-shadow(0 0 6px rgba(255, 204, 51, 0.5))'
+                          }}
+                        />
+                      </div>
+                    </div>
                     <h3 className="text-3xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-2">Congratulations!</h3>
                     <p className="text-lg text-gray-700 dark:text-gray-300">You've completed all 10 quiz modules.</p>
                   </div>

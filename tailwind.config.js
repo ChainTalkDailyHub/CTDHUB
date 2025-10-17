@@ -56,7 +56,8 @@ module.exports = {
         gridMove: { '0%': {backgroundPosition: '0 0, 0 0'}, '100%': {backgroundPosition: '200px 200px, 200px 200px'} },
         pulseSoft: { '0%,100%': {opacity:.8, transform:'translateY(0)'}, '50%': {opacity:1, transform:'translateY(-1px)'} },
         scanline: { '0%': {transform:'translateY(-100%)'}, '100%': {transform:'translateY(100%)'} },
-        ring: { '0%': {boxShadow:'0 0 0 0 rgba(255,199,0,.4)'}, '70%': {boxShadow:'0 0 0 10px rgba(255,199,0,0)'}, '100%': {boxShadow:'0 0 0 0 rgba(255,199,0,0)'} }
+        ring: { '0%': {boxShadow:'0 0 0 0 rgba(255,199,0,.4)'}, '70%': {boxShadow:'0 0 0 10px rgba(255,199,0,0)'}, '100%': {boxShadow:'0 0 0 0 rgba(255,199,0,0)'} },
+        float: { '0%, 100%': {transform: 'translateY(0)'}, '50%': {transform: 'translateY(-15px)'} }
       },
       fontFamily: {
         sans: [
