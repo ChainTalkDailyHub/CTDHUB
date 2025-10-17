@@ -85,39 +85,59 @@ export default function BurnBadgeNew() {
           setIsEligible(false)
           setEligibilityReason('Already completed! You can only burn once.')
           
-          // Buscar transação de burn no BscScan
+          // Buscar transação de burn no BscScan de forma mais robusta
+          let foundTxHash = ''
           try {
             console.log('🔍 Buscando transação de burn no BscScan...')
-            const bscscanUrl = `https://api.bscscan.com/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=desc&apikey=${BSCSCAN_API_KEY}`
+            
+            // Buscar últimas 100 transações
+            const bscscanUrl = `https://api.bscscan.com/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=100&sort=desc&apikey=${BSCSCAN_API_KEY}`
             const response = await fetch(bscscanUrl)
             const data = await response.json()
             
-            console.log('📡 BscScan response:', data)
+            console.log('📡 BscScan API Status:', data.status, 'Total transactions:', data.result?.length || 0)
             
-            if (data.status === '1' && data.result && data.result.length > 0) {
-              // Procurar pela transação de burn (interação com o contrato CTDQuizBurner)
+            if (data.status === '1' && data.result && Array.isArray(data.result)) {
+              // Procurar pela transação de burn
               const burnTx = data.result.find((tx: any) => 
-                tx.to && tx.to.toLowerCase() === BURNER_CONTRACT_ADDRESS.toLowerCase() &&
-                tx.isError === '0'
+                tx.to && 
+                tx.to.toLowerCase() === BURNER_CONTRACT_ADDRESS.toLowerCase() &&
+                tx.isError === '0' &&
+                tx.functionName && tx.functionName.includes('burnQuizTokens')
               )
               
               if (burnTx) {
-                console.log('✅ Transação de burn encontrada:', burnTx.hash)
-                setPreviousBurnTxHash(burnTx.hash)
-                
-                // Também salvar no burnResult para garantir exibição
-                setBurnResult({
-                  success: true,
-                  txHash: burnTx.hash
-                })
+                foundTxHash = burnTx.hash
+                console.log('✅ Transação de burn encontrada:', foundTxHash)
               } else {
-                console.log('⚠️ Transação de burn não encontrada nas primeiras transações')
+                console.log('⚠️ Transação não encontrada com filtros. Tentando sem filtro de função...')
+                // Tentar sem filtro de função
+                const anyBurnTx = data.result.find((tx: any) => 
+                  tx.to && 
+                  tx.to.toLowerCase() === BURNER_CONTRACT_ADDRESS.toLowerCase() &&
+                  tx.isError === '0'
+                )
+                if (anyBurnTx) {
+                  foundTxHash = anyBurnTx.hash
+                  console.log('✅ Transação encontrada (sem filtro função):', foundTxHash)
+                }
               }
-            } else {
-              console.log('⚠️ Nenhuma transação encontrada ou erro na API')
             }
           } catch (error) {
             console.error('⚠️ Erro ao buscar transação no BscScan:', error)
+          }
+          
+          // SEMPRE definir um hash (real ou placeholder) para mostrar o botão
+          if (foundTxHash) {
+            setPreviousBurnTxHash(foundTxHash)
+            setBurnResult({
+              success: true,
+              txHash: foundTxHash
+            })
+          } else {
+            // Se não encontrou, usar timestamp como indicador de que precisa mostrar botão genérico
+            console.log('⚠️ Não foi possível encontrar hash. Mostrando link genérico.')
+            setPreviousBurnTxHash('search') // Flag para mostrar link de busca
           }
           
           setCheckingEligibility(false)
@@ -295,12 +315,19 @@ export default function BurnBadgeNew() {
           <p className="text-blue-300/70 text-sm mb-4">{eligibilityReason}</p>
           {(burnResult?.txHash || previousBurnTxHash) && (
             <a
-              href={`https://bscscan.com/tx/${burnResult?.txHash || previousBurnTxHash}`}
+              href={
+                previousBurnTxHash === 'search' 
+                  ? `https://bscscan.com/address/${userAddress}#internaltx`
+                  : `https://bscscan.com/tx/${burnResult?.txHash || previousBurnTxHash}`
+              }
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-500 hover:to-emerald-500 transition-all shadow-lg font-medium"
             >
-              🔥 View Burn Transaction on BscScan →
+              {previousBurnTxHash === 'search' 
+                ? '🔍 View Your Transactions on BscScan →'
+                : '🔥 View Burn Transaction on BscScan →'
+              }
             </a>
           )}
         </div>

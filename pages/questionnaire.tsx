@@ -348,18 +348,13 @@ export default function Questionnaire() {
                   drop-shadow(0 0 10px rgba(255, 204, 51, 0.7));
         }
 
-        /* Neon glow background effect - contorno fino */
+        /* Neon glow background effect - apenas contorno (sem quadrado) */
         .neon-glow {
           position: absolute;
           width: 100%;
           height: 100%;
-          border: 2px solid rgba(255, 204, 51, 0.6);
-          border-radius: 20px;
-          box-shadow: 
-            0 0 5px rgba(255, 204, 51, 0.8),
-            0 0 10px rgba(255, 204, 51, 0.6),
-            0 0 15px rgba(255, 204, 51, 0.4),
-            inset 0 0 5px rgba(255, 204, 51, 0.3);
+          border-radius: 50%;
+          background: transparent;
           animation: pulseNeonOutline 3s ease-in-out infinite;
           z-index: -1;
           pointer-events: none;
@@ -369,18 +364,16 @@ export default function Questionnaire() {
           0%, 100% {
             opacity: 0.7;
             box-shadow: 
-              0 0 5px rgba(255, 204, 51, 0.8),
-              0 0 10px rgba(255, 204, 51, 0.6),
-              0 0 15px rgba(255, 204, 51, 0.4),
-              inset 0 0 5px rgba(255, 204, 51, 0.3);
+              0 0 20px rgba(255, 204, 51, 0.6),
+              0 0 40px rgba(255, 204, 51, 0.4),
+              0 0 60px rgba(255, 204, 51, 0.2);
           }
           50% {
             opacity: 1;
             box-shadow: 
-              0 0 8px rgba(255, 204, 51, 1),
-              0 0 15px rgba(255, 204, 51, 0.8),
-              0 0 20px rgba(255, 204, 51, 0.6),
-              inset 0 0 8px rgba(255, 204, 51, 0.5);
+              0 0 30px rgba(255, 204, 51, 0.8),
+              0 0 60px rgba(255, 204, 51, 0.6),
+              0 0 90px rgba(255, 204, 51, 0.4);
           }
         }
 
@@ -416,7 +409,9 @@ export default function Questionnaire() {
           }
 
           .neon-glow {
-            border-width: 1.5px;
+            box-shadow: 
+              0 0 15px rgba(255, 204, 51, 0.6),
+              0 0 30px rgba(255, 204, 51, 0.4);
           }
         }
       `}</style>
