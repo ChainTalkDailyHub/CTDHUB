@@ -343,9 +343,9 @@ export default function Questionnaire() {
         }
 
         .keep-building-image:hover {
-          filter: drop-shadow(0 0 30px rgba(255, 204, 51, 1))
-                  drop-shadow(0 0 60px rgba(255, 204, 51, 0.8))
-                  drop-shadow(0 0 90px rgba(255, 204, 51, 0.6));
+          filter: drop-shadow(0 0 3px rgba(255, 204, 51, 1))
+                  drop-shadow(0 0 6px rgba(255, 204, 51, 0.8))
+                  drop-shadow(0 0 10px rgba(255, 204, 51, 0.6));
         }
 
         /* Responsividade */
