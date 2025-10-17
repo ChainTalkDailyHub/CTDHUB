@@ -1,4 +1,11 @@
 import { Handler } from '@netlify/functions'
+import { 
+  searchToken, 
+  getTrendingTokens, 
+  formatTokenDataForAI, 
+  detectTokenQuery,
+  isTrendingQuery 
+} from '../../lib/geckoTerminalAPI'
 
 interface ChatMessage {
   role: 'user' | 'assistant'
@@ -54,12 +61,88 @@ const handler: Handler = async (event) => {
 
     const userMessage = lastMessage.content.toLowerCase()
 
+    // Check for token queries FIRST (before OpenAI)
+    const tokenQuery = detectTokenQuery(lastMessage.content)
+    if (tokenQuery) {
+      console.log(`🔍 Token query detected: ${tokenQuery}`)
+      const tokenData = await searchToken(tokenQuery)
+      
+      if (tokenData) {
+        const formattedResponse = formatTokenDataForAI(tokenData)
+        const aiResponse = `${formattedResponse}\n\n💡 **Quick Insights:**\n- This is real-time on-chain data from GeckoTerminal\n- Always verify contract addresses before interacting\n- DYOR (Do Your Own Research) before investing`
+        
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({ message: aiResponse }),
+        }
+      } else {
+        const notFoundResponse = `🔍 I couldn't find a token called **${tokenQuery}** on major networks (BSC, ETH, Polygon, Arbitrum, Avalanche, Base).\n\n**Possible reasons:**\n- Token might not be listed on DEXs yet\n- Name/symbol might be different\n- Token might be on a different network\n\n💡 **Try:**\n- Providing the full token name\n- Checking the contract address on BscScan/Etherscan\n- Asking about popular tokens like BNB, ETH, USDT`
+        
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({ message: notFoundResponse }),
+        }
+      }
+    }
+
+    // Check for trending tokens query
+    if (isTrendingQuery(lastMessage.content)) {
+      console.log('📈 Trending tokens query detected')
+      const trendingTokens = await getTrendingTokens('bsc', 5)
+      
+      if (trendingTokens.length > 0) {
+        let trendingResponse = `📈 **Top 5 Trending Tokens on BSC**\n\n`
+        trendingTokens.forEach((token, index) => {
+          const priceChange = parseFloat(token.price_change_24h)
+          const emoji = priceChange > 0 ? '🟢' : priceChange < 0 ? '🔴' : '⚪'
+          trendingResponse += `${index + 1}. ${emoji} **${token.name} (${token.symbol})**\n`
+          trendingResponse += `   Price: $${parseFloat(token.price_usd).toFixed(6)} | 24h: ${priceChange.toFixed(2)}%\n\n`
+        })
+        trendingResponse += `\n💡 Data from GeckoTerminal - Updated in real-time`
+        
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({ message: trendingResponse }),
+        }
+      }
+    }
+
     // Check for OpenAI API key
     const openaiApiKey = process.env.OPENAI_API_KEY
     
     if (openaiApiKey && openaiApiKey.startsWith('sk-')) {
       // Use OpenAI API
       try {
+        const systemPrompt = `You are BinnoAI, a specialized AI assistant for blockchain, Web3, DeFi, and cryptocurrency education. You are the mascot of CTD (Chain Talk Daily) platform. 
+
+🔗 **Special Capability**: You have access to real-time on-chain data from GeckoTerminal API. When users ask about specific tokens, you automatically fetch live price, volume, and market data.
+
+Key guidelines:
+- Provide educational, accurate, and helpful responses about blockchain technology
+- Use emojis and markdown formatting for engaging responses
+- Focus on practical examples and real-world applications
+- Explain complex concepts in simple terms
+- Always maintain a friendly, professional tone
+- If discussing risks, always mention them clearly
+- Provide actionable advice when possible
+- When discussing tokens, remind users to DYOR (Do Your Own Research)
+
+Topics you excel at:
+- Blockchain fundamentals and consensus mechanisms
+- Smart contracts and Solidity development
+- DeFi protocols, yield farming, and liquidity mining
+- Cryptocurrency trading strategies and analysis
+- Web3 development tools and frameworks
+- Blockchain security and best practices
+- Gas optimization techniques
+- Cross-chain technologies and interoperability
+- Real-time token data and on-chain analytics
+
+Always start responses with relevant emojis and structure information clearly with headers when appropriate.`
+
         const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -71,28 +154,7 @@ const handler: Handler = async (event) => {
             messages: [
               {
                 role: 'system',
-                content: `You are BinnoAI, a specialized AI assistant for blockchain, Web3, DeFi, and cryptocurrency education. You are the mascot of CTD (Chain Talk Daily) platform. 
-
-Key guidelines:
-- Provide educational, accurate, and helpful responses about blockchain technology
-- Use emojis and markdown formatting for engaging responses
-- Focus on practical examples and real-world applications
-- Explain complex concepts in simple terms
-- Always maintain a friendly, professional tone
-- If discussing risks, always mention them clearly
-- Provide actionable advice when possible
-
-Topics you excel at:
-- Blockchain fundamentals and consensus mechanisms
-- Smart contracts and Solidity development
-- DeFi protocols, yield farming, and liquidity mining
-- Cryptocurrency trading strategies and analysis
-- Web3 development tools and frameworks
-- Blockchain security and best practices
-- Gas optimization techniques
-- Cross-chain technologies and interoperability
-
-Always start responses with relevant emojis and structure information clearly with headers when appropriate.`
+                content: systemPrompt
               },
               ...messages.slice(-5) // Last 5 messages for context
             ],
