@@ -1,4 +1,5 @@
 import Head from 'next/head'
+import Header from '@/components/Header'
 
 export default function Questionnaire() {
   return (
@@ -7,6 +8,8 @@ export default function Questionnaire() {
         <title>CTD Skill Compass - Under Construction</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
+
+      <Header />
 
       <style jsx global>{`
         * {
@@ -19,7 +22,8 @@ export default function Questionnaire() {
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
           background: #1a202c;
           min-height: 100vh;
-          overflow: hidden;
+          overflow-x: hidden;
+          overflow-y: auto;
           position: relative;
         }
 
@@ -29,6 +33,7 @@ export default function Questionnaire() {
           justify-content: center;
           align-items: center;
           position: relative;
+          padding-top: 80px;
         }
 
         /* Partículas flutuantes de fundo */
@@ -336,9 +341,9 @@ export default function Questionnaire() {
         .keep-building-image {
           width: 350px;
           height: auto;
-          filter: drop-shadow(0 0 20px rgba(255, 204, 51, 0.8))
-                  drop-shadow(0 0 40px rgba(255, 204, 51, 0.6))
-                  drop-shadow(0 0 60px rgba(255, 204, 51, 0.4));
+          filter: drop-shadow(0 0 3px rgba(255, 204, 51, 0.8))
+                  drop-shadow(0 0 6px rgba(255, 204, 51, 0.6))
+                  drop-shadow(0 0 10px rgba(255, 204, 51, 0.4));
           transition: filter 0.3s ease;
         }
 
