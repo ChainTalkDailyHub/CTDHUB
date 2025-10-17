@@ -181,6 +181,13 @@ export function formatTokenDataForAI(tokenData: TokenData): string {
   const priceChange = parseFloat(tokenData.price_change_24h)
   const priceEmoji = priceChange > 0 ? '📈' : priceChange < 0 ? '📉' : '➡️'
   
+  const formatPrice = (priceStr: string) => {
+    const price = parseFloat(priceStr)
+    if (isNaN(price)) return priceStr
+    // Always show 8 decimal places for prices (most tokens cost < $1)
+    return `$${price.toFixed(8)}`
+  }
+  
   const formatNumber = (num: string) => {
     const n = parseFloat(num)
     if (isNaN(n)) return num
@@ -193,7 +200,7 @@ export function formatTokenDataForAI(tokenData: TokenData): string {
   let response = `🪙 **${tokenData.name} (${tokenData.symbol})**\n\n`
   response += `**Network:** ${tokenData.network}\n`
   response += `**Contract:** \`${tokenData.address}\`\n\n`
-  response += `**Price:** ${formatNumber(tokenData.price_usd)}\n`
+  response += `**Price:** ${formatPrice(tokenData.price_usd)}\n`
   response += `**24h Change:** ${priceEmoji} ${priceChange.toFixed(2)}%\n`
   response += `**24h Volume:** ${formatNumber(tokenData.volume_24h)}\n`
   

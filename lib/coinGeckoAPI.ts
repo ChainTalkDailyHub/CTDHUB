@@ -8,7 +8,9 @@ interface CoinGeckoTokenData {
   id: string
   symbol: string
   name: string
-  description: string
+  description: {
+    en: string
+  }
   market_data: {
     current_price: { usd: number }
     market_cap: { usd: number }
@@ -212,6 +214,12 @@ export async function getTokenByNameOrSymbol(query: string): Promise<SimplifiedT
  * Format token data for AI response
  */
 export function formatCoinGeckoDataForAI(tokenData: SimplifiedTokenData): string {
+  const formatPrice = (price: number) => {
+    if (isNaN(price)) return 'N/A'
+    // Always show 8 decimal places for prices (most tokens cost < $1)
+    return `$${price.toFixed(8)}`
+  }
+  
   const formatNumber = (num: number) => {
     if (isNaN(num)) return 'N/A'
     if (num >= 1e9) return `$${(num / 1e9).toFixed(2)}B`
@@ -241,7 +249,7 @@ export function formatCoinGeckoDataForAI(tokenData: SimplifiedTokenData): string
   
   // Market Data
   response += `**💰 Market Data:**\n`
-  response += `- **Current Price:** ${formatNumber(tokenData.price_usd)}\n`
+  response += `- **Current Price:** ${formatPrice(tokenData.price_usd)}\n`
   response += `- **Market Cap:** ${formatNumber(tokenData.market_cap_usd)}\n`
   response += `- **24h Volume:** ${formatNumber(tokenData.volume_24h_usd)}\n`
   response += `- **24h Change:** ${emoji24h} ${priceChange24h.toFixed(2)}%\n`
