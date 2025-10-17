@@ -274,6 +274,16 @@ export default function Home() {
                 <span>BNB Smart Chain</span>
               </a>
               <span className="text-gray-600 dark:text-gray-400 font-medium">· Part of the Web3 ecosystem</span>
+              <span className="text-gray-600 dark:text-gray-400 font-medium">·</span>
+              <a 
+                href="https://dappbay.bnbchain.org/detail/chain-talk-daily-hub" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold rounded-lg transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg"
+              >
+                <span>🚀</span>
+                <span>View on DappBay</span>
+              </a>
             </div>
           </div>
         </section>
