@@ -6,6 +6,11 @@ import {
   detectTokenQuery,
   isTrendingQuery 
 } from '../../lib/geckoTerminalAPI'
+import {
+  getTokenByNameOrSymbol,
+  formatCoinGeckoDataForAI,
+  getTrendingCoins
+} from '../../lib/coinGeckoAPI'
 
 interface ChatMessage {
   role: 'user' | 'assistant'
@@ -65,10 +70,29 @@ const handler: Handler = async (event) => {
     const tokenQuery = detectTokenQuery(lastMessage.content)
     if (tokenQuery) {
       console.log(`🔍 Token query detected: ${tokenQuery}`)
-      const tokenData = await searchToken(tokenQuery)
       
-      if (tokenData) {
-        const formattedResponse = formatTokenDataForAI(tokenData)
+      // Try CoinGecko first (more comprehensive data with description)
+      console.log('📊 Trying CoinGecko API first...')
+      const coinGeckoData = await getTokenByNameOrSymbol(tokenQuery)
+      
+      if (coinGeckoData) {
+        console.log(`✅ Found on CoinGecko: ${coinGeckoData.name}`)
+        const formattedResponse = formatCoinGeckoDataForAI(coinGeckoData)
+        
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({ message: formattedResponse }),
+        }
+      }
+      
+      // Fallback to GeckoTerminal (DEX data)
+      console.log('🔄 Trying GeckoTerminal API (DEX data)...')
+      const geckoTerminalData = await searchToken(tokenQuery)
+      
+      if (geckoTerminalData) {
+        console.log(`✅ Found on GeckoTerminal: ${geckoTerminalData.name}`)
+        const formattedResponse = formatTokenDataForAI(geckoTerminalData)
         const aiResponse = `${formattedResponse}\n\n💡 **Quick Insights:**\n- This is real-time on-chain data from GeckoTerminal\n- Always verify contract addresses before interacting\n- DYOR (Do Your Own Research) before investing`
         
         return {
@@ -76,25 +100,49 @@ const handler: Handler = async (event) => {
           headers,
           body: JSON.stringify({ message: aiResponse }),
         }
-      } else {
-        const notFoundResponse = `🔍 I couldn't find a token called **${tokenQuery}** on major networks (BSC, ETH, Polygon, Arbitrum, Avalanche, Base).\n\n**Possible reasons:**\n- Token might not be listed on DEXs yet\n- Name/symbol might be different\n- Token might be on a different network\n\n💡 **Try:**\n- Providing the full token name\n- Checking the contract address on BscScan/Etherscan\n- Asking about popular tokens like BNB, ETH, USDT`
-        
-        return {
-          statusCode: 200,
-          headers,
-          body: JSON.stringify({ message: notFoundResponse }),
-        }
+      }
+      
+      // Token not found anywhere
+      const notFoundResponse = `🔍 I couldn't find a token called **${tokenQuery}** on CoinGecko or major DEXs.\n\n**Possible reasons:**\n- Token might not be listed yet\n- Name/symbol might be different\n- Token might be too new or small\n\n💡 **Try:**\n- Providing the full token name\n- Checking the contract address on BscScan/Etherscan\n- Asking about popular tokens like BNB, ETH, USDT, BTC`
+      
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ message: notFoundResponse }),
       }
     }
 
     // Check for trending tokens query
     if (isTrendingQuery(lastMessage.content)) {
       console.log('📈 Trending tokens query detected')
-      const trendingTokens = await getTrendingTokens('bsc', 5)
       
-      if (trendingTokens.length > 0) {
+      // Try CoinGecko trending first (global trending)
+      const coinGeckoTrending = await getTrendingCoins()
+      
+      if (coinGeckoTrending.length > 0) {
+        let trendingResponse = `🔥 **Top 5 Trending Coins Globally**\n\n`
+        coinGeckoTrending.forEach((token, index) => {
+          const priceChange = token.price_change_24h
+          const emoji = priceChange > 0 ? '🟢' : priceChange < 0 ? '🔴' : '⚪'
+          trendingResponse += `${index + 1}. ${emoji} **${token.name} (${token.symbol})**\n`
+          trendingResponse += `   💰 $${token.price_usd.toFixed(6)} | 📊 ${priceChange.toFixed(2)}% (24h)\n`
+          trendingResponse += `   📈 Market Cap: $${(token.market_cap_usd / 1e9).toFixed(2)}B\n\n`
+        })
+        trendingResponse += `💡 **Data from CoinGecko** - Global trending cryptocurrencies`
+        
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({ message: trendingResponse }),
+        }
+      }
+      
+      // Fallback to GeckoTerminal (BSC DEX trending)
+      const bscTrending = await getTrendingTokens('bsc', 5)
+      
+      if (bscTrending.length > 0) {
         let trendingResponse = `📈 **Top 5 Trending Tokens on BSC**\n\n`
-        trendingTokens.forEach((token, index) => {
+        bscTrending.forEach((token, index) => {
           const priceChange = parseFloat(token.price_change_24h)
           const emoji = priceChange > 0 ? '🟢' : priceChange < 0 ? '🔴' : '⚪'
           trendingResponse += `${index + 1}. ${emoji} **${token.name} (${token.symbol})**\n`
