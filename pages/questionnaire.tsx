@@ -315,6 +315,65 @@ export default function Questionnaire() {
           animation-delay: 11s;
         }
 
+        /* Keep Building Character */
+        .keep-building-container {
+          position: fixed;
+          bottom: 0;
+          right: 40px;
+          z-index: 100;
+          animation: floatCharacter 4s ease-in-out infinite;
+        }
+
+        @keyframes floatCharacter {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-20px);
+          }
+        }
+
+        .keep-building-image {
+          width: 350px;
+          height: auto;
+          filter: drop-shadow(0 0 40px rgba(255, 204, 51, 0.8))
+                  drop-shadow(0 0 80px rgba(255, 204, 51, 0.5))
+                  drop-shadow(0 0 120px rgba(255, 204, 51, 0.3));
+          transition: filter 0.3s ease;
+        }
+
+        .keep-building-image:hover {
+          filter: drop-shadow(0 0 50px rgba(255, 204, 51, 1))
+                  drop-shadow(0 0 100px rgba(255, 204, 51, 0.7))
+                  drop-shadow(0 0 150px rgba(255, 204, 51, 0.5));
+        }
+
+        /* Neon glow background effect */
+        .neon-glow {
+          position: absolute;
+          width: 400px;
+          height: 400px;
+          background: radial-gradient(circle, rgba(255, 204, 51, 0.3) 0%, rgba(255, 204, 51, 0.1) 40%, transparent 70%);
+          border-radius: 50%;
+          filter: blur(40px);
+          animation: pulseNeon 3s ease-in-out infinite;
+          z-index: -1;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
+
+        @keyframes pulseNeon {
+          0%, 100% {
+            opacity: 0.6;
+            transform: translate(-50%, -50%) scale(1);
+          }
+          50% {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.1);
+          }
+        }
+
         /* Responsividade */
         @media (max-width: 768px) {
           .title {
@@ -335,6 +394,20 @@ export default function Questionnaire() {
           
           .tool-icon {
             font-size: 2.5rem;
+          }
+
+          .keep-building-container {
+            right: 10px;
+            bottom: 0;
+          }
+
+          .keep-building-image {
+            width: 220px;
+          }
+
+          .neon-glow {
+            width: 250px;
+            height: 250px;
           }
         }
       `}</style>
@@ -381,6 +454,16 @@ export default function Questionnaire() {
             We're working hard to bring you something amazing!<br />
             Soon you'll be able to explore and develop your skills.
           </p>
+        </div>
+
+        {/* Keep Building Character com efeito Neon */}
+        <div className="keep-building-container">
+          <div className="neon-glow"></div>
+          <img 
+            src="/images/keepbuilding.png" 
+            alt="Keep Building" 
+            className="keep-building-image"
+          />
         </div>
       </div>
 
