@@ -336,41 +336,51 @@ export default function Questionnaire() {
         .keep-building-image {
           width: 350px;
           height: auto;
-          filter: drop-shadow(0 0 40px rgba(255, 204, 51, 0.8))
-                  drop-shadow(0 0 80px rgba(255, 204, 51, 0.5))
-                  drop-shadow(0 0 120px rgba(255, 204, 51, 0.3));
+          filter: drop-shadow(0 0 2px rgba(255, 204, 51, 1))
+                  drop-shadow(0 0 4px rgba(255, 204, 51, 0.8))
+                  drop-shadow(0 0 6px rgba(255, 204, 51, 0.6));
           transition: filter 0.3s ease;
         }
 
         .keep-building-image:hover {
-          filter: drop-shadow(0 0 50px rgba(255, 204, 51, 1))
-                  drop-shadow(0 0 100px rgba(255, 204, 51, 0.7))
-                  drop-shadow(0 0 150px rgba(255, 204, 51, 0.5));
+          filter: drop-shadow(0 0 3px rgba(255, 204, 51, 1))
+                  drop-shadow(0 0 6px rgba(255, 204, 51, 0.9))
+                  drop-shadow(0 0 10px rgba(255, 204, 51, 0.7));
         }
 
-        /* Neon glow background effect */
+        /* Neon glow background effect - contorno fino */
         .neon-glow {
           position: absolute;
-          width: 400px;
-          height: 400px;
-          background: radial-gradient(circle, rgba(255, 204, 51, 0.3) 0%, rgba(255, 204, 51, 0.1) 40%, transparent 70%);
-          border-radius: 50%;
-          filter: blur(40px);
-          animation: pulseNeon 3s ease-in-out infinite;
+          width: 100%;
+          height: 100%;
+          border: 2px solid rgba(255, 204, 51, 0.6);
+          border-radius: 20px;
+          box-shadow: 
+            0 0 5px rgba(255, 204, 51, 0.8),
+            0 0 10px rgba(255, 204, 51, 0.6),
+            0 0 15px rgba(255, 204, 51, 0.4),
+            inset 0 0 5px rgba(255, 204, 51, 0.3);
+          animation: pulseNeonOutline 3s ease-in-out infinite;
           z-index: -1;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
+          pointer-events: none;
         }
 
-        @keyframes pulseNeon {
+        @keyframes pulseNeonOutline {
           0%, 100% {
-            opacity: 0.6;
-            transform: translate(-50%, -50%) scale(1);
+            opacity: 0.7;
+            box-shadow: 
+              0 0 5px rgba(255, 204, 51, 0.8),
+              0 0 10px rgba(255, 204, 51, 0.6),
+              0 0 15px rgba(255, 204, 51, 0.4),
+              inset 0 0 5px rgba(255, 204, 51, 0.3);
           }
           50% {
             opacity: 1;
-            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 
+              0 0 8px rgba(255, 204, 51, 1),
+              0 0 15px rgba(255, 204, 51, 0.8),
+              0 0 20px rgba(255, 204, 51, 0.6),
+              inset 0 0 8px rgba(255, 204, 51, 0.5);
           }
         }
 
@@ -406,8 +416,7 @@ export default function Questionnaire() {
           }
 
           .neon-glow {
-            width: 250px;
-            height: 250px;
+            border-width: 1.5px;
           }
         }
       `}</style>
