@@ -336,45 +336,16 @@ export default function Questionnaire() {
         .keep-building-image {
           width: 350px;
           height: auto;
-          filter: drop-shadow(0 0 2px rgba(255, 204, 51, 1))
-                  drop-shadow(0 0 4px rgba(255, 204, 51, 0.8))
-                  drop-shadow(0 0 6px rgba(255, 204, 51, 0.6));
+          filter: drop-shadow(0 0 20px rgba(255, 204, 51, 0.8))
+                  drop-shadow(0 0 40px rgba(255, 204, 51, 0.6))
+                  drop-shadow(0 0 60px rgba(255, 204, 51, 0.4));
           transition: filter 0.3s ease;
         }
 
         .keep-building-image:hover {
-          filter: drop-shadow(0 0 3px rgba(255, 204, 51, 1))
-                  drop-shadow(0 0 6px rgba(255, 204, 51, 0.9))
-                  drop-shadow(0 0 10px rgba(255, 204, 51, 0.7));
-        }
-
-        /* Neon glow background effect - apenas contorno (sem quadrado) */
-        .neon-glow {
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          border-radius: 50%;
-          background: transparent;
-          animation: pulseNeonOutline 3s ease-in-out infinite;
-          z-index: -1;
-          pointer-events: none;
-        }
-
-        @keyframes pulseNeonOutline {
-          0%, 100% {
-            opacity: 0.7;
-            box-shadow: 
-              0 0 20px rgba(255, 204, 51, 0.6),
-              0 0 40px rgba(255, 204, 51, 0.4),
-              0 0 60px rgba(255, 204, 51, 0.2);
-          }
-          50% {
-            opacity: 1;
-            box-shadow: 
-              0 0 30px rgba(255, 204, 51, 0.8),
-              0 0 60px rgba(255, 204, 51, 0.6),
-              0 0 90px rgba(255, 204, 51, 0.4);
-          }
+          filter: drop-shadow(0 0 30px rgba(255, 204, 51, 1))
+                  drop-shadow(0 0 60px rgba(255, 204, 51, 0.8))
+                  drop-shadow(0 0 90px rgba(255, 204, 51, 0.6));
         }
 
         /* Responsividade */
@@ -407,12 +378,6 @@ export default function Questionnaire() {
           .keep-building-image {
             width: 220px;
           }
-
-          .neon-glow {
-            box-shadow: 
-              0 0 15px rgba(255, 204, 51, 0.6),
-              0 0 30px rgba(255, 204, 51, 0.4);
-          }
         }
       `}</style>
 
@@ -426,14 +391,14 @@ export default function Questionnaire() {
           <div className="tool-icon">⚙️</div>
           <div className="tool-icon">🛠️</div>
           <div className="tool-icon">⚡</div>
-          <div className="tool-icon">💡</div>
+          <div className="tool-icon">🔥</div>
           <div className="tool-icon">🚀</div>
           <div className="tool-icon">🔨</div>
           <div className="tool-icon">🎨</div>
-          <div className="tool-icon">📊</div>
+          <div className="tool-icon">🔥</div>
           <div className="tool-icon">🔥</div>
           <div className="tool-icon">💻</div>
-          <div className="tool-icon">⭐</div>
+          <div className="tool-icon">🔥</div>
         </div>
 
         {/* Conteúdo principal */}
@@ -462,7 +427,6 @@ export default function Questionnaire() {
 
         {/* Keep Building Character com efeito Neon */}
         <div className="keep-building-container">
-          <div className="neon-glow"></div>
           <img 
             src="/images/keepbuilding.png" 
             alt="Keep Building" 
