@@ -31,6 +31,7 @@ export default function BurnBadgeNew() {
   const [eligibilityReason, setEligibilityReason] = useState('')
   const [userAddress, setUserAddress] = useState<string>('')
   const [burnResult, setBurnResult] = useState<BurnResult | null>(null)
+  const [previousBurnTxHash, setPreviousBurnTxHash] = useState<string>('')
 
   useEffect(() => {
     setIsClient(true)
@@ -83,6 +84,30 @@ export default function BurnBadgeNew() {
         if (hasCompleted) {
           setIsEligible(false)
           setEligibilityReason('Already completed! You can only burn once.')
+          
+          // Buscar transação de burn no BscScan
+          try {
+            console.log('🔍 Buscando transação de burn no BscScan...')
+            const bscscanUrl = `https://api.bscscan.com/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=desc&apikey=${BSCSCAN_API_KEY}`
+            const response = await fetch(bscscanUrl)
+            const data = await response.json()
+            
+            if (data.status === '1' && data.result.length > 0) {
+              // Procurar pela transação de burn (interação com o contrato CTDQuizBurner)
+              const burnTx = data.result.find((tx: any) => 
+                tx.to.toLowerCase() === BURNER_CONTRACT_ADDRESS.toLowerCase() &&
+                tx.isError === '0'
+              )
+              
+              if (burnTx) {
+                console.log('✅ Transação de burn encontrada:', burnTx.hash)
+                setPreviousBurnTxHash(burnTx.hash)
+              }
+            }
+          } catch (error) {
+            console.error('⚠️ Erro ao buscar transação no BscScan:', error)
+          }
+          
           setCheckingEligibility(false)
           return
         }
@@ -256,12 +281,12 @@ export default function BurnBadgeNew() {
         <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-4">
           <p className="text-blue-400 font-medium mb-3">🔍 Check Your Quiz Status</p>
           <p className="text-blue-300/70 text-sm mb-4">{eligibilityReason}</p>
-          {burnResult?.txHash && (
+          {(burnResult?.txHash || previousBurnTxHash) && (
             <a
-              href={`https://bscscan.com/tx/${burnResult.txHash}`}
+              href={`https://bscscan.com/tx/${burnResult?.txHash || previousBurnTxHash}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-500 hover:to-emerald-500 transition-all shadow-lg"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-500 hover:to-emerald-500 transition-all shadow-lg font-medium"
             >
               🔥 View Burn Transaction on BscScan →
             </a>
