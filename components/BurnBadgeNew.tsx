@@ -92,17 +92,29 @@ export default function BurnBadgeNew() {
             const response = await fetch(bscscanUrl)
             const data = await response.json()
             
-            if (data.status === '1' && data.result.length > 0) {
+            console.log('📡 BscScan response:', data)
+            
+            if (data.status === '1' && data.result && data.result.length > 0) {
               // Procurar pela transação de burn (interação com o contrato CTDQuizBurner)
               const burnTx = data.result.find((tx: any) => 
-                tx.to.toLowerCase() === BURNER_CONTRACT_ADDRESS.toLowerCase() &&
+                tx.to && tx.to.toLowerCase() === BURNER_CONTRACT_ADDRESS.toLowerCase() &&
                 tx.isError === '0'
               )
               
               if (burnTx) {
                 console.log('✅ Transação de burn encontrada:', burnTx.hash)
                 setPreviousBurnTxHash(burnTx.hash)
+                
+                // Também salvar no burnResult para garantir exibição
+                setBurnResult({
+                  success: true,
+                  txHash: burnTx.hash
+                })
+              } else {
+                console.log('⚠️ Transação de burn não encontrada nas primeiras transações')
               }
+            } else {
+              console.log('⚠️ Nenhuma transação encontrada ou erro na API')
             }
           } catch (error) {
             console.error('⚠️ Erro ao buscar transação no BscScan:', error)
